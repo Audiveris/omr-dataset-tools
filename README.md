@@ -11,7 +11,7 @@ Inspired by the famous example of [MNIST][1] public database (60000 labelled ima
 
 ## Organization
 
-Ultimately, once data structuring and content is sufficiently validated, we think this reference should preferably be hosted by the International Music Score Library Project ([IMSLP][2]). 
+Ultimately, once data structuring and content are sufficiently validated, we think this reference should preferably be hosted by the International Music Score Library Project ([IMSLP][2]). 
 
 Meanwhile, the purpose of this `omr-dataset` Github repository is to gather the material used to build preliminary versions of the target reference.
 
