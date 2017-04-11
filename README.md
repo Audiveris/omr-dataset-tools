@@ -6,7 +6,7 @@ Inspired by the famous example of [MNIST][1] public database (60000 labelled ima
 
 ## Purpose
 
-+ OMR samples for the training and testing of a symbol classifier
++ OMR samples for the training and testing of symbol classifiers
 + Ground-truth material for the evaluation or comparison of OMR engines
 
 ## Organization
