@@ -2,7 +2,7 @@
 
 ## Vision
 
-Inspired by the famous example of [MNIST][1] public database (60000 labelled images of hand-written digits), we acknowledge the need of a well-known and representative data set to help the development of applications in the specific domain of Optical Music Recognition.
+Inspired by the famous example of [MNIST][1] public database (60000 labelled images of hand-written digits), we acknowledge the need for a well-known and representative data set to help the development of applications in the specific domain of Optical Music Recognition.
 
 ## Purpose
 
