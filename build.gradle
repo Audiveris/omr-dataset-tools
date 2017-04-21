@@ -1,0 +1,68 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = '1.8'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+ext.targetOSName   = System.getProperty('os.name').toLowerCase()\
+                     .startsWith('mac os x') ? 'macosx' :\
+                     System.getProperty('os.name').split(' ')[0].toLowerCase()
+ext.targetOSArch   = ["i386":"x86", "i486":"x86", "i586":"x86", "i686":"x86",
+                      "amd64":"x86_64", "x86-64":"x86_64", "x86_64":"x86_64"]\
+                     [System.getProperty('os.arch').toLowerCase()]
+ext.targetOS       = "${project.ext.targetOSName}-${project.ext.targetOSArch}"  
+println "targetOS=${project.ext.targetOS}"
+
+ext.dl4jVersion = '0.7.2'
+ext.nd4jVersion = '0.7.2'
+
+// Ability to set a different main class
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'org.omrdataset.Main'
+}
+mainClassName = ext.mainClass
+
+// Useful for turning on deprecation warnings
+// Just uncomment the appropriate option
+allprojects {
+    tasks.withType(JavaCompile) {
+        //options.compilerArgs << "-Xlint:deprecation"
+        //options.compilerArgs << "-Xlint:unchecked"
+    }
+}
+
+run {
+    minHeapSize = '512m'
+    maxHeapSize = '1g'
+    
+    // Retrieve CLI arguments from exec.args property if any
+    if (hasProperty("exec.args")) {
+        args System.getProperty("exec.args").split()
+    }
+}
+
+repositories {
+    mavenCentral()
+    // You may define additional repositories, or even remove "mavenCentral()".
+    // Read more about repositories here:
+    //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:repositories
+}
+
+dependencies {
+    compile(
+        [group: 'args4j', name: 'args4j', version: '2.33'],
+        [group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'],
+        [group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'],
+        [group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: "${project.ext.dl4jVersion}"],
+        [group: 'org.deeplearning4j', name: 'deeplearning4j-ui_2.10', version: "${project.ext.dl4jVersion}"],
+        [group: 'org.nd4j', name: 'nd4j-native', version: "${project.ext.nd4jVersion}"]
+    )
+    
+    runtime(
+        [group: 'org.nd4j', name: 'nd4j-native', version: "${project.ext.nd4jVersion}", classifier: "${project.ext.targetOS}"]
+    ) 
+    
+    testCompile(
+        [ group: 'junit', name: 'junit', version: '4.10']
+    )    
+}
