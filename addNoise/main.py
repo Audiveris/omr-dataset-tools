@@ -16,8 +16,8 @@ output:
         newxmlFile (containing changed coordinates of musical symbols)
 
 usage:
-        python addNoise.py path/imageFile.png path/XMLFile.xml
-        python addNoise.py path/imageFile.png (If both the filenames are the same and are located in the same folder)
+        python main.py path/imageFile.png path/XMLFile.xml
+        python main.py path/imageFile.png (If both the filenames are the same and are located in the same folder)
 """
 
 import numpy as np
