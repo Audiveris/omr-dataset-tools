@@ -29,7 +29,7 @@ For example `python main.py path/imageFile.png path/XMLFile.xml`
 If both image file and the xml file have the same basename and are in the same directory, then you only need to specify the image file, i.e. `python main.py path/imageFile.png`.
 
 ### Note
-- Most of the parameters are hard coded for the purpose of hackday.
+- Most of the parameters are hard coded for the purpose of Hackday (Will be changed soon).
 - Some of the distortion functions are not yet complete.
 - More meaningful noise functions will be added.
 - Features to combine different distortions are not yet implemented.
