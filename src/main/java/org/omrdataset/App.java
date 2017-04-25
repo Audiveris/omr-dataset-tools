@@ -39,6 +39,18 @@ public abstract class App
     /** Path to input images. */
     public static final Path IMAGES_PATH = DATA_PATH.resolve("input-images");
 
+    /** Path to CNN model. */
+    public static final Path MODEL_PATH = DATA_PATH.resolve("cnn_model.zip");
+
+    /** File name for pixels norms. */
+    public static final String PIXELS_NORMS = "pixels.norms";
+
+    /** File name for symbol widths norms. */
+    public static final String WIDTHS_NORMS = "widths.norms";
+
+    /** File name for symbol heights norms. */
+    public static final String HEIGHTS_NORMS = "heights.norms";
+
     /** Path to created sub-images. */
     public static final Path SUBIMAGES_PATH = DATA_PATH.resolve("subimages");
 
@@ -59,4 +71,10 @@ public abstract class App
 
     /** Width in pixels for symbol context. */
     public static final int CONTEXT_WIDTH = 48;
+
+    /** Value used for background pixel feature. */
+    public static final int BACKGROUND = 0;
+
+    /** Value used for foreground pixel feature. */
+    public static final int FOREGROUND = 255;
 }

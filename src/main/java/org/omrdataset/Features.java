@@ -21,8 +21,12 @@
 // </editor-fold>
 package org.omrdataset;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import static org.omrdataset.App.*;
 import org.omrdataset.util.FileUtil;
+import org.omrdataset.util.Norms;
+import org.omrdataset.util.Population;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +46,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
@@ -51,6 +58,12 @@ import javax.imageio.ImageIO;
  * <p>
  * In the CSV file, there must be one record per symbol, containing the pixels of the sub-image
  * centered on the symbol center, followed by the (index of) symbol name.
+ * <p>
+ * Beside CSV training file, we need to retrieve Norm (mean + stdDev) for: <ul>
+ * <li>all pixel values whatever the shape
+ * <li>symbol width per shape
+ * <li>symbol height per shape
+ * </ul>
  *
  * @author Hervé Bitteur
  */
@@ -76,50 +89,61 @@ public class Features
             final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             final PrintWriter out = new PrintWriter(bw);
 
-            Files.walkFileTree(IMAGES_PATH,
-                               new SimpleFileVisitor<Path>()
-                       {
-                           @Override
-                           public FileVisitResult visitFile (Path path,
-                                                             BasicFileAttributes attrs)
-                                   throws IOException
-                           {
-                               final String fileName = path.getFileName().toString();
+            Population pixelPop = new Population(); // For pixels
+            Map<OmrShape, Population> widthPops = buildPopulationMap(); // For symbols widths
+            Map<OmrShape, Population> heightPops = buildPopulationMap(); // For symbols heights
 
-                               if (fileName.endsWith(IMAGE_EXT)) {
-                                   BufferedImage img = ImageIO.read(path.toFile());
-                                   logger.info("\n*** We got image {}", path);
+            Files.walkFileTree(
+                    IMAGES_PATH,
+                    new SimpleFileVisitor<Path>()
+            {
+                @Override
+                public FileVisitResult visitFile (Path path,
+                                                  BasicFileAttributes attrs)
+                        throws IOException
+                {
+                    final String fileName = path.getFileName().toString();
 
-                                   WritableRaster raster = img.getRaster();
+                    if (fileName.endsWith(IMAGE_EXT)) {
+                        BufferedImage img = ImageIO.read(path.toFile());
+                        logger.info("Image {}", path.toAbsolutePath());
 
-                                   byte[] bytes = getBytes(img);
+                        WritableRaster raster = img.getRaster();
 
-                                   // Make sure we have the xml counterpart
-                                   // And unmarshal the xml information
-                                   String radix = FileUtil.getNameSansExtension(path);
-                                   String infoName = radix + App.INFO_EXT;
-                                   Path infoPath = path.resolveSibling(infoName);
-                                   PageAnnotations pageInfo = PageAnnotations.unmarshal(infoPath);
-                                   logger.info("We got info {}", pageInfo);
+                        byte[] bytes = getBytes(img);
 
-                                   PageProcessor processor = new PageProcessor(
-                                           raster.getWidth(),
-                                           raster.getHeight(),
-                                           bytes,
-                                           pageInfo);
+                        // Make sure we have the xml counterpart
+                        // And unmarshal the xml information
+                        String radix = FileUtil.getNameSansExtension(path);
+                        String infoName = radix + App.INFO_EXT;
+                        Path infoPath = path.resolveSibling(infoName);
+                        PageAnnotations pageInfo = PageAnnotations.unmarshal(infoPath);
+                        logger.info("{}", pageInfo);
 
-                                   try {
-                                       processor.process(out);
-                                   } catch (Exception ex) {
-                                       logger.warn("Exception " + ex, ex);
-                                   }
-                               }
+                        PageProcessor processor = new PageProcessor(
+                                raster.getWidth(),
+                                raster.getHeight(),
+                                bytes,
+                                pageInfo,
+                                pixelPop);
 
-                               return FileVisitResult.CONTINUE;
-                           }
-                       });
+                        try {
+                            processor.extractFeatures(out, widthPops, heightPops);
+                        } catch (Exception ex) {
+                            logger.warn("Exception " + ex, ex);
+                        }
+                    }
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
             out.flush();
             out.close();
+
+            // Store norms
+            storePixelNorms(pixelPop);
+            storeShapeNorms(widthPops, WIDTHS_NORMS);
+            storeShapeNorms(heightPops, HEIGHTS_NORMS);
         } catch (Throwable ex) {
             logger.warn("Error loading data from " + IMAGES_PATH + " " + ex, ex);
         }
@@ -138,17 +162,16 @@ public class Features
     }
 
     /**
-     * Extract the bytes array of the provided BufferedImage.
+     * Extract (and invert) the bytes array of the provided BufferedImage.
      *
-     * @param bi the provided image
+     * @param bi the provided buffered image
      * @return the bytes array
      */
     private byte[] getBytes (BufferedImage bi)
     {
-        logger.info("type={}", bi.getType());
-
         if (bi.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-            throw new IllegalArgumentException("Type!=TYPE_BYTE_GRAY");
+            logger.warn("Wrong image type={}", bi.getType());
+            throw new IllegalArgumentException("Image type != TYPE_BYTE_GRAY");
         }
 
         WritableRaster raster = bi.getRaster();
@@ -156,15 +179,73 @@ public class Features
         DataBufferByte byteBuffer = (DataBufferByte) buffer;
         byte[] bytes = byteBuffer.getData();
 
-        //        int width = raster.getWidth();
-        //        int height = raster.getHeight();
-        // Invert bytes, so that 0=background and 255=foreground
+        // Invert bytes, so that black=0=background and white=255=foreground
         for (int i = bytes.length - 1; i >= 0; i--) {
             int val = bytes[i] & 0xFF;
-            val = 255 - val;
+            val = FOREGROUND - val;
             bytes[i] = (byte) val;
         }
 
         return bytes;
+    }
+
+    /**
+     * Allocate the map of shape populations.
+     *
+     * @return the map of populations
+     */
+    private Map<OmrShape, Population> buildPopulationMap ()
+    {
+        Map<OmrShape, Population> map = new EnumMap<OmrShape, Population>(OmrShape.class);
+
+        for (OmrShape shape : OmrShape.values()) {
+            map.put(shape, new Population());
+        }
+
+        return map;
+    }
+
+    /**
+     * Store the norms for all pixels.
+     *
+     * @param pixelPop population of pixels values
+     * @throws IOException
+     */
+    private void storePixelNorms (Population pixelPop)
+            throws IOException
+    {
+        INDArray pixels = Nd4j.create(
+                new double[]{
+                    pixelPop.getMeanValue(), pixelPop.getStandardDeviation() + Nd4j.EPS_THRESHOLD
+                });
+        logger.info("Pixels pop: {}", pixelPop);
+        new Norms(pixels).store(DATA_PATH, PIXELS_NORMS);
+    }
+
+    /**
+     * Store the norms for symbols widths or heights.
+     *
+     * @param popMap   population of symbols sizes (widths or heights)
+     * @param fileName target file name
+     * @throws IOException
+     */
+    private void storeShapeNorms (Map<OmrShape, Population> popMap,
+                                  String fileName)
+            throws IOException
+    {
+        final int shapeCount = OmrShape.values().length;
+        final INDArray vars = Nd4j.zeros(shapeCount, 2);
+
+        for (Entry<OmrShape, Population> entry : popMap.entrySet()) {
+            final int row = entry.getKey().ordinal();
+            final Population pop = entry.getValue();
+            final double mean = (pop.getCardinality() > 0) ? pop.getMeanValue() : 0;
+            final double std = (pop.getCardinality() > 0) ? pop.getStandardDeviation() : 0;
+            vars.putScalar(new int[]{row, 0}, mean);
+            vars.putScalar(new int[]{row, 1}, std + Nd4j.EPS_THRESHOLD);
+        }
+
+        logger.debug("{} pop: {}", fileName, vars);
+        new Norms(vars).store(DATA_PATH, fileName);
     }
 }

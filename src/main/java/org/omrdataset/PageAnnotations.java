@@ -101,7 +101,7 @@ public class PageAnnotations
             InputStream is = Files.newInputStream(path, StandardOpenOption.READ);
             Unmarshaller um = getJaxbContext().createUnmarshaller();
             PageAnnotations pageInfo = (PageAnnotations) um.unmarshal(is);
-            logger.info("Unmarshalled {}", pageInfo);
+            logger.debug("Unmarshalled {}", pageInfo);
             is.close();
 
             return pageInfo;

@@ -50,21 +50,14 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import static org.omrdataset.App.CONTEXT_HEIGHT;
-import static org.omrdataset.App.CONTEXT_WIDTH;
-import static org.omrdataset.App.CSV_PATH;
+import static org.omrdataset.App.*;
+import org.omrdataset.util.Norms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.nio.file.Files;
 
 /**
  * Class {@code Training} performs the training of the classifier neural network based
@@ -80,8 +73,6 @@ public class Training
 
     private static final int numClasses = OmrShape.values().length;
 
-    private static final File modelFile = new File("data/cnn-model.zip");
-
     //~ Methods ------------------------------------------------------------------------------------
     public void process ()
             throws Exception
@@ -92,9 +83,8 @@ public class Training
         int iterations = 10; // Number of training iterations
         int seed = 123; //
 
-        logger.info("Getting norms...");
-
-        final Norms norms = null; ///loadNorms();
+        // Pixel norms
+        final Norms pixelNorms = Norms.load(DATA_PATH, PIXELS_NORMS);
 
         // Get the dataset using the record reader. CSVRecordReader handles loading/parsing
         logger.info("Getting dataset...");
@@ -114,9 +104,7 @@ public class Training
                 -1);
 
         RecordReader testRecordReader = new CSVRecordReader(numLinesToSkip, delimiter);
-        testRecordReader.initialize(
-                ///new FileSplit(new File("../audiveris-ng/data/train/test.48x24.csv")));
-                new FileSplit(CSV_PATH.toFile()));
+        testRecordReader.initialize(new FileSplit(CSV_PATH.toFile()));
 
         DataSetIterator testIter = new RecordReaderDataSetIterator(
                 testRecordReader,
@@ -124,50 +112,45 @@ public class Training
                 labelIndex,
                 numClasses,
                 -1);
-        DataSetPreProcessor preProcessor = new MyPreProcessor(norms);
+        DataSetPreProcessor preProcessor = new MyPreProcessor(pixelNorms);
         trainIter.setPreProcessor(preProcessor);
         testIter.setPreProcessor(preProcessor);
 
-        //        if (true) {
-        //            printClasses(trainIter, "train");
-        //            printClasses(testIter, "test");
         //
-        //            ///System.exit(0);
+        //        if (false) {
+        //            // Debugging
+        //            DataSet ds = trainIter.next();
+        //            logger.info("ds:\n{}", ds);
+        //            logger.info("numExamples:{}", ds.numExamples());
+        //
+        //            INDArray labels = ds.getLabels();
+        //            logger.info("labels rows:{} cols:{}", labels.rows(), labels.columns());
+        //            logger.info("labels:\n{}", labels);
+        //
+        //            INDArray features = ds.getFeatures();
+        //            int rows = features.rows();
+        //            int cols = features.columns();
+        //            logger.info("features rows:{} cols:{}", rows, cols);
+        //            logger.info("features:\n{}", features);
+        //
+        //            INDArray r0 = features.getRow(0);
+        //            logger.info("r0:\n{}", r0);
+        //            logger.info("r0 rows:{} cols:{}", r0.rows(), r0.columns());
+        //
+        //            for (int i = 0; i < r0.columns(); i++) {
+        //                logger.info("i:{} val:{}", i, r0.getColumn(i));
+        //            }
+        //
+        //            trainIter.reset();
         //        }
         //
-        if (true) {
-            // Debugging
-            DataSet ds = trainIter.next();
-            logger.info("ds:\n{}", ds);
-            logger.info("numExamples:{}", ds.numExamples());
-
-            INDArray labels = ds.getLabels();
-            logger.info("labels rows:{} cols:{}", labels.rows(), labels.columns());
-            logger.info("labels:\n{}", labels);
-
-            INDArray features = ds.getFeatures();
-            int rows = features.rows();
-            int cols = features.columns();
-            logger.info("features rows:{} cols:{}", rows, cols);
-            logger.info("features:\n{}", features);
-
-            INDArray r0 = features.getRow(0);
-            logger.info("r0:\n{}", r0);
-            logger.info("r0 rows:{} cols:{}", r0.rows(), r0.columns());
-
-            for (int i = 0; i < r0.columns(); i++) {
-                logger.info("i:{} val:{}", i, r0.getColumn(i));
-            }
-
-            trainIter.reset();
-        }
-
-        ///System.exit(0);
+        //        ///System.exit(0);
+        //
         MultiLayerNetwork model = null;
 
-        if (modelFile.exists()) {
-            model = ModelSerializer.restoreMultiLayerNetwork(modelFile, false);
-            logger.info("Model restored from {}", modelFile.getAbsolutePath());
+        if (Files.exists(MODEL_PATH)) {
+            model = ModelSerializer.restoreMultiLayerNetwork(MODEL_PATH.toFile(), false);
+            logger.info("Model restored from {}", MODEL_PATH.toAbsolutePath());
         } else {
             /*
              * Construct the neural network
@@ -238,15 +221,6 @@ public class Training
             model.init();
         }
 
-        /*
-         * Exception in thread "main" org.deeplearning4j.exception.DL4JInvalidConfigException:
-         * Invalid configuration for layer (idx=4, name=(not named), type=ConvolutionLayer) for
-         * height dimension:
-         * Invalid input configuration for kernel height. Require 0 < kH <= inHeight + 2*padH; got
-         * (kH=5, inHeight=2, padH=0)
-         * Input type = InputTypeConvolutional(h=2,w=9,d=50), kernel = [5, 5], strides = [1, 1],
-         * padding = [0, 0], layer size (output depth) = 100, convolution mode = Truncate
-         */
         // Prepare monitoring
         UIServer uiServer = null;
 
@@ -293,8 +267,8 @@ public class Training
             }
 
             // Save model
-            ModelSerializer.writeModel(model, modelFile, false);
-            logger.info("Model stored as {}", modelFile.getAbsoluteFile());
+            ModelSerializer.writeModel(model, MODEL_PATH.toFile(), false);
+            logger.info("Model stored as {}", MODEL_PATH.toAbsolutePath());
         } finally {
             // Stop monitoring
             if (uiServer != null) {
@@ -305,65 +279,22 @@ public class Training
         logger.info("****************Example finished********************");
     }
 
-    private static int argMax (INDArray row)
+    /**
+     * Direct entry point.
+     *
+     * @param args not used
+     * @throws Exception
+     */
+    public static void main (String[] args)
+            throws Exception
     {
-        final int cols = row.columns();
-        int best = 0;
-
-        for (int i = 1; i < cols; i++) {
-            if (row.getDouble(i) > row.getDouble(best)) {
-                best = i;
-            }
-        }
-
-        return best;
-    }
-
-    private static Norms loadNorms ()
-            throws IOException
-    {
-        File normsFile = new File("../audiveris-ng/data/train/cnn-norms.zip");
-        INDArray means = null;
-        INDArray stds = null;
-        FileInputStream is = new FileInputStream(normsFile);
-
-        try {
-            final ZipInputStream zis = new ZipInputStream(is);
-            ZipEntry entry;
-
-            while ((entry = zis.getNextEntry()) != null) {
-                switch (entry.getName()) {
-                case "means.bin": {
-                    DataInputStream dis = new DataInputStream(zis);
-                    means = Nd4j.read(dis);
-                }
-
-                break;
-
-                case "stds.bin": {
-                    DataInputStream dis = new DataInputStream(zis);
-                    stds = Nd4j.read(dis);
-                }
-
-                break;
-                }
-
-                zis.closeEntry();
-            }
-
-            zis.close();
-
-            if ((means != null) && (stds != null)) {
-                return new Norms(means, stds);
-            } else {
-                return null;
-            }
-        } finally {
-            is.close();
-        }
+        new Training().process();
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
+    /**
+     * Normalize pixel data on the fly.
+     */
     private static class MyPreProcessor
             implements DataSetPreProcessor
     {
@@ -376,11 +307,9 @@ public class Training
         //~ Constructors ---------------------------------------------------------------------------
         public MyPreProcessor (Norms norms)
         {
-            /// mean:226.95 stdDev:69.19
-            // mean:231.53 stdDev:62.85
-            // mean:23.47 stdDev:62.85
-            mean = 23.47; // norms.means.getDouble(0);
-            std = 62.85; // norms.stds.getDouble(0);
+            mean = norms.getMean(0);
+            std = norms.getStd(0);
+            logger.info(String.format("Pixel pre-processor mean:%.2f std:%.2f", mean, std));
         }
 
         //~ Methods --------------------------------------------------------------------------------
@@ -397,65 +326,4 @@ public class Training
             theFeatures.divi(std);
         }
     }
-
-    private static class Norms
-    {
-        //~ Instance fields ------------------------------------------------------------------------
-
-        /** Features means. */
-        final INDArray means;
-
-        /** Features standard deviations. */
-        final INDArray stds;
-
-        //~ Constructors ---------------------------------------------------------------------------
-        public Norms (INDArray means,
-                      INDArray stds)
-        {
-            this.means = means;
-            this.stds = stds;
-        }
-    }
 }
-//
-//    private static void printClasses (DataSetIterator iter,
-//                                      String name)
-//    {
-//        logger.info("");
-//        logger.info("{} classes:", name);
-//
-//        // Map ShapeIndex -> Number of samples for that shape
-//        final Map<Integer, Integer> testMap = new TreeMap<Integer, Integer>();
-//        int total = 0;
-//        int batches = 0;
-//
-//        while (iter.hasNext()) {
-//            batches++;
-//            DataSet ds = iter.next();
-//            INDArray labels = ds.getLabels();
-//
-//            for (int row = 0; row < labels.rows(); row++) {
-//                total++;
-//
-//                int index = argMax(labels.getRow(row));
-//                Integer count = testMap.get(index);
-//
-//                if (count == null) {
-//                    testMap.put(index, 1);
-//                } else {
-//                    testMap.put(index, count + 1);
-//                }
-//            }
-//        }
-//
-//        for (Entry<Integer, Integer> entry : testMap.entrySet()) {
-//            logger.info(
-//                    String.format("%18s %3d", OmrShapes.NAMES.get(entry.getKey()), entry.getValue()));
-//        }
-//
-//        logger.info("{} samples: {}", name, total);
-//        logger.info("{} batches: {}", name, batches);
-//
-//        iter.reset();
-//    }
-//

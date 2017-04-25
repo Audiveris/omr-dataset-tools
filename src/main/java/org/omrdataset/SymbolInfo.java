@@ -23,7 +23,7 @@ package org.omrdataset;
 
 import org.omrdataset.util.Jaxb;
 
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -42,8 +42,8 @@ public class SymbolInfo
     public final OmrShape omrShape;
 
     @XmlElement(name = "BoundingBox")
-    @XmlJavaTypeAdapter(Jaxb.RectangleAdapter.class)
-    public final Rectangle bounds;
+    @XmlJavaTypeAdapter(Jaxb.Rectangle2DAdapter.class)
+    public final Rectangle2D bounds;
 
     //~ Constructors -------------------------------------------------------------------------------
     /**
@@ -53,7 +53,7 @@ public class SymbolInfo
      * @param bounds   symbol bounding box within containing image
      */
     public SymbolInfo (OmrShape omrShape,
-                       Rectangle bounds)
+                       Rectangle2D bounds)
     {
         this.omrShape = omrShape;
         this.bounds = bounds;

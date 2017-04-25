@@ -21,17 +21,20 @@
 // </editor-fold>
 package org.omrdataset;
 
-import static org.omrdataset.App.CONTEXT_HEIGHT;
-import static org.omrdataset.App.CONTEXT_WIDTH;
+import static org.omrdataset.App.*;
+
+import org.omrdataset.util.Population;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.io.PrintWriter;
+import java.util.Map;
 
 /**
- * Class {@code PageProcessor}
+ * Class {@code PageProcessor} processes a whole page (image + annotations) to extract
+ * its features.
  *
  * @author Hervé Bitteur
  */
@@ -50,51 +53,87 @@ public class PageProcessor
 
     private final PageAnnotations pageInfo;
 
+    private final Population pixelPop;
+
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Creates a new {@code PageProcessor} object.
      *
-     * @param bytes    DOCUMENT ME!
-     * @param pageInfo DOCUMENT ME!
+     * @param pageWidth  width of image
+     * @param pageHeight height of image
+     * @param bytes      the whole image bytes buffer
+     * @param pageInfo   page annotations
+     * @param pixelPop   (output) pixels population
      */
     public PageProcessor (int pageWidth,
                           int pageHeight,
                           byte[] bytes,
-                          PageAnnotations pageInfo)
+                          PageAnnotations pageInfo,
+                          Population pixelPop)
     {
         this.pageWidth = pageWidth;
         this.pageHeight = pageHeight;
         this.bytes = bytes;
         this.pageInfo = pageInfo;
+        this.pixelPop = pixelPop;
     }
 
     //~ Methods ------------------------------------------------------------------------------------
-    public void process (PrintWriter out)
+    /**
+     * Process the page (image / annotations) to append the extracted features
+     * (the context sub-image for each symbol) to the provided out stream.
+     * <p>
+     * Nota: if a sub-image goes beyond image borders, we fill the related external pixels with
+     * background value.
+     *
+     * @param out        the output to append to
+     * @param widthPops  population of symbol widths per shape
+     * @param heightPops population of symbol heights per shape
+     * @throws Exception
+     */
+    public void extractFeatures (PrintWriter out,
+                                 Map<OmrShape, Population> widthPops,
+                                 Map<OmrShape, Population> heightPops)
             throws Exception
     {
-        // Process each symbol definition
+        // Process each symbol definition in the page
         for (SymbolInfo symbol : pageInfo.getSymbols()) {
-            logger.info("{}", symbol);
+            logger.debug("{}", symbol);
 
-            Rectangle box = symbol.bounds;
+            Rectangle2D box = symbol.bounds;
+            widthPops.get(symbol.omrShape).includeValue(box.getWidth());
+            heightPops.get(symbol.omrShape).includeValue(box.getHeight());
 
             // Symbol center
-            int sCenterX = box.x + box.width / 2;
-            int sCenterY = box.y + box.height / 2;
+            double sCenterX = box.getX() + (box.getWidth() / 2.0);
+            double sCenterY = box.getY() + (box.getHeight() / 2.0);
 
             // Top-left corner of context
-            int left = sCenterX - CONTEXT_WIDTH / 2;
-            int top = sCenterY - CONTEXT_HEIGHT / 2;
+            int left = (int) Math.rint(sCenterX - (CONTEXT_WIDTH / 2));
+            int top = (int) Math.rint(sCenterY - (CONTEXT_HEIGHT / 2));
+            logger.debug("left:{} top:{}", left, top);
 
-            // extract bytes from sub-image, beware of image borders
-            // Layout: column by column (and not row by row!)
+            // Extract bytes from sub-image, paying attention to image limits
+            // Target format is flattened format, row by row.
             for (int y = 0; y < CONTEXT_HEIGHT; y++) {
-                int ay = top + y;
+                int ay = top + y; // Absolute y
 
-                for (int x = 0; x < CONTEXT_WIDTH; x++) {
-                    int ax = left + x;
-                    out.print(bytes[(ay * pageWidth) + ax] & 0xff);
-                    out.print(",");
+                if ((ay < 0) || (ay >= pageHeight)) {
+                    // Fill with background value
+                    for (int x = 0; x < CONTEXT_WIDTH; x++) {
+                        out.print(BACKGROUND);
+                        out.print(",");
+                        pixelPop.includeValue(BACKGROUND);
+                    }
+                } else {
+                    for (int x = 0; x < CONTEXT_WIDTH; x++) {
+                        int ax = left + x; // Absolute x
+                        int val = ((ax < 0) || (ax >= pageWidth)) ? BACKGROUND
+                                : (bytes[(ay * pageWidth) + ax] & 0xff);
+                        out.print(val);
+                        out.print(",");
+                        pixelPop.includeValue(val);
+                    }
                 }
             }
 
@@ -105,6 +144,7 @@ public class PageProcessor
                 logger.error("Missing shape {}", symbol);
                 throw new RuntimeException("Missing shape for " + symbol);
             }
+
             out.println();
         }
     }

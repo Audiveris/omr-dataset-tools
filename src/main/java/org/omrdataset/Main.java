@@ -39,6 +39,8 @@ public class Main
     public static void main (String[] args)
             throws Exception
     {
+        OmrShapes.printOmrShapes();
+
         // Extract features
         new Features().process();
 

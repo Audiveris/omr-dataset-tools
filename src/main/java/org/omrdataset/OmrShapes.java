@@ -57,6 +57,16 @@ public abstract class OmrShapes
     }
 
     /**
+     * Print out the omrShape ordinal and name.
+     */
+    public static void printOmrShapes ()
+    {
+        for (OmrShape shape : OmrShape.values()) {
+            System.out.printf("%3d %s%n", shape.ordinal(), shape.toString());
+        }
+    }
+
+    /**
      * Build the map (OmrShape -> Shape).
      *
      * @return the initialized map

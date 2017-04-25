@@ -30,6 +30,7 @@ import java.awt.Rectangle;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -153,6 +154,29 @@ public abstract class Jaxb
                 throws Exception
         {
             return facade.getCurve();
+        }
+    }
+
+    //------------------//
+    // DimensionAdapter //
+    //------------------//
+    public static class DimensionAdapter
+            extends XmlAdapter<DimensionFacade, Dimension>
+    {
+        //~ Methods --------------------------------------------------------------------------------
+
+        @Override
+        public DimensionFacade marshal (Dimension dim)
+                throws Exception
+        {
+            return new DimensionFacade(dim);
+        }
+
+        @Override
+        public Dimension unmarshal (DimensionFacade facade)
+                throws Exception
+        {
+            return facade.getDimension();
         }
     }
 
@@ -373,26 +397,26 @@ public abstract class Jaxb
         }
     }
 
-    //------------------//
-    // DimensionAdapter //
-    //------------------//
-    public static class DimensionAdapter
-            extends XmlAdapter<DimensionFacade, Dimension>
+    //--------------------//
+    // Rectangle2DAdapter //
+    //--------------------//
+    public static class Rectangle2DAdapter
+            extends XmlAdapter<Rectangle2DFacade, Rectangle2D>
     {
         //~ Methods --------------------------------------------------------------------------------
 
         @Override
-        public DimensionFacade marshal (Dimension dim)
+        public Rectangle2DFacade marshal (Rectangle2D rect)
                 throws Exception
         {
-            return new DimensionFacade(dim);
+            return new Rectangle2DFacade(rect);
         }
 
         @Override
-        public Dimension unmarshal (DimensionFacade facade)
+        public Rectangle2D unmarshal (Rectangle2DFacade facade)
                 throws Exception
         {
-            return facade.getDimension();
+            return facade.getRectangle2D();
         }
     }
 
@@ -642,6 +666,46 @@ public abstract class Jaxb
         public Point getPoint ()
         {
             return new Point(x, y);
+        }
+    }
+
+    //-------------------//
+    // Rectangle2DFacade //
+    //-------------------//
+    @XmlRootElement
+    private static class Rectangle2DFacade
+    {
+        //~ Instance fields ------------------------------------------------------------------------
+
+        @XmlAttribute
+        public double x;
+
+        @XmlAttribute
+        public double y;
+
+        @XmlAttribute(name = "w")
+        public double width;
+
+        @XmlAttribute(name = "h")
+        public double height;
+
+        //~ Constructors ---------------------------------------------------------------------------
+        public Rectangle2DFacade ()
+        {
+        }
+
+        public Rectangle2DFacade (Rectangle2D rect)
+        {
+            x = rect.getX();
+            y = rect.getY();
+            width = rect.getWidth();
+            height = rect.getHeight();
+        }
+
+        //~ Methods --------------------------------------------------------------------------------
+        public Rectangle2D getRectangle2D ()
+        {
+            return new Rectangle2D.Double(x, y, width, height);
         }
     }
 

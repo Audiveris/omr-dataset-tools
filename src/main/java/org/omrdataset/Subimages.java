@@ -174,11 +174,12 @@ public class Subimages
         DataBuffer buffer = raster.getDataBuffer();
         DataBufferByte byteBuffer = (DataBufferByte) buffer;
 
-        for (int c = 0; c < CONTEXT_WIDTH; c++) {
-            for (int r = 0; r < CONTEXT_HEIGHT; r++) {
-                int i = (c * CONTEXT_HEIGHT) + r;
+        for (int r = 0; r < CONTEXT_HEIGHT; r++) {
+            int offset = r * CONTEXT_WIDTH;
+            for (int c = 0; c < CONTEXT_WIDTH; c++) {
+                int i = offset + c;
                 int val = (int) Math.rint(row.getDouble(i));
-                ///int j = (r * CONTEXT_WIDTH) + c;
+                ///val = 255 - val; // Inversion
                 byteBuffer.setElem(i, val);
             }
         }

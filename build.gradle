@@ -33,7 +33,7 @@ allprojects {
 
 run {
     minHeapSize = '512m'
-    maxHeapSize = '1g'
+    maxHeapSize = '2g'
     
     // Retrieve CLI arguments from exec.args property if any
     if (hasProperty("exec.args")) {
