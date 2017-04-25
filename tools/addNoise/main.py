@@ -31,18 +31,26 @@ import os
 outputDir = 'output'
 
 ''' Copy XML file '''
-def copyXML(xmlinput,xmlFilename):
+
+
+def copyXML(xmlinput, xmlFilename):
     shutil.copy2(xmlinput, xmlFilename)
 
+
 ''' Read the image '''
+
+
 def callImage(imgFile, color):
     if color:
-        img = cv2.imread(imgFile,1)
+        img = cv2.imread(imgFile, 1)
     else:
         img = cv2.imread(imgFile, 0)
     return img
 
+
 ''' Display Image '''
+
+
 def Display(orig, distorted, name):
     cv2.namedWindow("Original Image")
     cv2.imshow("Original Image", orig)
@@ -53,18 +61,24 @@ def Display(orig, distorted, name):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-''' Guassian Noise '''
-def guassian(img):
-    #img = callImage(file,0)
-    row,col= img.shape
+
+''' Gaussian Noise '''
+
+
+def gaussian(img):
+    # img = callImage(file,0)
+    row, col = img.shape
     noise = np.zeros((row, col), np.int8)
     meanSD = cv2.meanStdDev(img)
-    cv2.randn(noise, 0, meanSD[1]) # zero mean
-    return cv2.add(img, noise, dtype = cv2.CV_8UC3)
+    cv2.randn(noise, 0, meanSD[1])  # zero mean
+    return cv2.add(img, noise, dtype=cv2.CV_8UC3)
+
 
 ''' Salt and pepper Noise '''
+
+
 def saltAndPepper(img):
-    sp = 0.5 # salt and pepper ratio
+    sp = 0.5  # salt and pepper ratio
     amount = 0.01
     out = img
     ## Salt mode
@@ -72,26 +86,35 @@ def saltAndPepper(img):
     coords = [np.random.randint(0, i - 1, int(numSalt)) for i in img.shape]
     out[coords] = 255
     ## Pepper mode
-    numPepper = np.ceil(amount* img.size * (1. - sp))
+    numPepper = np.ceil(amount * img.size * (1. - sp))
     coords = [np.random.randint(0, i - 1, int(numPepper)) for i in img.shape]
     out[coords] = 0
     return img
 
+
 ''' Speckle Noise '''
+
+
 def speckle(img):
-    row,col = img.shape
-    gauss = np.random.randn(row,col)
-    gauss = gauss.reshape(row,col)
-    return cv2.add(img, img * gauss * 0.4, dtype = cv2.CV_8UC3)
+    row, col = img.shape
+    gauss = np.random.randn(row, col)
+    gauss = gauss.reshape(row, col)
+    return cv2.add(img, img * gauss * 0.4, dtype=cv2.CV_8UC3)
+
 
 ''' Rotation '''
+
+
 def rotate(img, angle):
     rows, cols, ch = img.shape
-    M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
-    rot = cv2.warpAffine(img, M, (cols, rows), borderValue=[255,255,255])
+    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+    rot = cv2.warpAffine(img, M, (cols, rows), borderValue=[255, 255, 255])
     return rot, M
 
+
 ''' Replace the coordinates of the XML file after transformation '''
+
+
 def replace_XML(filename, transform):
     tree = ET.parse(filename)
     museScore = tree.getroot()
@@ -107,14 +130,17 @@ def replace_XML(filename, transform):
                 ## Rotate the bounding box
                 x, y, w, h = processBB([x, y, w, h], transform)
                 ## Replacing the old data
-                bbox.set("x",str(x))
-                bbox.set("y",str(y))
-                bbox.set("w",str(w))
-                bbox.set("h",str(h))
+                bbox.set("x", str(x))
+                bbox.set("y", str(y))
+                bbox.set("w", str(w))
+                bbox.set("h", str(h))
     tree.write(filename)
     return bboxes
 
+
 ''' Process a single Bounding Box '''
+
+
 def processBB(bbox, transform):
     x = int(bbox[0])
     y = int(bbox[1])
@@ -123,7 +149,10 @@ def processBB(bbox, transform):
     x, y, w, h = transformBB(x, y, w, h, transform)
     return x, y, w, h
 
+
 ''' Process Bounding boxes for display '''
+
+
 def processBBDisplay(bboxes, transform, orgImg, rotImg):
     img = orgImg
     for bbox in bboxes:
@@ -131,13 +160,15 @@ def processBBDisplay(bboxes, transform, orgImg, rotImg):
         y = int(bbox[1])
         w = int(bbox[2])
         h = int(bbox[3])
-        cv2.rectangle(img, (x,y),(x+w,y+h),(255,100,0),1)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 100, 0), 1)
         x, y, w, h = transformBB(x, y, w, h, transform)
         cv2.rectangle(rotImg, (x, y), (x + w, y + h), (0, 0, 255), 1)
     Display(img, rotImg, "Rotated Image")
 
 
 ''' Rotate a single bounding box '''
+
+
 def transformBB(x, y, w, h, transformation):
     ## Making the coordinates
     coord1 = x, y
@@ -151,7 +182,7 @@ def transformBB(x, y, w, h, transformation):
     coord4 = getRotatedCoordinates(transformation, coord4)
     ## Making Countour from the transformed coordinates
     contour = [coord1, coord2, coord4, coord3]
-    contour = np.array(contour).reshape((-1,1,2)).astype(np.int32)
+    contour = np.array(contour).reshape((-1, 1, 2)).astype(np.int32)
     ## Finding the minimum area rectangle of the contour
     rect = cv2.minAreaRect(contour)
     box = cv2.boxPoints(rect)
@@ -163,31 +194,43 @@ def transformBB(x, y, w, h, transformation):
     maxy = max([pts[1] for pts in box])
     return minx, miny, maxx - minx, maxy - miny
 
+
 ''' Return the rotated Coordinates '''
+
+
 def getRotatedCoordinates(transformMatrix, points):
     points = np.append(points, 1)
     points = points.reshape((1, 3))
     ptsTransformed = np.matrix(transformMatrix) * np.matrix(points.T)
-    ptsTransformed = np.array([ptsTransformed[0,0], ptsTransformed[1,0]])
+    ptsTransformed = np.array([ptsTransformed[0, 0], ptsTransformed[1, 0]])
     return ptsTransformed.astype(int)
 
+
 ''' Radial Distortion '''
+
+
 def radialDistortion(img):
     h, w = img.shape[:2]
-    cameraMatrix = np.matrix([[w,0,w/2],[0,h,h/2],[0,0,1]])
-    dist = np.array([0.1, 0.1, 0 , 0, 0]) # Radial
+    cameraMatrix = np.matrix([[w, 0, w / 2], [0, h, h / 2], [0, 0, 1]])
+    dist = np.array([0.1, 0.1, 0, 0, 0])  # Radial
     dst = cv2.undistort(img, cameraMatrix, dist)
     return dst
 
+
 ''' Tangential Distortion '''
+
+
 def tangentialDistortion(img):
     h, w = img.shape[:2]
-    cameraMatrix = np.matrix([[w,0,w/2],[0,h,h/2],[0,0,1]])
+    cameraMatrix = np.matrix([[w, 0, w / 2], [0, h, h / 2], [0, 0, 1]])
     dist = np.array([0, 0, 0.00, 0.05])  # Tangential
     dst = cv2.undistort(img, cameraMatrix, dist)
     return dst
 
+
 ''' Main process '''
+
+
 def main(argv):
     ## Processing arguments
     if len(argv) == 3:
@@ -212,7 +255,6 @@ def main(argv):
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
 
-
     ## Salt and Pepper Noise
     saltAndPepperDist = saltAndPepper(callImage(imgFile, 0))
     outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_salt_pepper'
@@ -221,7 +263,7 @@ def main(argv):
     # Display(callImage(imgFile, True), saltAndPepperDist, "Salt and Pepper Distortion")
 
     ## Gaussian Noise
-    gaussianDist = guassian(callImage(imgFile, 0))
+    gaussianDist = gaussian(callImage(imgFile, 0))
     outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_gaussian'
     cv2.imwrite(outputName + '.png', gaussianDist)
     copyXML(xmlFile, outputName + '.xml')
@@ -243,14 +285,13 @@ def main(argv):
     # processBBDisplay(bboxes, transform, callImage(imgFile, True), rotImage) # Display the rotated iamges with the coordinates
 
     # Radial distortion: straight lines will appear curved
-    radDist = radialDistortion(callImage(imgFile,0))
-    #Display(callImage(imgFile, True), radDist, "Radial Distortion")
+    radDist = radialDistortion(callImage(imgFile, 0))
+    # Display(callImage(imgFile, True), radDist, "Radial Distortion")
     '''To do: Write the new coordinates to the xml file'''
-
 
     # Tangential distortion : occurs because image taking lense is not aligned perfectly parallel to the imaging plane.
     tangDist = tangentialDistortion(callImage(imgFile, 0))
-    #Display(callImage(imgFile, True), tangDist, "Tangential Distortion")
+    # Display(callImage(imgFile, True), tangDist, "Tangential Distortion")
     '''To do: Write the new coordinates to the xml file'''
 
     # Localvar: Zero-mean Gaussian white noise with an intensity-dependent variance
