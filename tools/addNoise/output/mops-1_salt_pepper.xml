@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<museScore version="2.06">
+  <spatium>10</spatium>
+  <Page>
+    <size w="1191" h="1683"/>
+    </Page>
+  <Symbol shape="Sharp">
+    <bbox x="264" y="227" w="11" h="30"/>
+    </Symbol>
+  <Symbol shape="Flat">
+    <bbox x="227" y="213" w="9" h="25"/>
+    </Symbol>
+  <Symbol shape="Natural">
+    <bbox x="199" y="216" w="7" h="31"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="901" y="243" w="1" h="57"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="845" y="243" w="1" h="32"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="779" y="243" w="1" h="32"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="753" y="248" w="1" h="31"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="738" y="219" w="1" h="32"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="552" y="214" w="1" h="42"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="476" y="216" w="1" h="34"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="388" y="222" w="1" h="34"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="342" y="222" w="1" h="33"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="277" y="243" w="1" h="32"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="238" y="233" w="1" h="34"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="209" y="233" w="1" h="34"/>
+    </Symbol>
+  <Symbol shape="Stem">
+    <bbox x="161" y="243" w="1" h="32"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="901" y="236" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="845" y="236" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="779" y="236" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="753" y="241" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="726" y="246" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="540" y="251" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="464" y="246" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadVoid">
+    <bbox x="375" y="251" w="14" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="330" y="251" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="277" y="236" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="238" y="226" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="209" y="226" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="NoteHeadBlack">
+    <bbox x="161" y="236" w="13" h="11"/>
+    </Symbol>
+  <Symbol shape="ClefF">
+    <bbox x="63" y="606" w="27" h="31"/>
+    </Symbol>
+  <Symbol shape="ClefF">
+    <bbox x="63" y="416" w="27" h="31"/>
+    </Symbol>
+  <Symbol shape="ClefFSmall">
+    <bbox x="654" y="228" w="21" h="25"/>
+    </Symbol>
+  <Symbol shape="ClefG">
+    <bbox x="63" y="210" w="25" h="71"/>
+    </Symbol>
+  <Symbol shape="KeyFlat4">
+    <bbox x="94" y="603" w="39" h="45"/>
+    </Symbol>
+  <Symbol shape="KeyFlat4">
+    <bbox x="235" y="413" w="39" h="45"/>
+    </Symbol>
+  <Symbol shape="KeySharp2">
+    <bbox x="94" y="412" w="21" h="45"/>
+    </Symbol>
+  <Symbol shape="KeySharp2">
+    <bbox x="688" y="222" w="21" h="45"/>
+    </Symbol>
+  <Symbol shape="KeyFlat3">
+    <bbox x="93" y="213" w="29" h="45"/>
+    </Symbol>
+  <Symbol shape="CutTime">
+    <bbox x="472" y="423" w="17" h="28"/>
+    </Symbol>
+  <Symbol shape="CommonTime">
+    <bbox x="335" y="426" w="17" h="21"/>
+    </Symbol>
+  <Symbol shape="Time4_4">
+    <bbox x="127" y="227" w="16" h="40"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="1067" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="968" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="868" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="769" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="669" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="570" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="470" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="371" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="271" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="173" y="617" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="1096" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="1038" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="979" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="920" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="861" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="802" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="743" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="684" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="625" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="566" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="509" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="429" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="372" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="294" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="192" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="135" y="427" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="RestWhole">
+    <bbox x="1084" y="237" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="Rest4">
+    <bbox x="1018" y="231" w="11" h="29"/>
+    </Symbol>
+  <Symbol shape="Rest8">
+    <bbox x="994" y="238" w="10" h="19"/>
+    </Symbol>
+  <Symbol shape="Rest16">
+    <bbox x="973" y="238" w="13" h="29"/>
+    </Symbol>
+  <Symbol shape="Rest32">
+    <bbox x="956" y="228" w="15" h="39"/>
+    </Symbol>
+  <Symbol shape="Rest64">
+    <bbox x="937" y="228" w="17" h="49"/>
+    </Symbol>
+  <Symbol shape="Rest128">
+    <bbox x="917" y="218" w="17" h="59"/>
+    </Symbol>
+  <Symbol shape="Rest8">
+    <bbox x="876" y="238" w="10" h="19"/>
+    </Symbol>
+  <Symbol shape="Rest4">
+    <bbox x="804" y="231" w="11" h="29"/>
+    </Symbol>
+  <Symbol shape="Rest2">
+    <bbox x="633" y="240" w="15" h="6"/>
+    </Symbol>
+  <Symbol shape="Rest8">
+    <bbox x="604" y="238" w="10" h="19"/>
+    </Symbol>
+  <Symbol shape="Rest16">
+    <bbox x="583" y="238" w="13" h="29"/>
+    </Symbol>
+  <Symbol shape="Rest32">
+    <bbox x="565" y="228" w="15" h="39"/>
+    </Symbol>
+  <Symbol shape="Rest8">
+    <bbox x="511" y="238" w="10" h="19"/>
+    </Symbol>
+  <Symbol shape="Rest16">
+    <bbox x="490" y="238" w="13" h="29"/>
+    </Symbol>
+  <Symbol shape="Rest4">
+    <bbox x="418" y="231" w="11" h="29"/>
+    </Symbol>
+  <Symbol shape="Rest8">
+    <bbox x="355" y="238" w="10" h="19"/>
+    </Symbol>
+  <Symbol shape="Tenuto">
+    <bbox x="376" y="271" w="12" h="2"/>
+    </Symbol>
+  <Symbol shape="Marcato">
+    <bbox x="282" y="216" w="4" h="11"/>
+    </Symbol>
+  <Symbol shape="StaccatoDot">
+    <bbox x="244" y="220" w="4" h="4"/>
+    </Symbol>
+  <Symbol shape="Flag5Down">
+    <bbox x="900" y="246" w="11" h="53"/>
+    </Symbol>
+  <Symbol shape="Flag3Up">
+    <bbox x="552" y="214" w="10" h="43"/>
+    </Symbol>
+  <Symbol shape="Flag2Up">
+    <bbox x="476" y="217" w="10" h="35"/>
+    </Symbol>
+  <Symbol shape="Flag1Up">
+    <bbox x="342" y="223" w="10" h="30"/>
+    </Symbol>
+  <Symbol shape="Flag1Down">
+    <bbox x="209" y="238" w="12" h="29"/>
+    </Symbol>
+  <Symbol shape="HairpinSegment">
+    <bbox x="160" y="295" w="148" h="14"/>
+    </Symbol>
+  <Symbol shape="NoteDot">
+    <bbox x="862" y="239" w="5" h="5"/>
+    </Symbol>
+  <Symbol shape="NoteDot">
+    <bbox x="178" y="239" w="5" h="5"/>
+    </Symbol>
+  </museScore>
