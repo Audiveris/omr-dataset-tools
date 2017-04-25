@@ -3,7 +3,7 @@ __author__ = 'Pulimootil'
 
 """
 This script is used to introduce noise to synthetic images.
-This script was made as a part of Classical Music Hackday 2017 at Salzburg, Austria. 
+This script was made as a part of Classical Music Hackday 2017 at Salzburg, Austria.
 Most of the parameters are hardcoded for the purpose of hackday.
 Some of the distortions are not complete.
 
@@ -175,7 +175,7 @@ def transformBB(x, y, w, h, transformation):
     coord2 = x, y + h
     coord3 = x + w, y + h
     coord4 = x + w, y
-    ## Get teh transformed Coordinates
+    ## Get the transformed Coordinates
     coord1 = getRotatedCoordinates(transformation, coord1)
     coord2 = getRotatedCoordinates(transformation, coord2)
     coord3 = getRotatedCoordinates(transformation, coord3)
