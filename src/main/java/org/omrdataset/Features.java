@@ -23,10 +23,8 @@ package org.omrdataset;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-
 import static org.omrdataset.App.*;
-
-import org.omrdataset.util.FileUtil;
+import org.omrdataset.PageAnnotations.PageInfo;
 import org.omrdataset.util.Norms;
 import org.omrdataset.util.Population;
 
@@ -40,9 +38,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
@@ -87,7 +87,7 @@ public class Features
     public void process ()
             throws Exception
     {
-        // Scan the data folder for pairs of files: foo.png and foo.xml
+        // Scan the data folder for "foo.xml" files
         try {
             final OutputStream os = new FileOutputStream(CSV_PATH.toFile());
             final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -108,39 +108,75 @@ public class Features
                 {
                     final String fileName = path.getFileName().toString();
 
-                    if (fileName.endsWith(IMAGE_EXT)) {
-                        BufferedImage img = ImageIO.read(path.toFile());
-                        logger.info("Image {}", path.toAbsolutePath());
-
-                        if (img.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-                            logger.warn("Wrong image type={}", img.getType());
-                            throw new IllegalArgumentException(
-                                    "Image type != TYPE_BYTE_GRAY");
-                        }
-
-                        // Make sure we have the xml counterpart
-                        // And unmarshal the xml information
-                        String radix = FileUtil.getNameSansExtension(path);
-                        String infoName = radix + App.INFO_EXT;
-                        Path infoPath = path.resolveSibling(infoName);
-                        PageAnnotations annotations = PageAnnotations.unmarshal(infoPath);
-                        logger.info("{}", annotations);
-
-                        // Augment annotations with None symbols
-                        int nb = (int) Math.rint(
-                                App.NONE_RATIO * annotations.getSymbols().size());
-                        logger.info("Creating {} None symbols", nb);
-                        annotations.getSymbols().addAll(
-                                new NonesBuilder(annotations).insertNones(nb));
-                        Collections.shuffle(annotations.getSymbols());
-
-                        // Extract features for all symbols (valid or not)
-                        PageProcessor processor = new PageProcessor(
-                                img,
-                                annotations,
-                                pixelPop);
-
+                    if (fileName.endsWith(INFO_EXT)) {
                         try {
+                            logger.info("XML file {}", path);
+
+                            PageAnnotations annotations = PageAnnotations.unmarshal(path);
+                            logger.info("{}", annotations);
+
+                            if (annotations == null) {
+                                logger.warn("Skipping {} with no annotations", path);
+
+                                return FileVisitResult.CONTINUE;
+                            }
+
+                            PageInfo pageInfo = annotations.getPageInfo();
+
+                            if (pageInfo == null) {
+                                logger.warn("No Page information found");
+
+                                return FileVisitResult.CONTINUE;
+                            }
+
+                            String imageLink = pageInfo.imageFileName;
+
+                            if (imageLink == null) {
+                                logger.warn("No image link found");
+
+                                return FileVisitResult.CONTINUE;
+                            }
+
+                            // Make sure we can access the related image
+                            URI uri = new URI(imageLink).normalize();
+                            boolean isAbsolute = uri.isAbsolute();
+                            logger.info("uri={} isAbsolute={}", uri, isAbsolute);
+
+                            Path imgPath = (isAbsolute) ? Paths.get(uri)
+                                    : path.resolveSibling(Paths.get(imageLink));
+
+                            logger.info("imgPath={}", imgPath);
+
+                            if (!Files.exists(imgPath)) {
+                                logger.warn("Could not find image {}", uri);
+
+                                return FileVisitResult.CONTINUE;
+                            }
+
+                            BufferedImage img = isAbsolute ? ImageIO.read(uri.toURL())
+                                    : ImageIO.read(imgPath.toFile());
+                            logger.info("Image {}", imgPath.toAbsolutePath());
+
+                            if (img.getType() != BufferedImage.TYPE_BYTE_GRAY) {
+                                logger.warn("Wrong image type={}", img.getType());
+
+                                return FileVisitResult.CONTINUE;
+                            }
+
+                            // Augment annotations with None symbols
+                            int nb = (int) Math.rint(
+                                    App.NONE_RATIO * annotations.getSymbols().size());
+                            logger.info("Creating {} None symbols", nb);
+                            annotations.getSymbols().addAll(
+                                    new NonesBuilder(annotations).insertNones(nb));
+                            Collections.shuffle(annotations.getSymbols());
+
+                            // Extract features for all symbols (valid or not)
+                            PageProcessor processor = new PageProcessor(
+                                    img,
+                                    annotations,
+                                    pixelPop);
+
                             processor.extractFeatures(out, widthPops, heightPops);
 
                             Path controlPath = CONTROL_IMAGES_PATH.resolve(fileName);
