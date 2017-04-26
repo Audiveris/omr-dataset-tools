@@ -22,15 +22,25 @@
 package org.omrdataset;
 
 import static org.omrdataset.App.*;
-
 import org.omrdataset.util.Population;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 /**
  * Class {@code PageProcessor} processes a whole page (image + annotations) to extract
@@ -45,11 +55,7 @@ public class PageProcessor
     private static final Logger logger = LoggerFactory.getLogger(PageProcessor.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
-    private final int pageWidth;
-
-    private final int pageHeight;
-
-    private final byte[] bytes;
+    private final BufferedImage img;
 
     private final PageAnnotations pageInfo;
 
@@ -59,21 +65,15 @@ public class PageProcessor
     /**
      * Creates a new {@code PageProcessor} object.
      *
-     * @param pageWidth  width of image
-     * @param pageHeight height of image
-     * @param bytes      the whole image bytes buffer
-     * @param pageInfo   page annotations
-     * @param pixelPop   (output) pixels population
+     * @param img      the image
+     * @param pageInfo page annotations
+     * @param pixelPop (output) pixels population
      */
-    public PageProcessor (int pageWidth,
-                          int pageHeight,
-                          byte[] bytes,
+    public PageProcessor (BufferedImage img,
                           PageAnnotations pageInfo,
                           Population pixelPop)
     {
-        this.pageWidth = pageWidth;
-        this.pageHeight = pageHeight;
-        this.bytes = bytes;
+        this.img = img;
         this.pageInfo = pageInfo;
         this.pixelPop = pixelPop;
     }
@@ -96,13 +96,24 @@ public class PageProcessor
                                  Map<OmrShape, Population> heightPops)
             throws Exception
     {
+        final int pageWidth = img.getWidth();
+        final int pageHeight = img.getHeight();
+
+        WritableRaster raster = img.getRaster();
+        DataBuffer buffer = raster.getDataBuffer();
+        DataBufferByte byteBuffer = (DataBufferByte) buffer;
+        byte[] bytes = byteBuffer.getData();
+
         // Process each symbol definition in the page
         for (SymbolInfo symbol : pageInfo.getSymbols()) {
             logger.debug("{}", symbol);
 
             Rectangle2D box = symbol.bounds;
-            widthPops.get(symbol.omrShape).includeValue(box.getWidth());
-            heightPops.get(symbol.omrShape).includeValue(box.getHeight());
+
+            if (symbol.omrShape != OmrShape.None) {
+                widthPops.get(symbol.omrShape).includeValue(box.getWidth());
+                heightPops.get(symbol.omrShape).includeValue(box.getHeight());
+            }
 
             // Symbol center
             double sCenterX = box.getX() + (box.getWidth() / 2.0);
@@ -129,7 +140,7 @@ public class PageProcessor
                     for (int x = 0; x < CONTEXT_WIDTH; x++) {
                         int ax = left + x; // Absolute x
                         int val = ((ax < 0) || (ax >= pageWidth)) ? BACKGROUND
-                                : (bytes[(ay * pageWidth) + ax] & 0xff);
+                                : (255 - (bytes[(ay * pageWidth) + ax] & 0xff));
                         out.print(val);
                         out.print(",");
                         pixelPop.includeValue(val);
@@ -147,5 +158,41 @@ public class PageProcessor
 
             out.println();
         }
+    }
+
+    /**
+     * Draw symbols boxes and None symbols locations on control image.
+     *
+     * @param controlPath target path for control image
+     * @throws java.io.IOException
+     */
+    public void drawBoxes (Path controlPath)
+            throws IOException
+    {
+        BufferedImage ctrl = new BufferedImage(
+                img.getWidth(),
+                img.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = ctrl.createGraphics();
+        g.drawImage(img, null, null);
+
+        for (SymbolInfo symbol : pageInfo.getSymbols()) {
+            logger.debug("{}", symbol);
+
+            Rectangle2D box = symbol.bounds;
+
+            if (symbol.omrShape != OmrShape.None) {
+                g.setColor(Color.GREEN);
+                g.draw(box);
+            } else {
+                Rectangle b = box.getBounds();
+                g.setColor(Color.RED);
+                g.drawLine(b.x, b.y - NONE_Y_MARGIN, b.x, b.y + NONE_Y_MARGIN);
+                g.drawLine(b.x - NONE_X_MARGIN, b.y, b.x + NONE_X_MARGIN, b.y);
+            }
+        }
+
+        g.dispose();
+        ImageIO.write(ctrl, SUBIMAGE_FORMAT, controlPath.toFile());
     }
 }

@@ -23,7 +23,9 @@ package org.omrdataset;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+
 import static org.omrdataset.App.*;
+
 import org.omrdataset.util.FileUtil;
 import org.omrdataset.util.Norms;
 import org.omrdataset.util.Population;
@@ -32,9 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,6 +45,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,10 +56,14 @@ import javax.imageio.ImageIO;
  * Class {@code Features} reads input images data (collection of pairs: sheet image and
  * symbol descriptors) and produces the CSV file meant for NN training.
  * <p>
+ * Each page annotations are augmented with artificial None symbols.
+ * For visual checking, a page image can be produced with initial image, true symbols boxes and
+ * None symbols locations.
+ * <p>
  * In the CSV file, there must be one record per symbol, containing the pixels of the sub-image
  * centered on the symbol center, followed by the (index of) symbol name.
  * <p>
- * Beside CSV training file, we need to retrieve Norm (mean + stdDev) for: <ul>
+ * Beside CSV training file, we retrieve Norm (mean + stdDev) for: <ul>
  * <li>all pixel values whatever the shape
  * <li>symbol width per shape
  * <li>symbol height per shape
@@ -108,27 +112,39 @@ public class Features
                         BufferedImage img = ImageIO.read(path.toFile());
                         logger.info("Image {}", path.toAbsolutePath());
 
-                        WritableRaster raster = img.getRaster();
-
-                        byte[] bytes = getBytes(img);
+                        if (img.getType() != BufferedImage.TYPE_BYTE_GRAY) {
+                            logger.warn("Wrong image type={}", img.getType());
+                            throw new IllegalArgumentException(
+                                    "Image type != TYPE_BYTE_GRAY");
+                        }
 
                         // Make sure we have the xml counterpart
                         // And unmarshal the xml information
                         String radix = FileUtil.getNameSansExtension(path);
                         String infoName = radix + App.INFO_EXT;
                         Path infoPath = path.resolveSibling(infoName);
-                        PageAnnotations pageInfo = PageAnnotations.unmarshal(infoPath);
-                        logger.info("{}", pageInfo);
+                        PageAnnotations annotations = PageAnnotations.unmarshal(infoPath);
+                        logger.info("{}", annotations);
 
+                        // Augment annotations with None symbols
+                        int nb = (int) Math.rint(
+                                App.NONE_RATIO * annotations.getSymbols().size());
+                        logger.info("Creating {} None symbols", nb);
+                        annotations.getSymbols().addAll(
+                                new NonesBuilder(annotations).insertNones(nb));
+                        Collections.shuffle(annotations.getSymbols());
+
+                        // Extract features for all symbols (valid or not)
                         PageProcessor processor = new PageProcessor(
-                                raster.getWidth(),
-                                raster.getHeight(),
-                                bytes,
-                                pageInfo,
+                                img,
+                                annotations,
                                 pixelPop);
 
                         try {
                             processor.extractFeatures(out, widthPops, heightPops);
+
+                            Path controlPath = CONTROL_IMAGES_PATH.resolve(fileName);
+                            processor.drawBoxes(controlPath);
                         } catch (Exception ex) {
                             logger.warn("Exception " + ex, ex);
                         }
@@ -141,9 +157,9 @@ public class Features
             out.close();
 
             // Store norms
-            storePixelNorms(pixelPop);
             storeShapeNorms(widthPops, WIDTHS_NORMS);
             storeShapeNorms(heightPops, HEIGHTS_NORMS);
+            storePixelNorms(pixelPop);
         } catch (Throwable ex) {
             logger.warn("Error loading data from " + IMAGES_PATH + " " + ex, ex);
         }
@@ -161,34 +177,7 @@ public class Features
         new Features().process();
     }
 
-    /**
-     * Extract (and invert) the bytes array of the provided BufferedImage.
-     *
-     * @param bi the provided buffered image
-     * @return the bytes array
-     */
-    private byte[] getBytes (BufferedImage bi)
-    {
-        if (bi.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-            logger.warn("Wrong image type={}", bi.getType());
-            throw new IllegalArgumentException("Image type != TYPE_BYTE_GRAY");
-        }
-
-        WritableRaster raster = bi.getRaster();
-        DataBuffer buffer = raster.getDataBuffer();
-        DataBufferByte byteBuffer = (DataBufferByte) buffer;
-        byte[] bytes = byteBuffer.getData();
-
-        // Invert bytes, so that black=0=background and white=255=foreground
-        for (int i = bytes.length - 1; i >= 0; i--) {
-            int val = bytes[i] & 0xFF;
-            val = FOREGROUND - val;
-            bytes[i] = (byte) val;
-        }
-
-        return bytes;
-    }
-
+    //
     /**
      * Allocate the map of shape populations.
      *

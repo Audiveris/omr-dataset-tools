@@ -30,12 +30,12 @@ import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+
 import static org.omrdataset.App.CONTEXT_HEIGHT;
 import static org.omrdataset.App.CONTEXT_WIDTH;
 import static org.omrdataset.App.CSV_PATH;
 import static org.omrdataset.App.SUBIMAGES_PATH;
 import static org.omrdataset.App.SUBIMAGE_FORMAT;
-import org.omrdataset.util.Population;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,32 +94,23 @@ public class Subimages
                 numClasses,
                 -1);
 
-        Population pop = new Population();
-
         while (iterator.hasNext()) {
             DataSet dataSet = iterator.next();
 
             final INDArray features = dataSet.getFeatures();
-            logger.info("features rows:{} cols:{}", features.rows(), features.columns());
+            logger.debug("features rows:{} cols:{}", features.rows(), features.columns());
 
             final INDArray labels = dataSet.getLabels();
-            logger.info("labels rows:{} cols:{}", labels.rows(), labels.columns());
+            logger.debug("labels rows:{} cols:{}", labels.rows(), labels.columns());
 
             final int rows = features.rows();
-            final int cols = features.columns();
+            logger.info("Processing {} rows", rows);
 
             for (int r = 0; r < rows; r++) {
                 INDArray row = features.getRow(r);
-
-                for (int c = 0; c < cols; c++) {
-                    pop.includeValue(row.getDouble(c));
-                }
-
                 buildSubImage(row, ++index, getShape(labels.getRow(r)));
             }
         }
-
-        logger.info("pop: {}", pop);
     }
 
     /**
@@ -156,7 +147,7 @@ public class Subimages
     /**
      * Build the sub-image that corresponds to the provided row of features.
      *
-     * @param row   the row within features
+     * @param row   the row within features array
      * @param index sample sequential index
      * @param shape the OMR shape
      * @throws Exception

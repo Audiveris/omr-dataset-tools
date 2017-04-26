@@ -54,7 +54,8 @@ public class PageAnnotations
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(PageAnnotations.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+            PageAnnotations.class);
 
     /** Un/marshalling context for use with JAXB. */
     private static volatile JAXBContext jaxbContext;
@@ -87,6 +88,11 @@ public class PageAnnotations
     public List<SymbolInfo> getSymbols ()
     {
         return symbols;
+    }
+
+    public PageInfo getPageInfo ()
+    {
+        return pageInfo;
     }
 
     //-----------//
@@ -155,7 +161,7 @@ public class PageAnnotations
     //----------//
     // PageInfo //
     //----------//
-    private static class PageInfo
+    public static class PageInfo
     {
         //~ Instance fields ------------------------------------------------------------------------
 

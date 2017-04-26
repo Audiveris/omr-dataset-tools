@@ -51,6 +51,9 @@ public abstract class App
     /** File name for symbol heights norms. */
     public static final String HEIGHTS_NORMS = "heights.norms";
 
+    /** Path to created control-images. */
+    public static final Path CONTROL_IMAGES_PATH = DATA_PATH.resolve("control-images");
+
     /** Path to created sub-images. */
     public static final Path SUBIMAGES_PATH = DATA_PATH.resolve("subimages");
 
@@ -71,6 +74,15 @@ public abstract class App
 
     /** Width in pixels for symbol context. */
     public static final int CONTEXT_WIDTH = 48;
+
+    /** Abscissa margin around a None symbol location. */
+    public static final int NONE_X_MARGIN = 5;
+
+    /** Ordinate margin around a None symbol location. */
+    public static final int NONE_Y_MARGIN = 5;
+
+    /** Ratio of None symbols created versus valid symbols found in page. */
+    public static final double NONE_RATIO = 1.0;
 
     /** Value used for background pixel feature. */
     public static final int BACKGROUND = 0;

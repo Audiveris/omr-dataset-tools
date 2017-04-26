@@ -62,7 +62,7 @@ public class SymbolInfo
     /**
      * Creates a new {@code SymbolInfo} object.
      */
-    public SymbolInfo ()
+    private SymbolInfo ()
     {
         this.omrShape = null;
         this.bounds = null;
