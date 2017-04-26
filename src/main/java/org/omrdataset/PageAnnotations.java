@@ -180,7 +180,8 @@ public class PageAnnotations
             this.dim = dim;
         }
 
-        public PageInfo ()
+        // No-arg constructor needed by JAXB
+        private PageInfo ()
         {
             this.imageFileName = null;
             this.dim = null;
@@ -190,7 +191,7 @@ public class PageAnnotations
         @Override
         public String toString ()
         {
-            return imageFileName + " [width=" + dim.width + ",height=" + dim.height + "]";
+            return "{" + imageFileName + " [width=" + dim.width + ",height=" + dim.height + "]}";
         }
     }
 }
