@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Hervé Bitteur and others 2000-2016. All rights reserved.
+//  Copyright © Audiveris 2017. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -43,6 +43,7 @@ public class NonesBuilder
 
     private static final Logger logger = LoggerFactory.getLogger(NonesBuilder.class);
 
+    /** To sort rectangles on their abscissa value. */
     private static final Comparator<Rectangle> byAbscissa = new Comparator<Rectangle>()
     {
         @Override
@@ -71,25 +72,25 @@ public class NonesBuilder
     /**
      * Insert some None symbols in the page.
      *
-     * @param toAdd number of None symbols to add
-     * @return a list of inserted (None) symbols
+     * @param toAdd desired number of None symbols to add
+     * @return the list of inserted (None) symbols
      */
     public List<SymbolInfo> insertNones (int toAdd)
     {
-        // Filled boxes, kept sorted of x.
-        List<Rectangle> filled = new ArrayList<Rectangle>();
-        int maxWidth = fillWithSymbols(filled);
+        // Collection of filled boxes, kept sorted on x.
+        List<Rectangle> filledBoxes = new ArrayList<Rectangle>();
+        int maxWidth = fillWithSymbols(filledBoxes);
         maxWidth = Math.max(maxWidth, 2 * NONE_X_MARGIN); // Safer
 
         // Created None symbols
-        List<SymbolInfo> allCreated = new ArrayList<SymbolInfo>();
+        List<SymbolInfo> createdSymbols = new ArrayList<SymbolInfo>();
 
         final int pageWidth = annotations.getPageInfo().dim.width;
         final int pageHeight = annotations.getPageInfo().dim.height;
 
         // Put a reasonable limit on creation attempts
-        for (int i = 0; i < 10 * toAdd; i++) {
-            if (allCreated.size() >= toAdd) {
+        for (int i = 10 * toAdd; i >= 0; i--) {
+            if (createdSymbols.size() >= toAdd) {
                 break; // Normal exit
             }
 
@@ -98,30 +99,45 @@ public class NonesBuilder
             Rectangle rect = new Rectangle(x, y, 0, 0);
             rect.grow(NONE_X_MARGIN, NONE_Y_MARGIN);
 
-            if (tryInsertion(rect, filled, maxWidth)) {
-                allCreated.add(
+            if (tryInsertion(rect, filledBoxes, maxWidth)) {
+                createdSymbols.add(
                         new SymbolInfo(OmrShape.None, new Rectangle(x, y, 0, 0)));
             }
         }
 
-        return allCreated;
+        return createdSymbols;
     }
 
-    private int fillWithSymbols (List<Rectangle> filled)
+    /**
+     * Populate the "filledBoxes" collection with the boxes of all valid symbols.
+     *
+     * @param filledBoxes (output) collection to populate
+     * @return the maximum width across all symbols
+     */
+    private int fillWithSymbols (List<Rectangle> filledBoxes)
     {
         int maxWidth = 0;
 
         for (SymbolInfo symbol : annotations.getSymbols()) {
             Rectangle r = symbol.bounds.getBounds();
             maxWidth = Math.max(maxWidth, r.width);
-            filled.add(r);
+            filledBoxes.add(r);
         }
 
-        Collections.sort(filled, byAbscissa);
+        Collections.sort(filledBoxes, byAbscissa);
 
         return maxWidth;
     }
 
+    /**
+     * Insert the provided rectangle if this does not result in a collision with any
+     * existing rectangle (valid symbols plus already inserted artificial rectangles).
+     *
+     * @param rect     (input) the rectangle to insert
+     * @param filled   (input/output) the current collection of occupied rectangles
+     * @param maxWidth (input) maximum symbol width
+     * @return
+     */
     private boolean tryInsertion (Rectangle rect,
                                   List<Rectangle> filled,
                                   int maxWidth)
@@ -129,10 +145,12 @@ public class NonesBuilder
         final int size = filled.size();
         final int xMax = (rect.x + rect.width) - 1;
         final int xMin = (rect.x - maxWidth) + 1;
+
+        // Theoretical insertion index in the sorted list
         final int result = Collections.binarySearch(filled, rect, byAbscissa);
         final int index = (result >= 0) ? result : (-(result + 1));
 
-        // Check for collisions
+        // Check for collisions on right
         for (int i = index; i < size; i++) {
             Rectangle r = filled.get(i);
 
@@ -143,6 +161,7 @@ public class NonesBuilder
             }
         }
 
+        // Check for collisions on left
         for (int i = index - 1; i >= 0; i--) {
             Rectangle r = filled.get(i);
 
@@ -153,7 +172,7 @@ public class NonesBuilder
             }
         }
 
-        // No collision found
+        // No collision found, insert rectangle at proper index
         filled.add(index, rect);
         logger.debug("Added None at {}", rect);
 

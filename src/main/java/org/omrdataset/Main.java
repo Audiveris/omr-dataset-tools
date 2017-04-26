@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Hervé Bitteur and others 2000-2016. All rights reserved.
+//  Copyright © Audiveris 2017. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -44,7 +44,7 @@ public class Main
         // Extract features
         new Features().process();
 
-        // Extract subimages for visual check
+        // Extract subimages for visual check (not mandatory)
         new Subimages().process();
 
         // Train the classifier

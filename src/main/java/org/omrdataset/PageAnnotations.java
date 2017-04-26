@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Hervé Bitteur and others 2000-2016. All rights reserved.
+//  Copyright © Audiveris 2017. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Class {@code PageAnnotations} represents the symbols information for a page.
- * It's a sequence of: {symbol name + symbol bounding box
+ * It's a sequence of: {symbol name + symbol bounding box}
  *
  * @author Hervé Bitteur
  */
@@ -85,11 +85,21 @@ public class PageAnnotations
     }
 
     //~ Methods ------------------------------------------------------------------------------------
+    /**
+     * Report the list of symbols in page.
+     *
+     * @return symbols list
+     */
     public List<SymbolInfo> getSymbols ()
     {
         return symbols;
     }
 
+    /**
+     * Report information about page.
+     *
+     * @return page information
+     */
     public PageInfo getPageInfo ()
     {
         return pageInfo;
@@ -98,10 +108,17 @@ public class PageAnnotations
     //-----------//
     // unmarshal //
     //-----------//
+    /**
+     * Load PageAnnotations from the annotations XML file.
+     *
+     * @param path to the XML file.
+     * @return the unmarshalled PageAnnotations object
+     * @throws IOException
+     */
     public static PageAnnotations unmarshal (Path path)
             throws IOException
     {
-        logger.debug("PageInfo unmarshalling {}", path);
+        logger.debug("PageAnnotations unmarshalling {}", path);
 
         try {
             InputStream is = Files.newInputStream(path, StandardOpenOption.READ);

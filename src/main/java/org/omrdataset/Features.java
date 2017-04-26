@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Hervé Bitteur and others 2000-2016. All rights reserved.
+//  Copyright © Audiveris 2017. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -54,7 +54,7 @@ import javax.imageio.ImageIO;
 
 /**
  * Class {@code Features} reads input images data (collection of pairs: sheet image and
- * symbol descriptors) and produces the CSV file meant for NN training.
+ * symbol descriptors) and produces the features CSV file meant for NN training.
  * <p>
  * Each page annotations are augmented with artificial None symbols.
  * For visual checking, a page image can be produced with initial image, true symbols boxes and
@@ -65,8 +65,8 @@ import javax.imageio.ImageIO;
  * <p>
  * Beside CSV training file, we retrieve Norm (mean + stdDev) for: <ul>
  * <li>all pixel values whatever the shape
- * <li>symbol width per shape
- * <li>symbol height per shape
+ * <li>symbol width per valid shape
+ * <li>symbol height per valid shape
  * </ul>
  *
  * @author Hervé Bitteur
@@ -87,16 +87,18 @@ public class Features
     public void process ()
             throws Exception
     {
-        // Scan the data folder for "foo.xml" files
         try {
+            // Output features file
             final OutputStream os = new FileOutputStream(CSV_PATH.toFile());
             final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             final PrintWriter out = new PrintWriter(bw);
 
+            // Populations for norms computation
             Population pixelPop = new Population(); // For pixels
             Map<OmrShape, Population> widthPops = buildPopulationMap(); // For symbols widths
             Map<OmrShape, Population> heightPops = buildPopulationMap(); // For symbols heights
 
+            // Scan the data folder (and its sub-folders)
             Files.walkFileTree(
                     IMAGES_PATH,
                     new SimpleFileVisitor<Path>()
@@ -108,6 +110,7 @@ public class Features
                 {
                     final String fileName = path.getFileName().toString();
 
+                    // We look for "foo.xml" Annotations files
                     if (fileName.endsWith(INFO_EXT)) {
                         try {
                             logger.info("XML file {}", path);
@@ -129,21 +132,22 @@ public class Features
                                 return FileVisitResult.CONTINUE;
                             }
 
-                            String imageLink = pageInfo.imageFileName;
+                            // Related image file
+                            String uriStr = pageInfo.imageFileName;
 
-                            if (imageLink == null) {
+                            if (uriStr == null) {
                                 logger.warn("No image link found");
 
                                 return FileVisitResult.CONTINUE;
                             }
 
                             // Make sure we can access the related image
-                            URI uri = new URI(imageLink).normalize();
+                            URI uri = new URI(uriStr).normalize();
                             boolean isAbsolute = uri.isAbsolute();
                             logger.info("uri={} isAbsolute={}", uri, isAbsolute);
 
                             Path imgPath = (isAbsolute) ? Paths.get(uri)
-                                    : path.resolveSibling(Paths.get(imageLink));
+                                    : path.resolveSibling(Paths.get(uri.toString()));
 
                             logger.info("imgPath={}", imgPath);
 
@@ -176,9 +180,9 @@ public class Features
                                     img,
                                     annotations,
                                     pixelPop);
-
                             processor.extractFeatures(out, widthPops, heightPops);
 
+                            // Generate page image with valid symbol boxes and None locations
                             Path controlPath = CONTROL_IMAGES_PATH.resolve(fileName);
                             processor.drawBoxes(controlPath);
                         } catch (Exception ex) {
