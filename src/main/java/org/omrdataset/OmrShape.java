@@ -22,199 +22,292 @@
 package org.omrdataset;
 
 /**
- * Class {@code OmrShape} is the OMR-Dataset definition of shapes.
+ * Class {@code OmrShape} is the OMR-Dataset definition of symbol shapes.
  * <p>
- * Except the very first shape (None), the shape names are listed (rather) alphabetically for easier
- * visual browsing.
+ * This is a small subset of the list of symbol names described by SMuFL specification available at
+ * {@link http://www.smufl.org/}.
+ * Symbols are gathered using the same group numbers and names as found in SMuFL specification.
  * <p>
- * Flags direction (up/down) follow their stem direction, meaning that on say a stem down one can
- * find only flags down.
- * (Beware: this if the opposite of Audiveris initial definition of flag direction!).
+ * This subset is meant to focus on fixed-shape symbols. Accordingly, all symbols with varying size
+ * (hair-pins, slurs, beams, etc) have been left out, their recognition is not based on a symbol
+ * classifier.
+ * The only exception is the <b>brace</b> symbol, which can vary in size, but we hope that a
+ * classifier could recognize the brace center part.
  * <p>
- * NOTA for single-sign signatures: the 1-flat key is different from individual flat alteration
- * sign, and similarly the 1-sharp key is different from individual sharp alteration sign.
- * <p>
- * Shapes still to be studied: <ul>
- * <li>Repeat dot pair (?)
- * <li>Bracket (?)
- * <li>Additional predefined names for time combos
- * <li>Repeat signs (assuming we can limit bounding box to staff height): <ul>
- * <li>Left repeat sign (thick + thin + dots)
- * <li>Right repeat sign (dots + thin + thick)
- * <li>Back to back repeat sign (dots + thin + thick + thin + dots)
+ * We added a few names: <ul>
+ * <li><b>none</b>.
+ * This is a special name to indicate the absence of any valid symbol.
+ * <li><b>arpeggiato</b>.
+ * We could find only arpeggiato's ending with an arrow head, either {@code arpeggiatoUp} or
+ * {@code arpeggiatoDown}.
+ * <li><b>keyFlat</b>, <b>keyNatural</b>, <b>keySharp</b>.
+ * They represent flat, natural and sharp signs within a key signature.
+ * We hope that full-context training will allow to recognize them as such.
  * </ul>
- * </ul>
+ * All the barline and repeat symbols are meant to be defined for the staff height only.
+ *
+ * @see http://www.smufl.org/
  *
  * @author Hervé Bitteur
  */
 public enum OmrShape
 {
-    None("No valid shape"),
-    Accent("Accent"),
-    Arpeggiato("Arpeggiato"),
-    AugmentationDot("Augmentation Dot"),
-    Brace("Brace"),
-    BreathMark("Breath Mark"),
-    Breve("Double Whole"),
-    Caesura("Caesura"),
-    ClefC("Ut Clef"),
-    ClefF("Bass Clef"),
-    ClefF8a("Bass Clef Ottava Alta"),
-    ClefF8b("Bass Clef Ottava Bassa"),
-    ClefFSmall("Small Bass Clef"),
-    ClefG("Treble Clef"),
-    ClefG8a("Treble Clef Ottava Alta"),
-    ClefG8b("Treble Clef Ottava Bassa"),
-    ClefGSmall("Small Treble Clef"),
-    ClefPercussion("Percussion Clef"),
-    Coda("Closing section"),
-    CommonTime("Alpha = 4/4"),
-    CutTime("Semi-Alpha = 2/2"),
-    DaCapo("D.C.: Repeat from the beginning"),
-    DalSegno("D.S.: Repeat from the sign"),
-    Digit0("Digit 0"),
-    Digit1("Digit 1"),
-    Digit2("Digit 2"),
-    Digit3("Digit 3"),
-    Digit4("Digit 4"),
-    DoubleFlat("Double Flat"),
-    DoubleSharp("Double Sharp"),
-    DynamicF("F Forte"),
-    DynamicFF("FF Fortissimo"),
-    DynamicFFF("FFF"),
-    DynamicFFFF("FFFF"),
-    DynamicFFFFF("FFFFF"),
-    DynamicFFFFFF("FFFFFF"),
-    DynamicFP("FP FortePiano"),
-    DynamicM("M"),
-    DynamicMF("MF Mezzo Forte"),
-    DynamicMP("MP Mezzo Piano"),
-    DynamicP("P Piano"),
-    DynamicPP("PP Pianissimo"),
-    DynamicPPP("PPP"),
-    DynamicPPPP("PPPP"),
-    DynamicPPPPP("PPPPP"),
-    DynamicPPPPPP("PPPPPP"),
-    DynamicR("R"),
-    DynamicRF("RF"),
-    DynamicRFZ("RFZ"),
-    DynamicS("S"),
-    DynamicSF("SF"),
-    DynamicSFF("SFF"),
-    DynamicSFFZ("SFFZ"),
-    DynamicSFP("SFP"),
-    DynamicSFPP("SFPP"),
-    DynamicSFZ("SFZ Sforzando"),
-    DynamicZ("Z"),
-    FermataAbove("Fermata above staff"),
-    FermataBelow("Fermata below staff"),
-    Fine("Fine"),
-    Flag1Down("Single flag down"),
-    Flag1Up("Single flag up"),
-    Flag1UpSmall("Small single flag up"),
-    Flag1UpSmallSlash("Small single flag up with a slash"),
-    Flag2Down("Double flag down"),
-    Flag2Up("Double flag up"),
-    Flag3Down("Triple flag down"),
-    Flag3Up("Triple flag up"),
-    Flag4Down("Quadruple flag down"),
-    Flag4Up("Quadruple flag up"),
-    Flag5Down("Quintuple flag down"),
-    Flag5Up("Quintuple flag up"),
-    Flat("Minus one half step"),
-    GraceNote("Grace Note"),
-    GraceNoteSlash("Grace Note with a slash"),
-    HairpinSegment("Wedge segment"),
-    KeyFlat1("1-flat key"),
-    KeyFlat2("2-flat key"),
-    KeyFlat3("3-flat key"),
-    KeyFlat4("4-flat key"),
-    KeyFlat5("5-flat key"),
-    KeyFlat6("6-flat key"),
-    KeyFlat7("7-flat key"),
-    KeySharp1("1-sharp key"),
-    KeySharp2("2-sharp key"),
-    KeySharp3("3-sharp key"),
-    KeySharp4("4-sharp key"),
-    KeySharp5("5-sharp key"),
-    KeySharp6("6-sharp key"),
-    KeySharp7("7-sharp key"),
-    Ledger("Ledger"),
-    Marcato("Strong accent"),
-    Mordent("Mordent"),
-    MordentSlash("Mordent with a slash"),
-    Natural("Natural value"),
-    NoteHeadBlack("Filled node head for quarters and less"),
-    NoteHeadBlackSmall("Small filled note head for grace or cue"),
-    NoteHeadVoid("Hollow node head for halves"),
-    NoteHeadVoidSmall("Small hollow note head for grace or cue"),
-    NoteWhole("Whole Note"),
-    NoteWholeSmall("Small Whole Note"),
-    OttavaAlta("8 va"),
-    OttavaBassa("8 vb"),
-    PedalDown("Engage Pedal"),
-    PedalUp("Release Pedal"),
-    PluckA("Plucking annulaire/anular/ring"),
-    PluckI("Plucking index/indicio/index"),
-    PluckM("Plucking majeur/medio/middle"),
-    PluckP("Plucking pouce/pulgar/thumb"),
-    Rest2("Rest for a 1/2"),
-    Rest4("Rest for a 1/4"),
-    Rest8("Rest for a 1/8"),
-    Rest16("Rest for a 1/16"),
-    Rest32("Rest for a 1/32"),
-    Rest64("Rest for a 1/64"),
-    Rest128("Rest for a 1/128"),
-    Rest256("Rest for a 1/256"),
-    Rest512("Rest for a 1/512"),
-    Rest1024("Rest for a 1/1024"),
-    RestBreve("Rest for 2 measures"),
-    RestLong("Rest for 4 measures"),
-    RestWhole("Rest for whole measure"),
-    RomanI("Roman number 1"),
-    RomanII("Roman number 2"),
-    RomanIII("Roman number 3"),
-    RomanIV("Roman number 4"),
-    RomanV("Roman number 5"),
-    RomanVI("Roman number 6"),
-    RomanVII("Roman number 7"),
-    RomanVIII("Roman number 8"),
-    RomanIX("Roman number 9"),
-    RomanX("Roman number 10"),
-    RomanXI("Roman number 11"),
-    RomanXII("Roman number 12"),
-    Segno("Sign"),
-    Sharp("Plus one half step"),
-    Staccatissimo("Staccatissimo"),
-    StaccatoDot("Staccato dot"),
-    Stem("Stem"),
-    Tenuto("To hold"),
-    Time0("Time digit 0"),
-    Time1("Time digit 1"),
-    Time2("Time digit 2"),
-    Time3("Time digit 3"),
-    Time4("Time digit 4"),
-    Time5("Time digit 5"),
-    Time6("Time digit 6"),
-    Time7("Time digit 7"),
-    Time8("Time digit 8"),
-    Time9("Time digit 9"),
-    Time12("Time number 12"),
-    Time16("Time number 16"),
-    Time2_2("Time 2/2"),
-    Time3_4("Time 3/4"),
-    Time3_8("Time 3/8"),
-    Time4_4("Time 4/4"),
-    Time5_4("Time 5/4"),
-    Time6_8("Time 6/8"),
-    ToCoda("To coda"),
-    Tr("Trill"),
-    Tuplet3("Tuplet 3"),
-    Tuplet6("Tuplet 6"),
-    Turn("Turn"),
-    TurnInverted("Turn Inverted"),
-    TurnSlash("Turn with a slash"),
-    TurnUp("Turn Up");
+    none("No valid shape"),
+
+    //
+    // 4.1 Staff brackets and dividers
+    //
+    brace("Brace"),
+    bracketTop("Bracket top"),
+    bracketBottom("Bracket bottom"),
+
+    //
+    // 4.3 Barlines
+    //
+    barlineSingle("Single barline"),
+    barlineDouble("Double barline"),
+    barlineFinal("Final barline"),
+    barlineReverseFinal("Reverse final barline"),
+    barlineHeavy("Heavy barline"),
+    barlineHeavyHeavy("Heavy double barline"),
+    barlineDashed("Dashed barline"),
+    barlineDotted("Dotted barline"),
+
+    //
+    // 4.4 Repeats
+    //
+    repeatLeft("Left (start) repeat sign"),
+    repeatRight("Right (end) repeat sign"),
+    repeatRightLeft("Right and left repeat sign"),
+    repeatDots("Repeat dots"),
+    repeatDot("Repeat dot"),
+    dalSegno("Dal segno"),
+    daCapo("Da capo"),
+    segno("Segno"),
+    coda("Coda"),
+    codaSquare("Square coda"),
+
+    //
+    // 4.5 Clefs
+    //
+    gClef("G clef"),
+    gClef8vb("G clef ottava bassa"),
+    gClef8va("G clef ottava alta"),
+    gClef15mb("G clef quindicesima bassa"),
+    gClef15ma("G clef quindicesima alta"),
+    cClef("C clef"),
+    fClef("F clef"),
+    fClef8vb("F clef ottava bassa"),
+    fClef8va("F clef ottava alta"),
+    fClef15mb("F clef quindicesima bassa"),
+    fClef15ma("F clef quindicesima alta"),
+    unpitchedPercussionClef1("Unpitched percussion clef 1"),
+    gClefChange("G clef change"),
+    cClefChange("C clef change"),
+    fClefChange("F clef change"),
+    clef8("8 for clefs"),
+    clef15("15 for clefs"),
+
+    //
+    // 4.6 Time signatures
+    //
+    timeSig0("Time signature 0"),
+    timeSig1("Time signature 1"),
+    timeSig2("Time signature 2"),
+    timeSig3("Time signature 3"),
+    timeSig4("Time signature 4"),
+    timeSig5("Time signature 5"),
+    timeSig6("Time signature 6"),
+    timeSig7("Time signature 7"),
+    timeSig8("Time signature 8"),
+    timeSig9("Time signature 9"),
+    timeSig12("Time signature 12"),
+    timeSig16("Time signature 16"),
+    timeSigCommon("Common time"),
+    timeSigCutCommon("Cut time"),
+    timeSig2over4("2/4 time signature"),
+    timeSig2over2("2/2 time signature"),
+    timeSig3over2("3/2 time signature"),
+    timeSig3over4("3/4 time signature"),
+    timeSig3over8("3/8 time signature"),
+    timeSig4over4("4/4 time signature"),
+    timeSig5over4("5/4 time signature"),
+    timeSig5over8("5/8 time signature"),
+    timeSig6over4("6/4 time signature"),
+    timeSig6over8("6/8 time signature"),
+    timeSig7over8("7/8 time signature"),
+    timeSig9over8("9/8 time signature"),
+    timeSig12over8("12/8 time signature"),
+
+    //
+    // 4.7 Noteheads
+    //
+    noteheadBlack("Black notehead"),
+    noteheadBlackSmall("Black notehead (small staff)"),
+    noteheadHalf("Half (minim) notehead"),
+    noteheadHalfSmall("Half (minim) notehead (small staff)"),
+    noteheadWhole("Whole (semibreve) notehead"),
+    noteheadWholeSmall("Whole notehead (small staff)"),
+    noteheadDoubleWhole("Double whole (breve) notehead"),
+    noteheadDoubleWholeSmall("Double whole note (breve) (small staff)"),
+    augmentationDot("Augmentation dot"),
+    //
+    // 4.15 Stems
+    //
+    stem("Combining stem"),
+    //
+    // 4.17 Flags
+    //
+    flag8thUp("Combining flag 1 (8th) above"),
+    flag16thUp("Combining flag 2 (16th) above"),
+    flag32ndUp("Combining flag 3 (32nd) above"),
+    flag64thUp("Combining flag 4 (64th) above"),
+    flag128thUp("Combining flag 5 (128th) above"),
+    flag256thUp("Combining flag 6 (256th) above"),
+    flag512thUp("Combining flag 7 (512th) above"),
+    flag1024thUp("Combining flag 8 (1024th) above"),
+    flag8thDown("Combining flag 1 (8th) below"),
+    flag16thDown("Combining flag 2 (16th) below"),
+    flag32ndDown("Combining flag 3 (32nd) below"),
+    flag64thDown("Combining flag 4 (64th) below"),
+    flag128thDown("Combining flag 5 (128th) below"),
+    flag256thDown("Combining flag 6 (256th) below"),
+    flag512thDown("Combining flag 7 (512th) below"),
+    flag1024thDown("Combining flag 8 (1024th) below"),
+    //
+    // 4.18 Standard accidentals
+    //
+    accidentalFlat("Flat"),
+    accidentalNatural("Natural"),
+    accidentalSharp("Sharp"),
+    accidentalDoubleSharp("Double sharp"),
+    accidentalDoubleFlat("Double flat"),
+
+    //
+    // 4.18bis Alterations for key signatures (NOTA: this is an addition to SMuFL)
+    //
+    keyFlat("Flat in key signature"),
+    keyNatural("Natural in key signature"),
+    keySharp("Sharp in key signature"),
+    //
+    // 4.39 Articulations
+    //
+    articAccentAbove("Accent above"),
+    articAccentBelow("Accent below"),
+    articStaccatoAbove("Staccato above"),
+    articStaccatoBelow("Staccato below"),
+    articTenutoAbove("Tenuto above"),
+    articTenutoBelow("Tenuto below"),
+    articStaccatissimoAbove("Staccatissimo above"),
+    articStaccatissimoBelow("Staccatissimo below"),
+    articMarcatoAbove("Marcato above"),
+    articMarcatoBelow("Marcato below"),
+
+    //
+    // 4.40 Holds and pauses
+    //
+    fermataAbove("Fermata above staff"),
+    fermataBelow("Fermata below staff"),
+    breathMarkComma("Breath mark (comma)"),
+    caesura("Caesura"),
+    //
+    // 4.41 Rests
+    //
+    restMaxima("Maxima rest"),
+    restLonga("Longa rest"),
+    restDoubleWhole("Double whole (breve) rest"),
+    restWhole("Whole (semibreve) rest"),
+    restHalf("Half (minim) rest"),
+    restQuarter("Quarter (crotchet) rest"),
+    rest8th("Eighth (quaver) rest"),
+    rest16th("16th (semiquaver) rest"),
+    rest32nd("32nd (demisemiquaver) rest"),
+    rest64th("64th (hemidemisemiquaver) rest"),
+    rest128th("128th (semihemidemisemiquaver) rest"),
+    rest256th("256th rest"),
+    rest512th("512th rest"),
+    rest1024th("1024th rest"),
+    restHBar("Multiple measure rest"),
+
+    //
+    // 4.43 Octaves
+    //
+    ottavaAlta("Ottava alta (8va)"),
+    ottavaBassaVb("Ottava bassa (8vb)"),
+    //
+    // 4.44 Dynamics
+    //
+    dynamicPiano("Piano"),
+    dynamicMezzo("Mezzo"),
+    dynamicForte("Forte"),
+    dynamicRinforzando("Rinforzando (r)"),
+    dynamicSforzando("Sforzando (s)"),
+    dynamicZ("Z"),
+    dynamicNiente("Niente (n)"),
+    dynamicPPPPPP("pppppp"),
+    dynamicPPPPP("ppppp"),
+    dynamicPPPP("pppp"),
+    dynamicPPP("ppp"),
+    dynamicPP("pp"),
+    dynamicMP("mp"),
+    dynamicMF("mf"),
+    dynamicPF("pf"),
+    dynamicFF("ff"),
+    dynamicFFF("fff"),
+    dynamicFFFF("ffff"),
+    dynamicFFFFF("fffff"),
+    dynamicFFFFFF("ffffff"),
+    dynamicFortePiano("Forte-piano"),
+    dynamicForzando("Forzando (fz)"),
+    dynamicSforzando1("Sforzando 1 (sf)"),
+    dynamicSforzandoPiano("Sforzando-piano (sfp)"),
+    dynamicSforzandoPianissimo("Sforzando-pianissimo (sfpp)"),
+    dynamicSforzato("Sforzato (sfz)"),
+    dynamicSforzatoPiano("Sforzato-piano (sfzp)"),
+    dynamicSforzatoFF("Sforzatissimo (sffz)"),
+    dynamicRinforzando1("Rinforzando 1 (rf)"),
+    dynamicRinforzando2("Rinforzando 2 (rfz)"),
+
+    //
+    // 4.46 Common ornaments
+    //
+    graceNoteAcciaccaturaStemUp("Slashed grace note stem up"),
+    graceNoteAppoggiaturaStemUp("Grace note stem up"),
+    ornamentTrill("Trill"),
+    ornamentTurn("Turn"),
+    ornamentTurnInverted("Inverted turn"),
+    ornamentTurnSlash("Turn with slash"),
+    ornamentTurnUp("Turn up"),
+    ornamentMordent("Mordent"),
+    ornamentMordentInverted("Inverted mordent"),
+
+    //
+    // 4.53 Plucked techniques (NOTA: I found only arpeggiato down and up, with an arrow head)
+    //
+    arpeggiato("Arpeggiato"),
+    //
+    // 4.55 Keyboard techniques
+    //
+    keyboardPedalPed("Pedal mark"),
+    keyboardPedalUp("Pedal up mark"),
+    //
+    // 4.75 Tuplets
+    //
+    tuplet3("Tuplet 3"),
+    tuplet6("Tuplet 6"),
+    //
+    // 4.115 Fingering
+    //
+    fingering0("Fingering 0 (open string)"),
+    fingering1("Fingering 1 (thumb)"),
+    fingering2("Fingering 2 (index finger)"),
+    fingering3("Fingering 3 (middle finger)"),
+    fingering4("Fingering 4 (ring finger)"),
+    fingering5("Fingering 5 (little finger)"),
+    fingeringPLower("Fingering p (pulgar; right-hand thumb "),
+    fingeringILower("Fingering i (indicio; right-hand index finger for guitar)"),
+    fingeringMLower("Fingering m (medio; right-hand middle finger for guitar)"),
+    fingeringALower("Fingering a (anular; right-hand ring finger for guitar)");
 
     /** Short explanation of the symbol shape. */
     public final String description;

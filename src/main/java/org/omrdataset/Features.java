@@ -25,6 +25,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import static org.omrdataset.App.*;
 import org.omrdataset.PageAnnotations.PageInfo;
+import org.omrdataset.util.FileUtil;
 import org.omrdataset.util.Norms;
 import org.omrdataset.util.Population;
 
@@ -98,7 +99,7 @@ public class Features
             Map<OmrShape, Population> widthPops = buildPopulationMap(); // For symbols widths
             Map<OmrShape, Population> heightPops = buildPopulationMap(); // For symbols heights
 
-            // Scan the data folder (and its sub-folders)
+            // Scan the IMAGES_PATH folder (and its sub-folders)
             Files.walkFileTree(
                     IMAGES_PATH,
                     new SimpleFileVisitor<Path>()
@@ -144,12 +145,12 @@ public class Features
                             // Make sure we can access the related image
                             URI uri = new URI(uriStr).normalize();
                             boolean isAbsolute = uri.isAbsolute();
-                            logger.info("uri={} isAbsolute={}", uri, isAbsolute);
+                            logger.debug("uri={} isAbsolute={}", uri, isAbsolute);
 
                             Path imgPath = (isAbsolute) ? Paths.get(uri)
                                     : path.resolveSibling(Paths.get(uri.toString()));
 
-                            logger.info("imgPath={}", imgPath);
+                            logger.debug("imgPath={}", imgPath);
 
                             if (!Files.exists(imgPath)) {
                                 logger.warn("Could not find image {}", uri);
@@ -169,7 +170,7 @@ public class Features
 
                             // Augment annotations with None symbols
                             int nb = (int) Math.rint(
-                                    App.NONE_RATIO * annotations.getSymbols().size());
+                                    NONE_RATIO * annotations.getSymbols().size());
                             logger.info("Creating {} None symbols", nb);
                             annotations.getSymbols().addAll(
                                     new NonesBuilder(annotations).insertNones(nb));
@@ -183,7 +184,9 @@ public class Features
                             processor.extractFeatures(out, widthPops, heightPops);
 
                             // Generate page image with valid symbol boxes and None locations
-                            Path controlPath = CONTROL_IMAGES_PATH.resolve(fileName);
+                            String radix = FileUtil.getNameSansExtension(imgPath);
+                            Path controlPath = CONTROL_IMAGES_PATH.resolve(
+                                    radix + OUTPUT_IMAGES_EXT);
                             processor.drawBoxes(controlPath);
                         } catch (Exception ex) {
                             logger.warn("Exception " + ex, ex);

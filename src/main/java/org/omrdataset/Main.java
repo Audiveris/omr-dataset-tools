@@ -45,7 +45,7 @@ public class Main
         new Features().process();
 
         // Extract subimages for visual check (not mandatory)
-        new Subimages().process();
+        new SubImages().process();
 
         // Train the classifier
         new Training().process();

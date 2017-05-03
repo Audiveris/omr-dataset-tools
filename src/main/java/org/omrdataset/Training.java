@@ -79,7 +79,7 @@ public class Training
     {
         int nChannels = 1; // Number of input channels
         int batchSize = 64; // Batch size
-        int nEpochs = 2; // Number of training epochs
+        int nEpochs = 3; // Number of training epochs
         int iterations = 10; // Number of training iterations
         int seed = 123; //
 

@@ -108,7 +108,7 @@ public class Norms
             Nd4j.write(vars, dos);
             dos.flush();
             dos.close();
-            logger.info("\n{} stored into {}", vars, path);
+            logger.debug("\n{} stored into {}", vars, path);
         }
     }
 

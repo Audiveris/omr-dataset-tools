@@ -70,9 +70,6 @@ public class PageAnnotations
     @XmlElement(name = "Page")
     private PageInfo pageInfo;
 
-    @XmlElement(name = "Spatium")
-    private Integer interline;
-
     @XmlElement(name = "Symbol")
     private ArrayList<SymbolInfo> symbols = new ArrayList<SymbolInfo>();
 
@@ -161,10 +158,6 @@ public class PageAnnotations
 
         if (pageInfo != null) {
             sb.append(" page:").append(pageInfo);
-        }
-
-        if (interline != null) {
-            sb.append(" interline:").append(interline);
         }
 
         sb.append(" symbols:").append(symbols.size());

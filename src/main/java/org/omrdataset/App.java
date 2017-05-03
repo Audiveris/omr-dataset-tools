@@ -40,7 +40,7 @@ public abstract class App
     public static final Path IMAGES_PATH = DATA_PATH.resolve("input-images");
 
     /** Path to CNN model. */
-    public static final Path MODEL_PATH = DATA_PATH.resolve("cnn_model.zip");
+    public static final Path MODEL_PATH = DATA_PATH.resolve("cnn-model.zip");
 
     /** File name for pixels norms. */
     public static final String PIXELS_NORMS = "pixels.norms";
@@ -55,13 +55,13 @@ public abstract class App
     public static final Path CONTROL_IMAGES_PATH = DATA_PATH.resolve("control-images");
 
     /** Path to created sub-images. */
-    public static final Path SUBIMAGES_PATH = DATA_PATH.resolve("subimages");
+    public static final Path SUB_IMAGES_PATH = DATA_PATH.resolve("sub-images");
 
-    /** Format for sub-images. */
-    public static final String SUBIMAGE_FORMAT = "png";
+    /** Format for output images (sub-images & control-images). */
+    public static final String OUTPUT_IMAGES_FORMAT = "png";
 
-    /** File extension for page images. */
-    public static final String IMAGE_EXT = ".png";
+    /** File extension for output images. */
+    public static final String OUTPUT_IMAGES_EXT = "." + OUTPUT_IMAGES_FORMAT;
 
     /** File extension for page info. */
     public static final String INFO_EXT = ".xml";
@@ -78,15 +78,15 @@ public abstract class App
     /** Abscissa margin around a None symbol location. */
     public static final int NONE_X_MARGIN = 5;
 
-    /** Ordinate margin around a None symbol location. */
-    public static final int NONE_Y_MARGIN = 5;
-
-    /** Ratio of None symbols created versus valid symbols found in page. */
-    public static final double NONE_RATIO = 1.0;
-
     /** Value used for background pixel feature. */
     public static final int BACKGROUND = 0;
 
     /** Value used for foreground pixel feature. */
     public static final int FOREGROUND = 255;
+
+    /** Ordinate margin around a None symbol location. */
+    public static final int NONE_Y_MARGIN = 5;
+
+    /** Ratio of None symbols created versus valid symbols found in page. */
+    public static final double NONE_RATIO = 1.0;
 }

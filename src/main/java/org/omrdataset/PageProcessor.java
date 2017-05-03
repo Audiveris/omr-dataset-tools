@@ -22,6 +22,7 @@
 package org.omrdataset;
 
 import static org.omrdataset.App.*;
+
 import org.omrdataset.util.Population;
 
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -113,7 +115,13 @@ public class PageProcessor
 
             Rectangle2D box = symbol.bounds;
 
-            if (symbol.omrShape != OmrShape.None) {
+            if (symbol.omrShape != OmrShape.none) {
+                if (symbol.omrShape == null) {
+                    logger.warn("Null shape {}", symbol);
+
+                    continue;
+                }
+
                 widthPops.get(symbol.omrShape).includeValue(box.getWidth());
                 heightPops.get(symbol.omrShape).includeValue(box.getHeight());
             }
@@ -184,8 +192,14 @@ public class PageProcessor
 
             Rectangle2D box = symbol.bounds;
 
-            if (symbol.omrShape != OmrShape.None) {
+            if (symbol.omrShape != OmrShape.none) {
                 g.setColor(Color.GREEN);
+                // Draw outer rectangle, with line stroke of 1 pixel
+                box.setRect(
+                        box.getX() - 1,
+                        box.getY() - 1,
+                        box.getWidth() + 1,
+                        box.getHeight() + 1);
                 g.draw(box);
             } else {
                 Rectangle b = box.getBounds();
@@ -196,6 +210,7 @@ public class PageProcessor
         }
 
         g.dispose();
-        ImageIO.write(ctrl, SUBIMAGE_FORMAT, controlPath.toFile());
+        Files.createDirectories(controlPath.getParent());
+        ImageIO.write(ctrl, OUTPUT_IMAGES_FORMAT, controlPath.toFile());
     }
 }

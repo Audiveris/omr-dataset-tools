@@ -1,4 +1,10 @@
 /.nb-gradle/
 /.gradle/
 /build/
-/data/
+
+/data/*.csv
+/data/*.norms
+/data/*.zip
+/data/sub-images/
+/data/control-images/
+

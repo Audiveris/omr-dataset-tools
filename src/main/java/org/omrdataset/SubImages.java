@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------//
 //                                                                                                //
-//                                        S u b i m a g e s                                       //
+//                                        S u b I m a g e s                                       //
 //                                                                                                //
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
@@ -31,11 +31,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
-import static org.omrdataset.App.CONTEXT_HEIGHT;
-import static org.omrdataset.App.CONTEXT_WIDTH;
-import static org.omrdataset.App.CSV_PATH;
-import static org.omrdataset.App.SUBIMAGES_PATH;
-import static org.omrdataset.App.SUBIMAGE_FORMAT;
+import static org.omrdataset.App.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,20 +40,21 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 
 /**
- * Class {@code Subimages} takes the .CSV file as input and regenerates sub-images for
+ * Class {@code SubImages} takes the .CSV file as input and regenerates sub-images for
  * visual checking.
  *
  * @author Hervé Bitteur
  */
-public class Subimages
+public class SubImages
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(Subimages.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubImages.class);
 
     private static final int numClasses = OmrShape.values().length;
 
@@ -122,7 +119,7 @@ public class Subimages
     public static void main (String[] args)
             throws Exception
     {
-        new Subimages().process();
+        new SubImages().process();
     }
 
     /**
@@ -175,9 +172,9 @@ public class Subimages
             }
         }
 
-        ImageIO.write(
-                img,
-                SUBIMAGE_FORMAT,
-                SUBIMAGES_PATH.resolve(shape + "-" + index + "." + SUBIMAGE_FORMAT).toFile());
+        Files.createDirectories(SUB_IMAGES_PATH);
+        ImageIO.write(img,
+                      OUTPUT_IMAGES_FORMAT,
+                      SUB_IMAGES_PATH.resolve(shape + "-" + index + OUTPUT_IMAGES_EXT).toFile());
     }
 }

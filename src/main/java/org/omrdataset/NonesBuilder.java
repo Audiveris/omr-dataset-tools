@@ -57,6 +57,9 @@ public class NonesBuilder
     //~ Instance fields ----------------------------------------------------------------------------
     private final PageAnnotations annotations;
 
+    /** We need the same interline value for the whole page. */
+    private Integer interline;
+
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Creates a new {@code NoneSymbols} object.
@@ -77,6 +80,10 @@ public class NonesBuilder
      */
     public List<SymbolInfo> insertNones (int toAdd)
     {
+        if (!checkInterlineValue()) {
+            return Collections.emptyList();
+        }
+
         // Collection of filled boxes, kept sorted on x.
         List<Rectangle> filledBoxes = new ArrayList<Rectangle>();
         int maxWidth = fillWithSymbols(filledBoxes);
@@ -101,7 +108,7 @@ public class NonesBuilder
 
             if (tryInsertion(rect, filledBoxes, maxWidth)) {
                 createdSymbols.add(
-                        new SymbolInfo(OmrShape.None, new Rectangle(x, y, 0, 0)));
+                        new SymbolInfo(OmrShape.none, interline, new Rectangle(x, y, 0, 0)));
             }
         }
 
@@ -109,7 +116,29 @@ public class NonesBuilder
     }
 
     /**
+     * Check this page contains a single interline value.
+     *
+     * @return true if OK
+     */
+    private boolean checkInterlineValue ()
+    {
+        for (SymbolInfo symbol : annotations.getSymbols()) {
+            if (interline == null && symbol.interline != 0) {
+                interline = symbol.interline;
+            } else {
+                if (interline != symbol.interline) {
+                    logger.info("Several interline values");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Populate the "filledBoxes" collection with the boxes of all valid symbols.
+     * We also make sure that all symbols have the same interline value.
      *
      * @param filledBoxes (output) collection to populate
      * @return the maximum width across all symbols
@@ -119,6 +148,13 @@ public class NonesBuilder
         int maxWidth = 0;
 
         for (SymbolInfo symbol : annotations.getSymbols()) {
+            if (interline == null && symbol.interline != 0) {
+                interline = symbol.interline;
+            } else {
+                if (interline != symbol.interline) {
+                    throw new IllegalStateException("Several interline values in same page");
+                }
+            }
             Rectangle r = symbol.bounds.getBounds();
             maxWidth = Math.max(maxWidth, r.width);
             filledBoxes.add(r);
