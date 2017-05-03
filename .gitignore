@@ -2,3 +2,6 @@
 /.gradle/
 /build/
 /data/
+/tools/addNoise/.idea/*
+/tools/addNoise/*.pyc
+/tools/addNoise/output/
