@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Annotations version="1.0">
+  <Source>MuseScore 2.06</Source>
+  <Page>
+    <Image>mops-1.png</Image>
+    <Size w="1191" h="1683"/>
+  </Page>
+  <Symbol interline="10" shape="accidentalSharp">
+    <Bounds x="264" y="227" w="11" h="30"/>
+  </Symbol>
+  <Symbol interline="10" shape="accidentalFlat">
+    <Bounds x="227" y="213" w="9" h="25"/>
+  </Symbol>
+  <Symbol interline="10" shape="accidentalNatural">
+    <Bounds x="199" y="216" w="7" h="31"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="901" y="243" w="1" h="57"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="845" y="243" w="1" h="32"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="779" y="243" w="1" h="32"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="753" y="248" w="1" h="31"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="738" y="219" w="1" h="32"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="552" y="214" w="1" h="42"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="476" y="216" w="1" h="34"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="388" y="222" w="1" h="34"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="342" y="222" w="1" h="33"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="277" y="243" w="1" h="32"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="238" y="233" w="1" h="34"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="209" y="233" w="1" h="34"/>
+  </Symbol>
+  <Symbol interline="10" shape="stem">
+    <Bounds x="161" y="243" w="1" h="32"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="901" y="236" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="845" y="236" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="779" y="236" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="753" y="241" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="726" y="246" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="540" y="251" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="464" y="246" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadHalf">
+    <Bounds x="375" y="251" w="14" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="330" y="251" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="277" y="236" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="238" y="226" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="209" y="226" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="noteheadBlack">
+    <Bounds x="161" y="236" w="13" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="fClef">
+    <Bounds x="63" y="606" w="27" h="31"/>
+  </Symbol>
+  <Symbol interline="10" shape="fClef">
+    <Bounds x="63" y="416" w="27" h="31"/>
+  </Symbol>
+  <Symbol interline="10" shape="fClefChange">
+    <Bounds x="654" y="228" w="21" h="25"/>
+  </Symbol>
+  <Symbol interline="10" shape="gClef">
+    <Bounds x="63" y="210" w="25" h="71"/>
+  </Symbol>
+  
+<!--  <Symbol interline="10" shape="KeyFlat4">
+    <Bounds x="94" y="603" w="39" h="45"/>
+  </Symbol>-->
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="94" y="617" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="104" y="602" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="114" y="623" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="124" y="608" w="9" h="26"/>
+  </Symbol>
+  
+<!--  <Symbol interline="10" shape="KeyFlat4">
+    <Bounds x="235" y="413" w="39" h="45"/>
+  </Symbol>-->
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="235" y="428" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="245" y="413" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="255" y="433" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="265" y="417" w="9" h="26"/>
+  </Symbol>
+  
+<!--  <Symbol interline="10" shape="KeySharp2">
+    <Bounds x="94" y="412" w="21" h="45"/>
+  </Symbol>-->
+  <Symbol interline="10" shape="keySharp">
+    <Bounds x="94" y="412" w="11" h="30"/>
+  </Symbol>
+  <Symbol interline="10" shape="keySharp">
+    <Bounds x="104" y="426" w="11" h="30"/>
+  </Symbol>
+  
+<!--  <Symbol interline="10" shape="KeySharp2">
+    <Bounds x="688" y="222" w="21" h="45"/>
+  </Symbol>-->
+  <Symbol interline="10" shape="keySharp">
+    <Bounds x="688" y="222" w="11" h="30"/>
+  </Symbol>
+  <Symbol interline="10" shape="keySharp">
+    <Bounds x="698" y="237" w="11" h="30"/>
+  </Symbol>
+  
+<!--  <Symbol interline="10" shape="KeyFlat3">
+    <Bounds x="93" y="213" w="29" h="45"/>
+  </Symbol>-->
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="93" y="228" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="104" y="213" w="9" h="26"/>
+  </Symbol>
+  <Symbol interline="10" shape="keyFlat">
+    <Bounds x="114" y="233" w="9" h="26"/>
+  </Symbol>
+  
+  <Symbol interline="10" shape="timeSigCutCommon">
+    <Bounds x="472" y="423" w="17" h="28"/>
+  </Symbol>
+  <Symbol interline="10" shape="timeSigCommon">
+    <Bounds x="335" y="426" w="17" h="21"/>
+  </Symbol>
+  <Symbol interline="10" shape="timeSig4over4">
+    <Bounds x="127" y="227" w="16" h="40"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="1067" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="968" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="868" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="769" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="669" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="570" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="470" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="371" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="271" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="173" y="617" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="1096" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="1038" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="979" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="920" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="861" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="802" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="743" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="684" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="625" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="566" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="509" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="429" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="372" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="294" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="192" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="135" y="427" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restWhole">
+    <Bounds x="1084" y="237" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="restQuarter">
+    <Bounds x="1018" y="231" w="11" h="29"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest8th">
+    <Bounds x="994" y="238" w="10" h="19"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest16th">
+    <Bounds x="973" y="238" w="13" h="29"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest32nd">
+    <Bounds x="956" y="228" w="15" h="39"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest64th">
+    <Bounds x="937" y="228" w="17" h="49"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest128th">
+    <Bounds x="917" y="218" w="17" h="59"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest8th">
+    <Bounds x="876" y="238" w="10" h="19"/>
+  </Symbol>
+  <Symbol interline="10" shape="restQuarter">
+    <Bounds x="804" y="231" w="11" h="29"/>
+  </Symbol>
+  <Symbol interline="10" shape="restHalf">
+    <Bounds x="633" y="240" w="15" h="6"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest8th">
+    <Bounds x="604" y="238" w="10" h="19"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest16th">
+    <Bounds x="583" y="238" w="13" h="29"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest32nd">
+    <Bounds x="565" y="228" w="15" h="39"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest8th">
+    <Bounds x="511" y="238" w="10" h="19"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest16th">
+    <Bounds x="490" y="238" w="13" h="29"/>
+  </Symbol>
+  <Symbol interline="10" shape="restQuarter">
+    <Bounds x="418" y="231" w="11" h="29"/>
+  </Symbol>
+  <Symbol interline="10" shape="rest8th">
+    <Bounds x="355" y="238" w="10" h="19"/>
+  </Symbol>
+  <Symbol interline="10" shape="articTenutoBelow">
+    <Bounds x="376" y="271" w="12" h="2"/>
+  </Symbol>
+  <Symbol interline="10" shape="articStaccatissimoAbove">
+    <Bounds x="282" y="216" w="4" h="11"/>
+  </Symbol>
+  <Symbol interline="10" shape="articStaccatoAbove">
+    <Bounds x="244" y="220" w="4" h="4"/>
+  </Symbol>
+  <Symbol interline="10" shape="flag128thDown">
+    <Bounds x="900" y="246" w="11" h="53"/>
+  </Symbol>
+  <Symbol interline="10" shape="flag32ndUp">
+    <Bounds x="552" y="214" w="10" h="43"/>
+  </Symbol>
+  <Symbol interline="10" shape="flag16thUp">
+    <Bounds x="476" y="217" w="10" h="35"/>
+  </Symbol>
+  <Symbol interline="10" shape="flag8thUp">
+    <Bounds x="342" y="223" w="10" h="30"/>
+  </Symbol>
+  <Symbol interline="10" shape="flag8thDown">
+    <Bounds x="209" y="238" w="12" h="29"/>
+  </Symbol>
+<!--  <Symbol interline="10" shape="HairpinSegment">
+    <Bounds x="160" y="295" w="148" h="14"/>
+  </Symbol>-->
+  <Symbol interline="10" shape="augmentationDot">
+    <Bounds x="862" y="239" w="5" h="5"/>
+  </Symbol>
+  <Symbol interline="10" shape="augmentationDot">
+    <Bounds x="178" y="239" w="5" h="5"/>
+  </Symbol>
+</Annotations>
