@@ -6,14 +6,24 @@ This script is a part of the addNoise tool.
 It performs morphological Operations.
 """
 import cv2
+import numpy as np
 import logging
 
-''' Rotation '''
+''' Opening '''
 
 
-def rotate(img, angle):
-    logging.info('Rotating the image.')
-    rows, cols, ch = img.shape
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
-    rot = cv2.warpAffine(img, M, (cols, rows), borderValue=[255, 255, 255])
-    return rot, M
+def opening(img, SE='square', size=2):
+    if SE == 'square':
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
+    elif SE == 'ellipse':
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size))
+    elif SE == 'cross':
+        kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (size, size))
+    elif SE == 'vline':
+        kernel = np.ones((size,1))
+    elif SE == 'hline':
+        kernel = np.ones((1,size))
+
+    logging.info('Kernel used for opening: \n' + np.array_str(kernel))
+    open = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    return open

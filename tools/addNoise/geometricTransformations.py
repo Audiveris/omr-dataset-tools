@@ -32,3 +32,13 @@ def tangentialDistortion(img):
     dist = np.array([0, 0, 0.00, 0.05])  # Tangential
     dst = cv2.undistort(img, cameraMatrix, dist)
     return dst
+
+''' Rotation '''
+
+
+def rotate(img, angle):
+    logging.info('Rotating the image.')
+    rows, cols, ch = img.shape
+    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+    rot = cv2.warpAffine(img, M, (cols, rows), borderValue=[255, 255, 255])
+    return rot, M

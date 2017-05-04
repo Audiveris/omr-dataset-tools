@@ -7,6 +7,7 @@ It performs operations related to XML reading and writing.
 """
 
 import shutil
+import logging
 import xml.etree.ElementTree as ET
 from coordinatesManipulations import processBB
 
@@ -15,6 +16,8 @@ from coordinatesManipulations import processBB
 
 def copyXML(xmlinput, xmlFilename):
     shutil.copy2(xmlinput, xmlFilename)
+    logging.info(xmlFilename + ' created')
+
 
 
 ''' Replace the coordinates of the XML file after transformation '''
@@ -40,4 +43,5 @@ def replace_XML(filename, transform):
                 bbox.set("w", str(w))
                 bbox.set("h", str(h))
     tree.write(filename)
+    logging.info(filename + ' modified')
     return bboxes

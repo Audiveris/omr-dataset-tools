@@ -22,7 +22,6 @@ usage:
         python __main__.py path/imageFile.png (If both the filenames are the same and are located in the same folder)
 """
 
-
 import sys
 import os
 import logging
@@ -128,7 +127,7 @@ def main(argv):
     logging.basicConfig(filename='logFile.log',
                         level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(funcName)s :: %(message)s',
-                        filemode = 'w')
+                        filemode='w')  # Change filemode to append later
 
     ## Processing arguments
     if len(argv) == 3:
@@ -206,8 +205,17 @@ def main(argv):
 
     # Localvar: Zero-mean Gaussian white noise with an intensity-dependent variance
     # Skew: measure of the asymmetry of the probability distribution of a real-valued random variable about its mean.
+
     # Morphological Closing to connect the close objects.
+    # Opening us used instead of closing since the background is white and the foreground is black
+    openImg = opening(callImage(imgFile, 0), size=3, SE='square')
+    #Display(callImage(imgFile, True), openImg, "Opening Operation")
+    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_opening'
+    cv2.imwrite(outputName + '.png', openImg)
+    copyXML(xmlFile, outputName + '.xml')
+
     logging.info('----------------------------------------')
+
 
 if __name__ == "__main__":
     main(sys.argv)
