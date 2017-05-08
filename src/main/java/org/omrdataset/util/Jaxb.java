@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import static java.nio.file.StandardOpenOption.CREATE;
+import java.text.DecimalFormat;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,6 +64,20 @@ public abstract class Jaxb
     //~ Static fields/initializers -----------------------------------------------------------------
 
     private static final Logger logger = LoggerFactory.getLogger(Jaxb.class);
+
+    /** For a maximum of 1 decimal. */
+    private static final DecimalFormat decimal1 = new DecimalFormat();
+
+    static {
+        decimal1.setMaximumFractionDigits(1);
+    }
+
+    /** For a maximum of 3 decimals. */
+    private static final DecimalFormat decimal3 = new DecimalFormat();
+
+    static {
+        decimal3.setMaximumFractionDigits(3);
+    }
 
     //~ Methods ------------------------------------------------------------------------------------
     //---------//
@@ -196,7 +211,7 @@ public abstract class Jaxb
                 return null;
             }
 
-            return String.format("%.1f", d);
+            return decimal1.format(d);
         }
 
         @Override
@@ -223,7 +238,7 @@ public abstract class Jaxb
                 return null;
             }
 
-            return String.format("%.3f", d);
+            return decimal3.format(d);
         }
 
         @Override
@@ -374,29 +389,6 @@ public abstract class Jaxb
         }
     }
 
-    //------------------//
-    // RectangleAdapter //
-    //------------------//
-    public static class RectangleAdapter
-            extends XmlAdapter<RectangleFacade, Rectangle>
-    {
-        //~ Methods --------------------------------------------------------------------------------
-
-        @Override
-        public RectangleFacade marshal (Rectangle rect)
-                throws Exception
-        {
-            return new RectangleFacade(rect);
-        }
-
-        @Override
-        public Rectangle unmarshal (RectangleFacade facade)
-                throws Exception
-        {
-            return facade.getRectangle();
-        }
-    }
-
     //--------------------//
     // Rectangle2DAdapter //
     //--------------------//
@@ -417,6 +409,29 @@ public abstract class Jaxb
                 throws Exception
         {
             return facade.getRectangle2D();
+        }
+    }
+
+    //------------------//
+    // RectangleAdapter //
+    //------------------//
+    public static class RectangleAdapter
+            extends XmlAdapter<RectangleFacade, Rectangle>
+    {
+        //~ Methods --------------------------------------------------------------------------------
+
+        @Override
+        public RectangleFacade marshal (Rectangle rect)
+                throws Exception
+        {
+            return new RectangleFacade(rect);
+        }
+
+        @Override
+        public Rectangle unmarshal (RectangleFacade facade)
+                throws Exception
+        {
+            return facade.getRectangle();
         }
     }
 

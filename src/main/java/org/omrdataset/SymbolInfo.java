@@ -48,12 +48,12 @@ public class SymbolInfo
             SymbolInfo.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
+    @XmlAttribute(name = "interline")
+    public final int interline;
+
     @XmlAttribute(name = "shape")
     @XmlJavaTypeAdapter(OmrShapeAdapter.class)
     public final OmrShape omrShape;
-
-    @XmlAttribute(name = "interline")
-    public final int interline;
 
     @XmlElement(name = "Bounds")
     @XmlJavaTypeAdapter(Jaxb.Rectangle2DAdapter.class)

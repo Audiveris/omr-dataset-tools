@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -108,7 +110,7 @@ public class PageAnnotations
     /**
      * Load PageAnnotations from the annotations XML file.
      *
-     * @param path to the XML file.
+     * @param path to the XML input file.
      * @return the unmarshalled PageAnnotations object
      * @throws IOException
      */
@@ -130,6 +132,29 @@ public class PageAnnotations
 
             return null;
         }
+    }
+
+    //----------//
+    // marshall //
+    //----------//
+    /**
+     * Marshall this instance to the provided XML file.
+     *
+     * @param path to the XML output file
+     * @throws IOException
+     * @throws JAXBException
+     */
+    public void marshall (Path path)
+            throws IOException, JAXBException
+    {
+        Files.createDirectories(path.getParent());
+
+        OutputStream os = Files.newOutputStream(path, StandardOpenOption.CREATE);
+        Marshaller m = getJaxbContext().createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        m.marshal(this, os);
+        os.flush();
+        os.close();
     }
 
     //----------------//

@@ -125,6 +125,10 @@ public class Features
                                 return FileVisitResult.CONTINUE;
                             }
 
+                            //
+                            // annotations.marshall(
+                            //         CONTROL_IMAGES_PATH.resolve(path.getFileName()));
+                            //
                             PageInfo pageInfo = annotations.getPageInfo();
 
                             if (pageInfo == null) {
