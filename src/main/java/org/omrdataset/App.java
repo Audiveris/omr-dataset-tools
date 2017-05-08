@@ -21,6 +21,9 @@
 // </editor-fold>
 package org.omrdataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -32,6 +35,29 @@ import java.nio.file.Paths;
 public abstract class App
 {
     //~ Static fields/initializers -----------------------------------------------------------------
+
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+
+    /** Predefined interline value: {@value}. */
+    public static final int INTERLINE = 10;
+
+    /** Needed multiple for context dimensions: {@value}. */
+    public static final int MULTIPLE = 4;
+
+    /** Height for symbol context, in pixels. */
+    public static final int CONTEXT_HEIGHT = toMultiple(INTERLINE * 9.6);
+
+    /** Width for symbol context, in pixels. */
+    public static final int CONTEXT_WIDTH = toMultiple(INTERLINE * 4.8);
+
+    /** Abscissa margin around a None symbol location. */
+    public static final int NONE_X_MARGIN = (int) Math.rint(INTERLINE * 0.5);
+
+    /** Ordinate margin around a None symbol location. */
+    public static final int NONE_Y_MARGIN = (int) Math.rint(INTERLINE * 0.5);
+
+    /** Ratio of None symbols created versus valid symbols found in page: {@value}. */
+    public static final double NONE_RATIO = 1.0;
 
     /** Path to where the data is found. */
     public static final Path DATA_PATH = Paths.get("data");
@@ -69,24 +95,28 @@ public abstract class App
     /** Path to single CSV file. */
     public static final Path CSV_PATH = DATA_PATH.resolve("features.csv");
 
-    /** Height in pixels for symbol context. */
-    public static final int CONTEXT_HEIGHT = 96;
-
-    /** Width in pixels for symbol context. */
-    public static final int CONTEXT_WIDTH = 48;
-
-    /** Abscissa margin around a None symbol location. */
-    public static final int NONE_X_MARGIN = 5;
-
     /** Value used for background pixel feature. */
     public static final int BACKGROUND = 0;
 
     /** Value used for foreground pixel feature. */
     public static final int FOREGROUND = 255;
 
-    /** Ordinate margin around a None symbol location. */
-    public static final int NONE_Y_MARGIN = 5;
+    static {
+        logger.info(
+                "INTERLINE:{} CONTEXT_WIDTH:{} CONTEXT_HEIGHT:{}",
+                INTERLINE,
+                CONTEXT_WIDTH,
+                CONTEXT_HEIGHT);
+    }
 
-    /** Ratio of None symbols created versus valid symbols found in page. */
-    public static final double NONE_RATIO = 1.0;
+    //~ Methods ------------------------------------------------------------------------------------
+    /**
+     * Report the integer value (as multiple of MULTIPLE).
+     *
+     * @return ceiling value, as multiple of MULTIPLE
+     */
+    private static int toMultiple (double val)
+    {
+        return MULTIPLE * (int) Math.ceil(val / MULTIPLE);
+    }
 }

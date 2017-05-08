@@ -22,7 +22,6 @@
 package org.omrdataset;
 
 import static org.omrdataset.App.*;
-
 import org.omrdataset.util.Population;
 
 import org.slf4j.Logger;
@@ -31,7 +30,9 @@ import org.slf4j.LoggerFactory;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -41,6 +42,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
@@ -60,25 +62,28 @@ public class PageProcessor
     private static final Logger logger = LoggerFactory.getLogger(PageProcessor.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
-    private final BufferedImage img;
+    private final BufferedImage initialImg;
 
     private final PageAnnotations pageInfo;
 
     private final Population pixelPop;
 
+    /** Image(s) gathered by interline value. */
+    private final Map<Integer, BufferedImage> imgMap = new TreeMap<Integer, BufferedImage>();
+
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Creates a new {@code PageProcessor} object.
      *
-     * @param img      the image
-     * @param pageInfo page annotations
-     * @param pixelPop (output) pixels population
+     * @param initialImg the initial image
+     * @param pageInfo   page annotations
+     * @param pixelPop   (output) pixels population
      */
-    public PageProcessor (BufferedImage img,
+    public PageProcessor (BufferedImage initialImg,
                           PageAnnotations pageInfo,
                           Population pixelPop)
     {
-        this.img = img;
+        this.initialImg = initialImg;
         this.pageInfo = pageInfo;
         this.pixelPop = pixelPop;
     }
@@ -101,19 +106,12 @@ public class PageProcessor
                                  Map<OmrShape, Population> heightPops)
             throws Exception
     {
-        final int pageWidth = img.getWidth();
-        final int pageHeight = img.getHeight();
-
-        WritableRaster raster = img.getRaster();
-        DataBuffer buffer = raster.getDataBuffer();
-        DataBufferByte byteBuffer = (DataBufferByte) buffer;
-        byte[] bytes = byteBuffer.getData();
-
         // Process each symbol definition in the page
         for (SymbolInfo symbol : pageInfo.getSymbols()) {
             logger.debug("{}", symbol);
 
             Rectangle2D box = symbol.bounds;
+            BufferedImage img = null;
 
             if (symbol.omrShape != OmrShape.none) {
                 if (symbol.omrShape == null) {
@@ -121,19 +119,37 @@ public class PageProcessor
 
                     continue;
                 }
-
-                widthPops.get(symbol.omrShape).includeValue(box.getWidth());
-                heightPops.get(symbol.omrShape).includeValue(box.getHeight());
             }
 
+            // Pick up image properly scaled
+            final int interline = symbol.interline;
+            final boolean rescale = interline != INTERLINE;
+            final double ratio = (double) INTERLINE / interline;
+            img = imgMap.get(interline);
+
+            if (img == null) {
+                imgMap.put(interline, img = rescale ? scale(initialImg, ratio) : initialImg);
+            }
+
+            widthPops.get(symbol.omrShape).includeValue(box.getWidth() * ratio);
+            heightPops.get(symbol.omrShape).includeValue(box.getHeight() * ratio);
+
             // Symbol center
-            double sCenterX = box.getX() + (box.getWidth() / 2.0);
-            double sCenterY = box.getY() + (box.getHeight() / 2.0);
+            double sCenterX = ratio * (box.getX() + (box.getWidth() / 2.0));
+            double sCenterY = ratio * (box.getY() + (box.getHeight() / 2.0));
 
             // Top-left corner of context
             int left = (int) Math.rint(sCenterX - (CONTEXT_WIDTH / 2));
             int top = (int) Math.rint(sCenterY - (CONTEXT_HEIGHT / 2));
             logger.debug("left:{} top:{}", left, top);
+
+            final int pageWidth = img.getWidth();
+            final int pageHeight = img.getHeight();
+
+            WritableRaster raster = img.getRaster();
+            DataBuffer buffer = raster.getDataBuffer();
+            DataBufferByte byteBuffer = (DataBufferByte) buffer;
+            byte[] bytes = byteBuffer.getData();
 
             // Extract bytes from sub-image, paying attention to image limits
             // Target format is flattened format, row by row.
@@ -172,6 +188,26 @@ public class PageProcessor
     }
 
     /**
+     * Build a scaled version of an image.
+     *
+     * @param img   image to scale
+     * @param ratio scaling ratio
+     * @return the scaled image
+     */
+    public static BufferedImage scale (BufferedImage img,
+                                       double ratio)
+    {
+        AffineTransform at = AffineTransform.getScaleInstance(ratio, ratio);
+        AffineTransformOp atop = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        BufferedImage scaledImg = new BufferedImage(
+                (int) Math.ceil(img.getWidth() * ratio),
+                (int) Math.ceil(img.getHeight() * ratio),
+                img.getType());
+
+        return atop.filter(img, scaledImg);
+    }
+
+    /**
      * Draw symbols boxes and None symbols locations on control image.
      *
      * @param controlPath target path for control image
@@ -181,11 +217,11 @@ public class PageProcessor
             throws IOException
     {
         BufferedImage ctrl = new BufferedImage(
-                img.getWidth(),
-                img.getHeight(),
+                initialImg.getWidth(),
+                initialImg.getHeight(),
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = ctrl.createGraphics();
-        g.drawImage(img, null, null);
+        g.drawImage(initialImg, null, null);
 
         for (SymbolInfo symbol : pageInfo.getSymbols()) {
             logger.debug("{}", symbol);
@@ -193,19 +229,22 @@ public class PageProcessor
             Rectangle2D box = symbol.bounds;
 
             if (symbol.omrShape != OmrShape.none) {
-                g.setColor(Color.GREEN);
                 // Draw outer rectangle, with line stroke of 1 pixel
-                box.setRect(
+                Rectangle2D b = new Rectangle2D.Double(
                         box.getX() - 1,
                         box.getY() - 1,
                         box.getWidth() + 1,
                         box.getHeight() + 1);
-                g.draw(box);
+                g.setColor(Color.GREEN);
+                g.draw(b);
             } else {
+                double ratio = (double) INTERLINE / symbol.interline;
+                int xMargin = (int) Math.rint(NONE_X_MARGIN / ratio);
+                int yMargin = (int) Math.rint(NONE_Y_MARGIN / ratio);
                 Rectangle b = box.getBounds();
                 g.setColor(Color.RED);
-                g.drawLine(b.x, b.y - NONE_Y_MARGIN, b.x, b.y + NONE_Y_MARGIN);
-                g.drawLine(b.x - NONE_X_MARGIN, b.y, b.x + NONE_X_MARGIN, b.y);
+                g.drawLine(b.x, b.y - yMargin, b.x, b.y + yMargin);
+                g.drawLine(b.x - xMargin, b.y, b.x + xMargin, b.y);
             }
         }
 

@@ -254,7 +254,7 @@ public class Features
                 new double[]{
                     pixelPop.getMeanValue(), pixelPop.getStandardDeviation() + Nd4j.EPS_THRESHOLD
                 });
-        logger.info("Pixels pop: {}", pixelPop);
+        logger.info("Pixels {}", pixelPop);
         new Norms(pixels).store(DATA_PATH, PIXELS_NORMS);
     }
 
