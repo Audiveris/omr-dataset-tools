@@ -28,12 +28,17 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
  * Class {@code NonesBuilder} generates None-shape symbols within a page.
+ * <p>
+ * We try to insert None-shape symbols at random locations in the page, provided that ordinate of
+ * location center is within a valid symbol vertical range and the none-shape symbol does not
+ * intersect another symbol rectangle.
  *
  * @author Hervé Bitteur
  */
@@ -55,16 +60,20 @@ public class NonesBuilder
     };
 
     //~ Instance fields ----------------------------------------------------------------------------
+    /** Annotations for this page. */
     private final PageAnnotations annotations;
 
     /** We need the same interline value for the whole page. */
     private Integer interline;
 
+    /** List of filled boxes, kept sorted on x. */
+    private final List<Rectangle> filledBoxes = new ArrayList<Rectangle>();
+
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Creates a new {@code NoneSymbols} object.
      *
-     * @param annotations known symbols for the page
+     * @param annotations Annotations for the page
      */
     public NonesBuilder (PageAnnotations annotations)
     {
@@ -81,19 +90,21 @@ public class NonesBuilder
     public List<SymbolInfo> insertNones (int toAdd)
     {
         if (!checkInterlineValue()) {
+            logger.info("Page has several interline values, no None symbol can be inserted.");
+
             return Collections.emptyList();
         }
 
-        // Collection of filled boxes, kept sorted on x.
-        List<Rectangle> filledBoxes = new ArrayList<Rectangle>();
-        int maxWidth = fillWithSymbols(filledBoxes);
+        int maxWidth = fillWithSymbols();
         maxWidth = Math.max(maxWidth, 2 * NONE_X_MARGIN); // Safer
 
         // Created None symbols
-        List<SymbolInfo> createdSymbols = new ArrayList<SymbolInfo>();
-
+        final List<SymbolInfo> createdSymbols = new ArrayList<SymbolInfo>();
         final int pageWidth = annotations.getPageInfo().dim.width;
         final int pageHeight = annotations.getPageInfo().dim.height;
+
+        // Ordinates occupied by valid symbols
+        final boolean[] occupiedYs = getOccupiedYs(pageHeight);
 
         // Put a reasonable limit on creation attempts
         for (int i = 10 * toAdd; i >= 0; i--) {
@@ -101,14 +112,18 @@ public class NonesBuilder
                 break; // Normal exit
             }
 
-            int x = (int) Math.rint(Math.random() * pageWidth);
-            int y = (int) Math.rint(Math.random() * pageHeight);
-            Rectangle rect = new Rectangle(x, y, 0, 0);
-            rect.grow(NONE_X_MARGIN, NONE_Y_MARGIN);
+            // Make sure we pick a y within some valid symbol vertical range
+            final int y = (int) Math.rint(Math.random() * pageHeight);
 
-            if (tryInsertion(rect, filledBoxes, maxWidth)) {
-                createdSymbols.add(
-                        new SymbolInfo(OmrShape.none, interline, new Rectangle(x, y, 0, 0)));
+            if ((y >= 0) && (y < pageHeight) && occupiedYs[y]) {
+                final int x = (int) Math.rint(Math.random() * pageWidth);
+                final Rectangle rect = new Rectangle(x, y, 0, 0);
+                rect.grow(NONE_X_MARGIN, NONE_Y_MARGIN);
+
+                if (tryInsertion(rect, maxWidth)) {
+                    createdSymbols.add(
+                            new SymbolInfo(OmrShape.none, interline, new Rectangle(x, y, 0, 0)));
+                }
             }
         }
 
@@ -123,13 +138,10 @@ public class NonesBuilder
     private boolean checkInterlineValue ()
     {
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            if (interline == null && symbol.interline != 0) {
+            if ((interline == null) && (symbol.interline != 0)) {
                 interline = symbol.interline;
-            } else {
-                if (interline != symbol.interline) {
-                    logger.info("Several interline values");
-                    return false;
-                }
+            } else if (interline != symbol.interline) {
+                return false;
             }
         }
 
@@ -138,23 +150,14 @@ public class NonesBuilder
 
     /**
      * Populate the "filledBoxes" collection with the boxes of all valid symbols.
-     * We also make sure that all symbols have the same interline value.
      *
-     * @param filledBoxes (output) collection to populate
      * @return the maximum width across all symbols
      */
-    private int fillWithSymbols (List<Rectangle> filledBoxes)
+    private int fillWithSymbols ()
     {
         int maxWidth = 0;
 
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            if (interline == null && symbol.interline != 0) {
-                interline = symbol.interline;
-            } else {
-                if (interline != symbol.interline) {
-                    throw new IllegalStateException("Several interline values in same page");
-                }
-            }
             Rectangle r = symbol.bounds.getBounds();
             maxWidth = Math.max(maxWidth, r.width);
             filledBoxes.add(r);
@@ -170,25 +173,23 @@ public class NonesBuilder
      * existing rectangle (valid symbols plus already inserted artificial rectangles).
      *
      * @param rect     (input) the rectangle to insert
-     * @param filled   (input/output) the current collection of occupied rectangles
      * @param maxWidth (input) maximum symbol width
      * @return
      */
     private boolean tryInsertion (Rectangle rect,
-                                  List<Rectangle> filled,
                                   int maxWidth)
     {
-        final int size = filled.size();
+        final int size = filledBoxes.size();
         final int xMax = (rect.x + rect.width) - 1;
         final int xMin = (rect.x - maxWidth) + 1;
 
         // Theoretical insertion index in the sorted list
-        final int result = Collections.binarySearch(filled, rect, byAbscissa);
+        final int result = Collections.binarySearch(filledBoxes, rect, byAbscissa);
         final int index = (result >= 0) ? result : (-(result + 1));
 
         // Check for collisions on right
         for (int i = index; i < size; i++) {
-            Rectangle r = filled.get(i);
+            Rectangle r = filledBoxes.get(i);
 
             if (r.x > xMax) {
                 break;
@@ -199,7 +200,7 @@ public class NonesBuilder
 
         // Check for collisions on left
         for (int i = index - 1; i >= 0; i--) {
-            Rectangle r = filled.get(i);
+            Rectangle r = filledBoxes.get(i);
 
             if (r.x < xMin) {
                 break;
@@ -209,9 +210,31 @@ public class NonesBuilder
         }
 
         // No collision found, insert rectangle at proper index
-        filled.add(index, rect);
+        filledBoxes.add(index, rect);
         logger.debug("Added None at {}", rect);
 
         return true;
+    }
+
+    /**
+     * Return which ordinate values are occupied by a valid symbol
+     *
+     * @param height page height
+     * @return table of booleans indexed by y
+     */
+    private boolean[] getOccupiedYs (int height)
+    {
+        boolean[] occupied = new boolean[height];
+        Arrays.fill(occupied, false);
+
+        for (SymbolInfo symbol : annotations.getSymbols()) {
+            Rectangle r = symbol.bounds.getBounds();
+
+            for (int y = r.y; y < (r.y + r.height); y++) {
+                occupied[y] = true;
+            }
+        }
+
+        return occupied;
     }
 }
