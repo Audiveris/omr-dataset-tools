@@ -35,9 +35,9 @@ run {
     minHeapSize = '512m'
     maxHeapSize = '2g'
     
-    // Retrieve CLI arguments from exec.args property if any
-    if (hasProperty("exec.args")) {
-        args System.getProperty("exec.args").split()
+    // Retrieve CLI arguments from cmdLineArgs property if any
+    if (hasProperty("cmdLineArgs")) {
+        args System.getProperty("cmdLineArgs").split()
     }
 }
 
