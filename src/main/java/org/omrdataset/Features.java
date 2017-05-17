@@ -125,7 +125,7 @@ public class Features
                                 return FileVisitResult.CONTINUE;
                             }
 
-                            //
+                            // Rewrite annotations?
                             // annotations.marshall(
                             //         CONTROL_IMAGES_PATH.resolve(path.getFileName()));
                             //
@@ -184,13 +184,17 @@ public class Features
                             PageProcessor processor = new PageProcessor(
                                     img,
                                     annotations,
-                                    pixelPop);
-                            processor.extractFeatures(out, widthPops, heightPops);
+                                    true, // leaves
+                                    pixelPop,
+                                    widthPops,
+                                    heightPops);
+                            processor.extractFeatures(out);
 
                             // Generate page image with valid symbol boxes and None locations
                             String radix = FileUtil.getNameSansExtension(imgPath);
                             Path controlPath = CONTROL_IMAGES_PATH.resolve(
                                     radix + OUTPUT_IMAGES_EXT);
+                            logger.info("Generating control image {}", controlPath);
                             processor.drawBoxes(controlPath);
                         } catch (Exception ex) {
                             logger.warn("Exception " + ex, ex);

@@ -138,9 +138,9 @@ public class NonesBuilder
     private boolean checkInterlineValue ()
     {
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            if ((interline == null) && (symbol.interline != 0)) {
-                interline = symbol.interline;
-            } else if (interline != symbol.interline) {
+            if ((interline == null) && (symbol.getInterline() != 0)) {
+                interline = symbol.getInterline();
+            } else if (interline != symbol.getInterline()) {
                 return false;
             }
         }
@@ -158,7 +158,7 @@ public class NonesBuilder
         int maxWidth = 0;
 
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            Rectangle r = symbol.bounds.getBounds();
+            Rectangle r = symbol.getBounds().getBounds();
             maxWidth = Math.max(maxWidth, r.width);
             filledBoxes.add(r);
         }
@@ -228,7 +228,7 @@ public class NonesBuilder
         Arrays.fill(occupied, false);
 
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            Rectangle r = symbol.bounds.getBounds();
+            Rectangle r = symbol.getBounds().getBounds();
 
             for (int y = r.y; y < (r.y + r.height); y++) {
                 occupied[y] = true;

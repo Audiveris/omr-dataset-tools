@@ -81,8 +81,8 @@ public enum OmrShape
     repeatRightLeft("Right and left repeat sign"),
     repeatDots("Repeat dots"),
     repeatDot("Repeat dot"),
-    dalSegno("Dal segno"),
-    daCapo("Da capo"),
+    dalSegno("Dal segno (D.S.)"),
+    daCapo("Da capo (D.C.)"),
     segno("Segno"),
     coda("Coda"),
     codaSquare("Square coda"),
@@ -151,6 +151,10 @@ public enum OmrShape
     noteheadDoubleWhole("Double whole (breve) notehead"),
     noteheadDoubleWholeSmall("Double whole note (breve) (small staff)"),
     augmentationDot("Augmentation dot"),
+    //
+    // 4.7bis Ledgers (NOTA: this is an addition to SMuFL)
+    //
+    ledger("Ledger line"),
     //
     // 4.15 Stems
     //

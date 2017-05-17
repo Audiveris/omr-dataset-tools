@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -66,7 +67,13 @@ public class PageProcessor
 
     private final PageAnnotations pageInfo;
 
+    private final boolean leaves;
+
     private final Population pixelPop;
+
+    private final Map<OmrShape, Population> widthPops;
+
+    private final Map<OmrShape, Population> heightPops;
 
     /** Image(s) gathered by interline value. */
     private final Map<Integer, BufferedImage> imgMap = new TreeMap<Integer, BufferedImage>();
@@ -77,52 +84,79 @@ public class PageProcessor
      *
      * @param initialImg the initial image
      * @param pageInfo   page annotations
+     * @param leaves     true for using leaf symbols
      * @param pixelPop   (output) pixels population
+     * @param widthPops  population of symbol widths per shape
+     * @param heightPops population of symbol heights per shape
      */
     public PageProcessor (BufferedImage initialImg,
                           PageAnnotations pageInfo,
-                          Population pixelPop)
+                          boolean leaves,
+                          Population pixelPop,
+                          Map<OmrShape, Population> widthPops,
+                          Map<OmrShape, Population> heightPops)
     {
         this.initialImg = initialImg;
         this.pageInfo = pageInfo;
+        this.leaves = leaves;
         this.pixelPop = pixelPop;
+        this.widthPops = widthPops;
+        this.heightPops = heightPops;
     }
 
     //~ Methods ------------------------------------------------------------------------------------
     /**
      * Process the page (image / annotations) to append the extracted features
-     * (the context sub-image for each symbol) to the provided out stream.
+     * (the context sub-image for each symbol) to the out stream.
      * <p>
      * Nota: if a sub-image goes beyond image borders, we fill the related external pixels with
      * background value.
      *
-     * @param out        the output to append to
-     * @param widthPops  population of symbol widths per shape
-     * @param heightPops population of symbol heights per shape
+     * @param out output to be populated by CSV records
      * @throws Exception
      */
-    public void extractFeatures (PrintWriter out,
-                                 Map<OmrShape, Population> widthPops,
-                                 Map<OmrShape, Population> heightPops)
+    public void extractFeatures (PrintWriter out)
             throws Exception
     {
         // Process each symbol definition in the page
-        for (SymbolInfo symbol : pageInfo.getSymbols()) {
+        processSymbols(pageInfo.getSymbols(), out);
+    }
+
+    private void processSymbols (List<SymbolInfo> symbols,
+                                 PrintWriter out)
+    {
+        for (SymbolInfo symbol : symbols) {
+            final OmrShape symbolShape = symbol.getOmrShape();
             logger.debug("{}", symbol);
 
-            Rectangle2D box = symbol.bounds;
-            BufferedImage img = null;
+            // Inner symbols?
+            if (leaves) {
+                List<SymbolInfo> innerSymbols = symbol.getInnerSymbols();
 
-            if (symbol.omrShape != OmrShape.none) {
-                if (symbol.omrShape == null) {
+                if (!innerSymbols.isEmpty()) {
+                    logger.debug("+++ Processing inner symbols of {}", symbol);
+                    processSymbols(innerSymbols, out);
+                    logger.debug("--- End of inner symbols of {}", symbol);
+
+                    if (!OmrShapes.TIME_COMBOS.contains(symbolShape)) {
+                        continue;
+                    }
+                }
+            }
+
+            if (symbolShape != OmrShape.none) {
+                if (symbolShape == null) {
                     logger.warn("Null shape {}", symbol);
 
                     continue;
                 }
             }
 
+            Rectangle2D box = symbol.getBounds();
+            BufferedImage img = null;
+
             // Pick up image properly scaled
-            final int interline = symbol.interline;
+            final int interline = symbol.getInterline();
             final boolean rescale = interline != INTERLINE;
             final double ratio = (double) INTERLINE / interline;
             img = imgMap.get(interline);
@@ -131,8 +165,8 @@ public class PageProcessor
                 imgMap.put(interline, img = rescale ? scale(initialImg, ratio) : initialImg);
             }
 
-            widthPops.get(symbol.omrShape).includeValue(box.getWidth() * ratio);
-            heightPops.get(symbol.omrShape).includeValue(box.getHeight() * ratio);
+            widthPops.get(symbolShape).includeValue(box.getWidth() * ratio);
+            heightPops.get(symbolShape).includeValue(box.getHeight() * ratio);
 
             // Symbol center
             double sCenterX = ratio * (box.getX() + (box.getWidth() / 2.0));
@@ -141,7 +175,7 @@ public class PageProcessor
             // Top-left corner of context
             int left = (int) Math.rint(sCenterX - (CONTEXT_WIDTH / 2));
             int top = (int) Math.rint(sCenterY - (CONTEXT_HEIGHT / 2));
-            logger.debug("left:{} top:{}", left, top);
+            logger.trace("left:{} top:{}", left, top);
 
             final int pageWidth = img.getWidth();
             final int pageHeight = img.getHeight();
@@ -177,7 +211,7 @@ public class PageProcessor
 
             // Add (OMR) shape index
             try {
-                out.print(symbol.omrShape.ordinal());
+                out.print(symbolShape.ordinal());
             } catch (Exception ex) {
                 logger.error("Missing shape {}", symbol);
                 throw new RuntimeException("Missing shape for " + symbol);
@@ -223,12 +257,37 @@ public class PageProcessor
         Graphics2D g = ctrl.createGraphics();
         g.drawImage(initialImg, null, null);
 
-        for (SymbolInfo symbol : pageInfo.getSymbols()) {
+        drawSymbols(pageInfo.getSymbols(), g);
+
+        g.dispose();
+        Files.createDirectories(controlPath.getParent());
+        ImageIO.write(ctrl, OUTPUT_IMAGES_FORMAT, controlPath.toFile());
+    }
+
+    /**
+     * Draw the boxes for the provided symbols (and recursively their inner symbols)
+     *
+     * @param symbols the collection of symbols to process
+     * @param g       the graphic output
+     */
+    private void drawSymbols (List<SymbolInfo> symbols,
+                              Graphics2D g)
+    {
+        for (SymbolInfo symbol : symbols) {
             logger.debug("{}", symbol);
 
-            Rectangle2D box = symbol.bounds;
+            // Inner symbols?
+            List<SymbolInfo> innerSymbols = symbol.getInnerSymbols();
 
-            if (symbol.omrShape != OmrShape.none) {
+            if (!innerSymbols.isEmpty()) {
+                logger.debug("+++ Drawing inner symbols of {}", symbol);
+                drawSymbols(innerSymbols, g);
+                logger.debug("--- End of inner symbols of {}", symbol);
+            }
+
+            Rectangle2D box = symbol.getBounds();
+
+            if (symbol.getOmrShape() != OmrShape.none) {
                 // Draw outer rectangle, with line stroke of 1 pixel
                 Rectangle2D b = new Rectangle2D.Double(
                         box.getX() - 1,
@@ -238,7 +297,7 @@ public class PageProcessor
                 g.setColor(Color.GREEN);
                 g.draw(b);
             } else {
-                double ratio = (double) INTERLINE / symbol.interline;
+                double ratio = (double) INTERLINE / symbol.getInterline();
                 int xMargin = (int) Math.rint(NONE_X_MARGIN / ratio);
                 int yMargin = (int) Math.rint(NONE_Y_MARGIN / ratio);
                 Rectangle b = box.getBounds();
@@ -247,9 +306,5 @@ public class PageProcessor
                 g.drawLine(b.x - xMargin, b.y, b.x + xMargin, b.y);
             }
         }
-
-        g.dispose();
-        Files.createDirectories(controlPath.getParent());
-        ImageIO.write(ctrl, OUTPUT_IMAGES_FORMAT, controlPath.toFile());
     }
 }

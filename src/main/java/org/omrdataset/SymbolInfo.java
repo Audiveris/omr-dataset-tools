@@ -27,6 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.Unmarshaller;
@@ -36,7 +39,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * Class {@code SymbolInfo} handles info about one symbol (name, bounding box).
+ * Class {@code SymbolInfo} handles info about one OMR symbol (name, bounding box).
  *
  * @author Hervé Bitteur
  */
@@ -49,15 +52,19 @@ public class SymbolInfo
 
     //~ Instance fields ----------------------------------------------------------------------------
     @XmlAttribute(name = "interline")
-    public final int interline;
+    private final int interline;
 
     @XmlAttribute(name = "shape")
     @XmlJavaTypeAdapter(OmrShapeAdapter.class)
-    public final OmrShape omrShape;
+    private final OmrShape omrShape;
 
     @XmlElement(name = "Bounds")
     @XmlJavaTypeAdapter(Jaxb.Rectangle2DAdapter.class)
-    public final Rectangle2D bounds;
+    private final Rectangle2D bounds;
+
+    /** Inner symbols, if any. */
+    @XmlElement(name = "Symbol")
+    private List<SymbolInfo> innerSymbols;
 
     //~ Constructors -------------------------------------------------------------------------------
     /**
@@ -77,7 +84,7 @@ public class SymbolInfo
     }
 
     /**
-     * Creates a new {@code SymbolInfo} object.
+     * No-arg constructor needed for JAXB.
      */
     private SymbolInfo ()
     {
@@ -92,8 +99,14 @@ public class SymbolInfo
     {
         StringBuilder sb = new StringBuilder("Symbol{");
         sb.append(omrShape);
+
+        if ((innerSymbols != null) && !innerSymbols.isEmpty()) {
+            sb.append(" OUTER");
+        }
+
         sb.append(" interline:").append(interline);
         sb.append(" ").append(bounds);
+
         sb.append("}");
 
         return sb.toString();
@@ -112,7 +125,65 @@ public class SymbolInfo
         }
     }
 
+    /**
+     * Report the inner symbols, if any
+     *
+     * @return un-mutable list of inner symbols, perhaps empty but never null
+     */
+    public List<SymbolInfo> getInnerSymbols ()
+    {
+        if (innerSymbols == null) {
+            return Collections.emptyList();
+        }
+
+        return Collections.unmodifiableList(innerSymbols);
+    }
+
+    /**
+     * @return the interline
+     */
+    public int getInterline ()
+    {
+        return interline;
+    }
+
+    /**
+     * @return the omrShape
+     */
+    public OmrShape getOmrShape ()
+    {
+        return omrShape;
+    }
+
+    /**
+     * @return a COPY of the bounds
+     */
+    public Rectangle2D getBounds ()
+    {
+        Rectangle2D copy = new Rectangle2D.Double();
+        copy.setRect(bounds);
+
+        return copy;
+    }
+
+    /**
+     * Add an inner symbol within this one.
+     *
+     * @param symbol the inner symbol to add
+     */
+    public void addInnerSymbol (SymbolInfo symbol)
+    {
+        if (innerSymbols == null) {
+            innerSymbols = new ArrayList<SymbolInfo>();
+        }
+
+        innerSymbols.add(symbol);
+    }
+
     //~ Inner Classes ------------------------------------------------------------------------------
+    //-----------------//
+    // OmrShapeAdapter //
+    //-----------------//
     /**
      * We need a specific adapter to warn about unknown shape names.
      */
