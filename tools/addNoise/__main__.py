@@ -107,7 +107,7 @@ def speckle(img):
 ''' Process Bounding boxes for display '''
 
 
-def processBBDisplay(bboxes, transform, orgImg, rotImg):
+def processBBDisplay(bboxes, transform, orgImg, rotImg, mode):
     img = orgImg
     for bbox in bboxes:
         x = int(bbox[0])
@@ -115,12 +115,13 @@ def processBBDisplay(bboxes, transform, orgImg, rotImg):
         w = int(bbox[2])
         h = int(bbox[3])
         cv2.rectangle(img, (x, y), (x + w, y + h), (255, 100, 0), 1)
-        x, y, w, h = transformBB(x, y, w, h, transform)
+        x, y, w, h = transformBB(x, y, w, h, transform, mode)
         cv2.rectangle(rotImg, (x, y), (x + w, y + h), (0, 0, 255), 1)
-    Display(img, rotImg, "Rotated Image")
+    Display(img, rotImg, "Transformed Image")
 
 
 ''' Main process '''
+
 
 
 def main(argv):
@@ -167,6 +168,7 @@ def main(argv):
     outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_salt_pepper'
     cv2.imwrite(outputName + '.png', saltAndPepperDist)
     copyXML(xmlFile, outputName + '.xml')
+    deteriorationXML(xmlFile, mode='', parameters='')
     # Display(callImage(imgFile, True), saltAndPepperDist, "Salt and Pepper Distortion")
 
     ## Gaussian Noise
@@ -190,12 +192,17 @@ def main(argv):
     outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_rotate'
     copyXML(xmlFile, outputName + '.xml')
     cv2.imwrite(outputName + '.png', rotImage)
-    bboxes = replace_XML(outputName + '.xml', transform)
+    bboxes = replaceBBoxXML(outputName + '.xml', transform, mode='rotation')
     # processBBDisplay(bboxes, transform, callImage(imgFile, True), rotImage) # Display the rotated iamges with the coordinates
 
     # Radial distortion: straight lines will appear curved
-    radDist = radialDistortion(callImage(imgFile, 0))
+    radDist, transform = radialDistortion(callImage(imgFile, 0))
     # Display(callImage(imgFile, True), radDist, "Radial Distortion")
+    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_radial'
+    copyXML(xmlFile, outputName + '.xml')
+    cv2.imwrite(outputName + '.png', radDist)
+    bboxes = replaceBBoxXML(outputName + '.xml', transform, mode='distortion')
+    #processBBDisplay(bboxes, transform, callImage(imgFile, True), radDist, mode='distortion')
     '''To do: Write the new coordinates to the xml file'''
 
     # Tangential distortion : occurs because image taking lense is not aligned perfectly parallel to the imaging plane.
@@ -208,11 +215,15 @@ def main(argv):
 
     # Morphological Closing to connect the close objects.
     # Opening us used instead of closing since the background is white and the foreground is black
-    openImg = opening(callImage(imgFile, 0), size=3, SE='square')
-    #Display(callImage(imgFile, True), openImg, "Opening Operation")
+    openImg = opening(callImage(imgFile, 0), size=5)
+    # Display(callImage(imgFile, True), openImg, "Opening Operation")
     outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_opening'
     cv2.imwrite(outputName + '.png', openImg)
     copyXML(xmlFile, outputName + '.xml')
+
+    ## Perspective Transform
+    perspectiveImage, transform = perspective(callImage(imgFile, 1))
+    # Display(callImage(imgFile, True), perspectiveImage, "Persective Transform")
 
     logging.info('----------------------------------------')
 

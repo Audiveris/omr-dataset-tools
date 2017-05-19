@@ -12,7 +12,7 @@ import logging
 ''' Opening '''
 
 
-def opening(img, SE='square', size=2):
+def opening(img, SE='cross', size=3):
     if SE == 'square':
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
     elif SE == 'ellipse':
