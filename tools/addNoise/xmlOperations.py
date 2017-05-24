@@ -8,7 +8,7 @@ It performs operations related to XML reading and writing.
 
 import shutil
 import logging
-from xml.etree.ElementTree import ElementTree, Element
+import xml.etree.ElementTree as ET
 from coordinatesManipulations import processBB
 
 ''' Copy XML file '''
@@ -23,7 +23,7 @@ def copyXML(xmlinput, xmlFilename):
 
 
 def replaceBBoxXML(filename, transform, mode):
-    tree = ElementTree.parse(filename)
+    tree = ET.parse(filename)
     museScore = tree.getroot()
     bboxes = []
     for symbol in museScore:
@@ -49,24 +49,23 @@ def replaceBBoxXML(filename, transform, mode):
 
 
 def deteriorationXML(filename, mode, parameters):
-    tree = ElementTree.parse(filename)
+    # mode should contain the name of the noise string
+    # Parameters should contain a dict of noise paramters
+
+    tree = ET.parse(filename)
     museScore = tree.getroot()
     deterioration = museScore.find('deterioration')
+
+    # Create deterioration node if not available in xml file
     if deterioration is None:
-        # Create the element
-        museScore.append(Element('deterioration'))
-        # deterioration = tree.Element('deterioration')
-        # museScore.insert(0, deterioration)
+        print 'Not Found'
+        child = ET.Element('deterioration')
+        museScore.insert(2, child)
 
-    # Pass the mode and parameter to the element
+    # Adding parameters to deterioration
+    det = museScore.find('deterioration')
+    child = ET.Element(mode, attrib=parameters)
+    det.insert(0, child)
 
-
-    # for tag in museScore:
-    #
-    #     # Check if the root already contains the tag
-    #     if deterioration is None:
-    #         print 'Does not contain deterioration tag. Creating...'
-    #         museScore.insert(1,'test')
+    # Writing the new file
     tree.write(filename)
-    ElementTree(tree).write(filename, encoding='utf-8')
-    print 'Writing..'
