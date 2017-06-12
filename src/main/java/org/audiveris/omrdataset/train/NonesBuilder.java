@@ -19,9 +19,13 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
+package org.audiveris.omrdataset.train;
 
-import static org.omrdataset.App.*;
+import org.audiveris.omrdataset.api.OmrShape;
+import org.audiveris.omrdataset.api.SheetAnnotations;
+import org.audiveris.omrdataset.api.SymbolInfo;
+
+import static org.audiveris.omrdataset.train.App.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +38,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Class {@code NonesBuilder} generates None-shape symbols within a page.
+ * Class {@code NonesBuilder} generates None-shape symbols within a sheet.
  * <p>
- * We try to insert None-shape symbols at random locations in the page, provided that ordinate of
+ * We try to insert None-shape symbols at random locations in the sheet, provided that ordinate of
  * location center is within a valid symbol vertical range and the none-shape symbol does not
  * intersect another symbol rectangle.
  *
@@ -61,7 +65,7 @@ public class NonesBuilder
 
     //~ Instance fields ----------------------------------------------------------------------------
     /** Annotations for this page. */
-    private final PageAnnotations annotations;
+    private final SheetAnnotations annotations;
 
     /** We need the same interline value for the whole page. */
     private Integer interline;
@@ -75,7 +79,7 @@ public class NonesBuilder
      *
      * @param annotations Annotations for the page
      */
-    public NonesBuilder (PageAnnotations annotations)
+    public NonesBuilder (SheetAnnotations annotations)
     {
         this.annotations = annotations;
     }
@@ -95,16 +99,21 @@ public class NonesBuilder
             return Collections.emptyList();
         }
 
+        // Adjust margin to sheet interline value
+        final double ratio = (double) INTERLINE / interline;
+        final int xMargin = (int) Math.rint(NONE_X_MARGIN / ratio);
+        final int yMargin = (int) Math.rint(NONE_Y_MARGIN / ratio);
+
         int maxWidth = fillWithSymbols();
-        maxWidth = Math.max(maxWidth, 2 * NONE_X_MARGIN); // Safer
+        maxWidth = Math.max(maxWidth, 2 * xMargin); // Safer
 
         // Created None symbols
         final List<SymbolInfo> createdSymbols = new ArrayList<SymbolInfo>();
-        final int pageWidth = annotations.getPageInfo().dim.width;
-        final int pageHeight = annotations.getPageInfo().dim.height;
+        final int sheetWidth = annotations.getSheetInfo().dim.width;
+        final int sheetHeight = annotations.getSheetInfo().dim.height;
 
-        // Ordinates occupied by valid symbols
-        final boolean[] occupiedYs = getOccupiedYs(pageHeight);
+        // Ordinates occupied by standard symbols
+        final boolean[] occupiedYs = getOccupiedYs(sheetHeight);
 
         // Put a reasonable limit on creation attempts
         for (int i = 10 * toAdd; i >= 0; i--) {
@@ -113,16 +122,16 @@ public class NonesBuilder
             }
 
             // Make sure we pick a y within some valid symbol vertical range
-            final int y = (int) Math.rint(Math.random() * pageHeight);
+            final int y = (int) Math.rint(Math.random() * sheetHeight);
 
-            if ((y >= 0) && (y < pageHeight) && occupiedYs[y]) {
-                final int x = (int) Math.rint(Math.random() * pageWidth);
+            if ((y >= 0) && (y < sheetHeight) && occupiedYs[y]) {
+                final int x = (int) Math.rint(Math.random() * sheetWidth);
                 final Rectangle rect = new Rectangle(x, y, 0, 0);
-                rect.grow(NONE_X_MARGIN, NONE_Y_MARGIN);
+                rect.grow(xMargin, yMargin);
 
                 if (tryInsertion(rect, maxWidth)) {
                     createdSymbols.add(
-                            new SymbolInfo(OmrShape.none, interline, new Rectangle(x, y, 0, 0)));
+                            new SymbolInfo(OmrShape.none, interline, null, new Rectangle(x, y, 0, 0)));
                 }
             }
         }
@@ -158,14 +167,40 @@ public class NonesBuilder
         int maxWidth = 0;
 
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            Rectangle r = symbol.getBounds().getBounds();
-            maxWidth = Math.max(maxWidth, r.width);
-            filledBoxes.add(r);
+            if (!IgnoredShapes.isIgnored(symbol.getOmrShape())) {
+                Rectangle r = symbol.getBounds().getBounds();
+                maxWidth = Math.max(maxWidth, r.width);
+                filledBoxes.add(r);
+            }
         }
 
         Collections.sort(filledBoxes, byAbscissa);
 
         return maxWidth;
+    }
+
+    /**
+     * Return which ordinate values are occupied by a valid symbol
+     *
+     * @param height page height
+     * @return table of booleans indexed by y
+     */
+    private boolean[] getOccupiedYs (int height)
+    {
+        boolean[] occupied = new boolean[height];
+        Arrays.fill(occupied, false);
+
+        for (SymbolInfo symbol : annotations.getSymbols()) {
+            if (!IgnoredShapes.isIgnored(symbol.getOmrShape())) {
+                Rectangle r = symbol.getBounds().getBounds();
+
+                for (int y = r.y; y < (r.y + r.height); y++) {
+                    occupied[y] = true;
+                }
+            }
+        }
+
+        return occupied;
     }
 
     /**
@@ -214,27 +249,5 @@ public class NonesBuilder
         logger.debug("Added None at {}", rect);
 
         return true;
-    }
-
-    /**
-     * Return which ordinate values are occupied by a valid symbol
-     *
-     * @param height page height
-     * @return table of booleans indexed by y
-     */
-    private boolean[] getOccupiedYs (int height)
-    {
-        boolean[] occupied = new boolean[height];
-        Arrays.fill(occupied, false);
-
-        for (SymbolInfo symbol : annotations.getSymbols()) {
-            Rectangle r = symbol.getBounds().getBounds();
-
-            for (int y = r.y; y < (r.y + r.height); y++) {
-                occupied[y] = true;
-            }
-        }
-
-        return occupied;
     }
 }

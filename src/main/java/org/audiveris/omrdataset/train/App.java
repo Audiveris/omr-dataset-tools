@@ -19,13 +19,14 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
+package org.audiveris.omrdataset.train;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.audiveris.omrdataset.Main;
 
 /**
  * Class {@code App} defines constants for the whole {@code OmrDataSet} application.
@@ -50,6 +51,14 @@ public abstract class App
     /** Width for symbol context, in pixels. */
     public static final int CONTEXT_WIDTH = toMultiple(INTERLINE * 4.8);
 
+    static {
+        logger.info(
+                "INTERLINE:{} CONTEXT_WIDTH:{} CONTEXT_HEIGHT:{}",
+                INTERLINE,
+                CONTEXT_WIDTH,
+                CONTEXT_HEIGHT);
+    }
+
     /** Abscissa margin around a None symbol location. */
     public static final int NONE_X_MARGIN = (int) Math.rint(INTERLINE * 0.5);
 
@@ -59,31 +68,13 @@ public abstract class App
     /** Ratio of None symbols created versus valid symbols found in page: {@value}. */
     public static final double NONE_RATIO = 1.0;
 
-    /** Path to where the data is found. */
-    public static final Path DATA_PATH = Paths.get("data");
+    /** Value used for background pixel feature: {@value}. */
+    public static final int BACKGROUND = 0;
 
-    /** Path to input images. */
-    public static final Path IMAGES_PATH = DATA_PATH.resolve("input-images");
+    /** Value used for foreground pixel feature: {@value}. */
+    public static final int FOREGROUND = 255;
 
-    /** Path to CNN model. */
-    public static final Path MODEL_PATH = DATA_PATH.resolve("cnn-model.zip");
-
-    /** File name for pixels norms. */
-    public static final String PIXELS_NORMS = "pixels.norms";
-
-    /** File name for symbol widths norms. */
-    public static final String WIDTHS_NORMS = "widths.norms";
-
-    /** File name for symbol heights norms. */
-    public static final String HEIGHTS_NORMS = "heights.norms";
-
-    /** Path to created control-images. */
-    public static final Path CONTROL_IMAGES_PATH = DATA_PATH.resolve("control-images");
-
-    /** Path to created sub-images. */
-    public static final Path SUB_IMAGES_PATH = DATA_PATH.resolve("sub-images");
-
-    /** Format for output images (sub-images & control-images). */
+    /** Format for output images (sub-images and control-images): {@value}. */
     public static final String OUTPUT_IMAGES_FORMAT = "png";
 
     /** File extension for output images. */
@@ -92,22 +83,39 @@ public abstract class App
     /** File extension for page info. */
     public static final String INFO_EXT = ".xml";
 
-    /** Path to single CSV file. */
-    public static final Path CSV_PATH = DATA_PATH.resolve("features.csv");
+    /** Path to where the data is written. */
+    public static final Path OUTPUT_PATH = (Main.cli.outputFolder != null) ? Main.cli.outputFolder
+            : Paths.get("data/output");
 
-    /** Value used for background pixel feature. */
-    public static final int BACKGROUND = 0;
+    /** Path to created control-images. */
+    public static final Path CONTROL_IMAGES_PATH = OUTPUT_PATH.resolve("control-images");
 
-    /** Value used for foreground pixel feature. */
-    public static final int FOREGROUND = 255;
+    /** Path to created sub-images. */
+    public static final Path SUB_IMAGES_PATH = OUTPUT_PATH.resolve("sub-images");
 
-    static {
-        logger.info(
-                "INTERLINE:{} CONTEXT_WIDTH:{} CONTEXT_HEIGHT:{}",
-                INTERLINE,
-                CONTEXT_WIDTH,
-                CONTEXT_HEIGHT);
-    }
+    /** Path to mistakes. */
+    public static final Path MISTAKES_PATH = OUTPUT_PATH.resolve("mistakes");
+
+    /** Path to single features file. */
+    public static final Path FEATURES_PATH = OUTPUT_PATH.resolve("features.csv");
+
+    /** Path to single journal file. */
+    public static final Path JOURNAL_PATH = OUTPUT_PATH.resolve("journal.csv");
+
+    /** Path to single sheets file. */
+    public static final Path SHEETS_PATH = OUTPUT_PATH.resolve("sheets.csv");
+
+    /** Path to pixels populations. */
+    public static final Path PIXELS_PATH = OUTPUT_PATH.resolve("pixels.dat");
+
+    /** Path to symbol widths populations. */
+    public static final Path WIDTHS_PATH = OUTPUT_PATH.resolve("widths.dat");
+
+    /** Path to symbol heights populations. */
+    public static final Path HEIGHTS_PATH = OUTPUT_PATH.resolve("heights.dat");
+
+    /** Path to neural network model. */
+    public static final Path MODEL_PATH = OUTPUT_PATH.resolve("img-model.zip");
 
     //~ Methods ------------------------------------------------------------------------------------
     /**

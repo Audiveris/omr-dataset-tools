@@ -19,13 +19,13 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
+package org.audiveris.omrdataset.api;
 
 /**
  * Class {@code OmrShape} is the OMR-Dataset definition of symbol shapes.
  * <p>
  * This is a small subset of the list of symbol names described by SMuFL specification available at
- * {@link http://www.smufl.org/}.
+ * <a href="http://www.smufl.org/">http://www.smufl.org/</a>.
  * Symbols are gathered using the same group numbers and names as found in SMuFL specification.
  * <p>
  * This subset is meant to focus on fixed-shape symbols. Accordingly, all symbols with varying size
@@ -46,7 +46,7 @@ package org.omrdataset;
  * </ul>
  * All the barline and repeat symbols are meant to be defined for the staff height only.
  *
- * @see http://www.smufl.org/
+ * @see <a href="http://www.smufl.org/">http://www.smufl.org/</a>
  *
  * @author Hervé Bitteur
  */

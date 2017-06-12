@@ -27,20 +27,52 @@ From command line, for a full rebuild, use:
     gradle clean build
 ```
 
-To run all tasks in a row, use:
+To just display usage rules, use:
 
 ```
     gradle run
+```   
+
+this will display:  
+
+
+    Syntax:
+       [OPTIONS] -- [INPUT_FILES]
+
+    Options:
+     -clean           : Cleans up output
+     -controls        : Generates control images
+     -features        : Generates .csv and .dat files
+     -help            : Displays general help then stops
+     -names           : Prints all possible symbol names
+     -nones           : Generates none symbols
+     -output <folder> : Defines output directory
+     -subimages       : Generates subimages
+     -training        : Trains classifier on features
+
+    Input file extensions:
+     .xml: annotations file
+
+    @file:
+     content to be extended in line
+
+
+To clean up output, use:
+```
+    gradle run -PcmdLineArgs="-output,data/output,-clean"
 ```
 
-To run just one task (`Features`, `SubImages` or `Training`), specify the desired main class 
-(using its fully qualified name), like:
-
+To generate features, with all options, using input from `data/input-images`, use:
 ```
-    gradle run -PmainClass="org.omrdataset.Features"
+    gradle run -PcmdLineArgs="-output,data/output,-features,-nones,-controls,-subimages,--,data/input-images"
 ```
 
-Remark: the `Training` task lasts about 10 minutes.
+To launch training on generated features, use:
+```
+    gradle run -PcmdLineArgs="-output,data/output,-training"
+```
+
+Remark: the training task lasts about 15 minutes (on the toy example `data/input-images` folder).
 To monitor the neural network being trained, simply open a browser on http://localhost:9000 url.
 
 ## Development

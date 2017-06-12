@@ -18,7 +18,7 @@ ext.nd4jVersion = '0.7.2'
 
 // Ability to set a different main class
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'org.omrdataset.Main'
+    ext.mainClass = 'org.audiveris.omrdataset.Main'
 }
 mainClassName = ext.mainClass
 
@@ -36,8 +36,8 @@ run {
     maxHeapSize = '2g'
     
     // Retrieve CLI arguments from cmdLineArgs property if any
-    if (hasProperty("cmdLineArgs")) {
-        args System.getProperty("cmdLineArgs").split()
+    if (project.hasProperty("cmdLineArgs")) {
+        args(cmdLineArgs.split(','))
     }
 }
 

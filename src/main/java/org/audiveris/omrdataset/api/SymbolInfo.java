@@ -19,14 +19,13 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
-
-import org.omrdataset.util.Jaxb;
+package org.audiveris.omrdataset.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,12 +53,15 @@ public class SymbolInfo
     @XmlAttribute(name = "interline")
     private final int interline;
 
+    @XmlAttribute(name = "id")
+    private final Integer id;
+
     @XmlAttribute(name = "shape")
     @XmlJavaTypeAdapter(OmrShapeAdapter.class)
     private final OmrShape omrShape;
 
     @XmlElement(name = "Bounds")
-    @XmlJavaTypeAdapter(Jaxb.Rectangle2DAdapter.class)
+    @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
     private final Rectangle2D bounds;
 
     /** Inner symbols, if any. */
@@ -72,14 +74,17 @@ public class SymbolInfo
      *
      * @param omrShape  symbol OMR shape
      * @param interline related interline
+     * @param id        symbol id, if any
      * @param bounds    symbol bounding box within containing image
      */
     public SymbolInfo (OmrShape omrShape,
                        int interline,
+                       Integer id,
                        Rectangle2D bounds)
     {
         this.omrShape = omrShape;
         this.interline = interline;
+        this.id = id;
         this.bounds = bounds;
     }
 
@@ -90,39 +95,48 @@ public class SymbolInfo
     {
         this.omrShape = null;
         this.interline = 0;
+        this.id = null;
         this.bounds = null;
     }
 
     //~ Methods ------------------------------------------------------------------------------------
-    @Override
-    public String toString ()
+    /**
+     * Add an inner symbol within this one.
+     *
+     * @param symbol the inner symbol to add
+     */
+    public void addInnerSymbol (SymbolInfo symbol)
     {
-        StringBuilder sb = new StringBuilder("Symbol{");
-        sb.append(omrShape);
-
-        if ((innerSymbols != null) && !innerSymbols.isEmpty()) {
-            sb.append(" OUTER");
+        if (innerSymbols == null) {
+            innerSymbols = new ArrayList<SymbolInfo>();
         }
 
-        sb.append(" interline:").append(interline);
-        sb.append(" ").append(bounds);
-
-        sb.append("}");
-
-        return sb.toString();
+        innerSymbols.add(symbol);
     }
 
     /**
-     * Called after all the properties (except IDREF) are unmarshalled
-     * for this object, but before this object is set to the parent object.
+     * @return a COPY of the bounds
      */
-    @PostConstruct
-    private void afterUnmarshal (Unmarshaller um,
-                                 Object parent)
+    public Rectangle2D getBounds ()
     {
-        if (omrShape == null) {
-            logger.warn("*** Null shape {}", this);
+        Rectangle2D copy = new Rectangle2D.Double();
+        copy.setRect(bounds);
+
+        return copy;
+    }
+
+    /**
+     * Report symbol id (a positive integer)
+     *
+     * @return symbol id or 0
+     */
+    public int getId ()
+    {
+        if (id == null) {
+            return 0;
         }
+
+        return id;
     }
 
     /**
@@ -155,29 +169,40 @@ public class SymbolInfo
         return omrShape;
     }
 
-    /**
-     * @return a COPY of the bounds
-     */
-    public Rectangle2D getBounds ()
+    @Override
+    public String toString ()
     {
-        Rectangle2D copy = new Rectangle2D.Double();
-        copy.setRect(bounds);
+        StringBuilder sb = new StringBuilder("Symbol{");
+        sb.append(omrShape);
 
-        return copy;
+        if ((innerSymbols != null) && !innerSymbols.isEmpty()) {
+            sb.append(" OUTER");
+        }
+
+        sb.append(" interline:").append(interline);
+
+        if (id != null) {
+            sb.append(" id:").append(id);
+        }
+
+        sb.append(" ").append(bounds);
+
+        sb.append("}");
+
+        return sb.toString();
     }
 
     /**
-     * Add an inner symbol within this one.
-     *
-     * @param symbol the inner symbol to add
+     * Called after all the properties (except IDREF) are unmarshalled
+     * for this object, but before this object is set to the parent object.
      */
-    public void addInnerSymbol (SymbolInfo symbol)
+    @PostConstruct
+    private void afterUnmarshal (Unmarshaller um,
+                                 Object parent)
     {
-        if (innerSymbols == null) {
-            innerSymbols = new ArrayList<SymbolInfo>();
+        if (omrShape == null) {
+            logger.warn("*** Null shape {}", this);
         }
-
-        innerSymbols.add(symbol);
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
@@ -196,6 +221,10 @@ public class SymbolInfo
         public String marshal (OmrShape shape)
                 throws Exception
         {
+            if (shape == null) {
+                return null;
+            }
+
             return shape.toString();
         }
 
@@ -209,6 +238,102 @@ public class SymbolInfo
                 logger.warn("*** Unknown shape name: {}", string);
 
                 return null;
+            }
+        }
+    }
+
+    //----------------//
+    // Double3Adapter //
+    //----------------//
+    private static class Double3Adapter
+            extends XmlAdapter<String, Double>
+    {
+        //~ Static fields/initializers -------------------------------------------------------------
+
+        private static final DecimalFormat decimal3 = new DecimalFormat();
+
+        static {
+            decimal3.setGroupingUsed(false);
+            decimal3.setMaximumFractionDigits(3); // For a maximum of 3 decimals
+        }
+
+        //~ Methods --------------------------------------------------------------------------------
+        @Override
+        public String marshal (Double d)
+                throws Exception
+        {
+            if (d == null) {
+                return null;
+            }
+
+            return decimal3.format(d);
+        }
+
+        @Override
+        public Double unmarshal (String s)
+                throws Exception
+        {
+            return Double.valueOf(s);
+        }
+    }
+
+    //--------------------//
+    // Rectangle2DAdapter //
+    //--------------------//
+    private static class Rectangle2DAdapter
+            extends XmlAdapter<Rectangle2DAdapter.Rectangle2DFacade, Rectangle2D>
+    {
+        //~ Methods --------------------------------------------------------------------------------
+
+        @Override
+        public Rectangle2DFacade marshal (Rectangle2D rect)
+                throws Exception
+        {
+            return new Rectangle2DFacade(rect);
+        }
+
+        @Override
+        public Rectangle2D unmarshal (Rectangle2DFacade facade)
+                throws Exception
+        {
+            return facade.getRectangle2D();
+        }
+
+        //~ Inner Classes --------------------------------------------------------------------------
+        @XmlJavaTypeAdapter(value = Double3Adapter.class, type = double.class)
+        private static class Rectangle2DFacade
+        {
+            //~ Instance fields --------------------------------------------------------------------
+
+            @XmlAttribute(name = "x")
+            public double x;
+
+            @XmlAttribute(name = "y")
+            public double y;
+
+            @XmlAttribute(name = "w")
+            public double width;
+
+            @XmlAttribute(name = "h")
+            public double height;
+
+            //~ Constructors -----------------------------------------------------------------------
+            public Rectangle2DFacade (Rectangle2D rect)
+            {
+                x = rect.getX();
+                y = rect.getY();
+                width = rect.getWidth();
+                height = rect.getHeight();
+            }
+
+            private Rectangle2DFacade ()
+            {
+            }
+
+            //~ Methods ----------------------------------------------------------------------------
+            public Rectangle2D getRectangle2D ()
+            {
+                return new Rectangle2D.Double(x, y, width, height);
             }
         }
     }

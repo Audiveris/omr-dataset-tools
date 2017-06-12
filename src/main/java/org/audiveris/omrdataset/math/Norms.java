@@ -19,7 +19,7 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset.util;
+package org.audiveris.omrdataset.math;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -40,6 +40,11 @@ import static java.nio.file.StandardOpenOption.CREATE;
 /**
  * Class {@code Norms} encapsulates the means and standard deviations of one or several
  * variables.
+ * <p>
+ * NOTA: Methods {@link #load} and {@link #store} are provided for completeness but Norms are not
+ * additive.
+ * A better practice is to load and store Populations which are additive and from which Norms are
+ * derived by {@link Populations#toNorms} method.
  *
  * @author Hervé Bitteur
  */
@@ -87,41 +92,13 @@ public class Norms
         return vars.getDouble(index, 1);
     }
 
-    //-------//
-    // store //
-    //-------//
     /**
-     * Store the Norms data to the provided output file.
-     *
-     * @param root     path to root of file system
-     * @param fileName file/entry name
-     * @throws IOException
-     */
-    public void store (Path root,
-                       String fileName)
-            throws IOException
-    {
-        {
-            Path path = root.resolve(fileName);
-            DataOutputStream dos = new DataOutputStream(
-                    new BufferedOutputStream(Files.newOutputStream(path, CREATE)));
-            Nd4j.write(vars, dos);
-            dos.flush();
-            dos.close();
-            logger.debug("\n{} stored into {}", vars, path);
-        }
-    }
-
-    //------//
-    // load //
-    //------//
-    /**
-     * Try to load Norms data from the provided input file.
+     * Load Norms data from the provided input file.
      *
      * @param root     the root path to file system
      * @param fileName file/entry name
      * @return the loaded Norms instance, or exception is thrown
-     * @throws IOException
+     * @throws IOException in case of IO problem
      */
     public static Norms load (Path root,
                               String fileName)
@@ -139,11 +116,39 @@ public class Norms
         }
 
         if (vars != null) {
-            logger.info("{} read from {}", vars, path);
+            logger.debug("{} read from {}", vars, path);
 
             return new Norms(vars);
         }
 
         throw new IllegalStateException("Norms were not found in " + fileName);
+    }
+
+    /**
+     * Store Norms data to the provided output file.
+     *
+     * @param root     path to root of file system
+     * @param fileName file/entry name
+     * @throws IOException in case of IO problem
+     */
+    public void store (Path root,
+                       String fileName)
+            throws IOException
+    {
+        {
+            Path path = root.resolve(fileName);
+            DataOutputStream dos = new DataOutputStream(
+                    new BufferedOutputStream(Files.newOutputStream(path, CREATE)));
+            Nd4j.write(vars, dos);
+            dos.flush();
+            dos.close();
+            logger.debug("\n{} stored into {}", vars, path);
+        }
+    }
+
+    @Override
+    public String toString ()
+    {
+        return vars.toString();
     }
 }

@@ -19,13 +19,15 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
+package org.audiveris.omrdataset.api;
 
-import static org.omrdataset.OmrShape.*;
+import static org.audiveris.omrdataset.api.OmrShape.*;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class {@code OmrShapes} complements enum {@link OmrShape} with related features.
@@ -36,6 +38,7 @@ public abstract class OmrShapes
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
+    /** OmrShapes as a list a strings. */
     public static final List<String> NAMES = getNames();
 
     /** Predefined combos for time signatures. */
@@ -53,6 +56,9 @@ public abstract class OmrShapes
             timeSig7over8,
             timeSig9over8,
             timeSig12over8);
+
+    /** Map of predefined combos to num/den integer pairs. */
+    public static final Map<OmrShape, NumDen> COMBO_MAP = buildComboMap();
 
     //~ Methods ------------------------------------------------------------------------------------
     /**
@@ -72,12 +78,105 @@ public abstract class OmrShapes
     }
 
     /**
+     * Report the integer value, if any, conveyed by the provided shape
+     *
+     * @param shape provided shape
+     * @return related value or null
+     */
+    public static Integer integerValueOf (OmrShape shape)
+    {
+        switch (shape) {
+        case timeSig0:
+            return 0;
+
+        case timeSig1:
+            return 1;
+
+        case timeSig2:
+            return 2;
+
+        case timeSig3:
+            return 3;
+
+        case timeSig4:
+            return 4;
+
+        case timeSig5:
+            return 5;
+
+        case timeSig6:
+            return 6;
+
+        case timeSig7:
+            return 7;
+
+        case timeSig8:
+            return 8;
+
+        case timeSig9:
+            return 9;
+
+        case timeSig12:
+            return 12;
+
+        case timeSig16:
+            return 16;
+        }
+
+        return null;
+    }
+
+    /**
      * Print out the omrShape ordinal and name.
      */
     public static void printOmrShapes ()
     {
         for (OmrShape shape : OmrShape.values()) {
             System.out.printf("%3d %s%n", shape.ordinal(), shape.toString());
+        }
+    }
+
+    private static Map<OmrShape, NumDen> buildComboMap ()
+    {
+        final Map<OmrShape, NumDen> map = new EnumMap<OmrShape, NumDen>(OmrShape.class);
+        map.put(OmrShape.timeSig2over4, new NumDen(2, 4));
+        map.put(OmrShape.timeSig2over2, new NumDen(2, 2));
+        map.put(OmrShape.timeSig3over2, new NumDen(3, 2));
+        map.put(OmrShape.timeSig3over4, new NumDen(3, 4));
+        map.put(OmrShape.timeSig3over8, new NumDen(3, 8));
+        map.put(OmrShape.timeSig4over4, new NumDen(4, 4));
+        map.put(OmrShape.timeSig5over4, new NumDen(5, 4));
+        map.put(OmrShape.timeSig5over8, new NumDen(5, 8));
+        map.put(OmrShape.timeSig6over4, new NumDen(6, 4));
+        map.put(OmrShape.timeSig6over8, new NumDen(6, 8));
+        map.put(OmrShape.timeSig7over8, new NumDen(7, 8));
+        map.put(OmrShape.timeSig9over8, new NumDen(9, 8));
+        map.put(OmrShape.timeSig12over8, new NumDen(12, 8));
+
+        return map;
+    }
+
+    //~ Inner Classes ------------------------------------------------------------------------------
+    //--------//
+    // NumDen //
+    //--------//
+    /**
+     * Handles the numerator and denominator structure as a spair of integer values.
+     */
+    public static class NumDen
+    {
+        //~ Instance fields ------------------------------------------------------------------------
+
+        public final int num;
+
+        public final int den;
+
+        //~ Constructors ---------------------------------------------------------------------------
+        public NumDen (int num,
+                       int den)
+        {
+            this.num = num;
+            this.den = den;
         }
     }
 }
