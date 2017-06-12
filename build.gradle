@@ -66,13 +66,3 @@ dependencies {
         [ group: 'junit', name: 'junit', version: '4.10']
     )    
 }
-
-clean.doLast {
-    file('data/sub-images').deleteDir()
-    file('data/control-images').deleteDir()
-    file('data/cnn-model.zip').delete()
-    file('data/features.csv').delete()
-    file('data/pixels.norms').delete()
-    file('data/heights.norms').delete()
-    file('data/widths.norms').delete()
-}
