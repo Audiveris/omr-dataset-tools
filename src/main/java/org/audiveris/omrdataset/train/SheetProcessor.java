@@ -25,8 +25,11 @@ import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.OmrShapes;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
-import org.audiveris.omrdataset.math.Populations;
 import static org.audiveris.omrdataset.train.App.*;
+
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.api.preprocessor.stats.DistributionStats;
+import org.nd4j.linalg.factory.Nd4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,11 +86,10 @@ public class SheetProcessor
 
     private final boolean leaves;
 
-    private final Populations pixels;
+    private final DistributionStats.Builder pixels;
 
-    private final Populations widths;
-
-    private final Populations heights;
+    /** width/height gathered per shape. */
+    private final Map<OmrShape, DistributionStats.Builder> dimMap;
 
     /** Image(s) gathered by interline value. */
     private final Map<Integer, BufferedImage> imgMap = new TreeMap<Integer, BufferedImage>();
@@ -101,24 +103,21 @@ public class SheetProcessor
      * @param annotations sheet annotations
      * @param leaves      true for using leaf symbols
      * @param pixels      pixels population
-     * @param widths      population of symbol widths per shape
-     * @param heights     population of symbol heights per shape
+     * @param dimMap      population of symbol dims per shape
      */
     public SheetProcessor (int sheetId,
                            BufferedImage initialImg,
                            SheetAnnotations annotations,
                            boolean leaves,
-                           Populations pixels,
-                           Populations widths,
-                           Populations heights)
+                           DistributionStats.Builder pixels,
+                           Map<OmrShape, DistributionStats.Builder> dimMap)
     {
         this.sheetId = sheetId;
         this.initialImg = initialImg;
         this.annotations = annotations;
         this.leaves = leaves;
         this.pixels = pixels;
-        this.widths = widths;
-        this.heights = heights;
+        this.dimMap = dimMap;
     }
 
     //~ Methods ------------------------------------------------------------------------------------
@@ -292,9 +291,17 @@ public class SheetProcessor
                 imgMap.put(interline, img = rescale ? scale(initialImg, ratio) : initialImg);
             }
 
-            final int shapeIndex = symbolShape.ordinal();
-            widths.includeValue(shapeIndex, box.getWidth() * ratio);
-            heights.includeValue(shapeIndex, box.getHeight() * ratio);
+            // Cumulate symbol width/height in mean/std builder for proper shape
+            DistributionStats.Builder whBuilder = dimMap.get(symbolShape);
+
+            if (whBuilder == null) {
+                dimMap.put(symbolShape, whBuilder = new DistributionStats.Builder());
+            }
+
+            INDArray wh = Nd4j.zeros(2);
+            wh.putScalar(0, box.getWidth() * ratio);
+            wh.putScalar(1, box.getHeight() * ratio);
+            whBuilder.add(wh, null);
 
             // Symbol center
             double sCenterX = ratio * (box.getX() + (box.getWidth() / 2.0));
@@ -315,6 +322,11 @@ public class SheetProcessor
 
             // Extract bytes from sub-image, paying attention to image limits
             // Target format is flattened format, row by row.
+            // We also collect pixel values to populate mean/std pixels builder
+            final int length = CONTEXT_HEIGHT * CONTEXT_WIDTH;
+            double[] pixDoubles = new double[length];
+            int index = 0;
+
             for (int y = 0; y < CONTEXT_HEIGHT; y++) {
                 int ay = top + y; // Absolute y
 
@@ -323,7 +335,7 @@ public class SheetProcessor
                     for (int x = 0; x < CONTEXT_WIDTH; x++) {
                         features.print(BACKGROUND);
                         features.print(",");
-                        pixels.includeValue(0, BACKGROUND);
+                        pixDoubles[index++] = BACKGROUND;
                     }
                 } else {
                     for (int x = 0; x < CONTEXT_WIDTH; x++) {
@@ -332,10 +344,14 @@ public class SheetProcessor
                                 : (255 - (bytes[(ay * sheetWidth) + ax] & 0xff));
                         features.print(val);
                         features.print(",");
-                        pixels.includeValue(0, val);
+                        pixDoubles[index++] = val;
                     }
                 }
             }
+
+            // Cumulate pixels for mean/std
+            INDArray pixVector = Nd4j.create(pixDoubles, new int[]{length, 1});
+            pixels.add(pixVector, null);
 
             // Add (OMR) shape index
             try {

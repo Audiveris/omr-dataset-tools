@@ -81,6 +81,10 @@ public class CLI
     @Option(name = "-training", usage = "Trains classifier on features")
     public boolean training;
 
+    /** Mistakes. */
+    @Option(name = "-mistakes", usage = "Save mistake images")
+    public boolean mistakes;
+
     /** Target directory for output data. */
     @Option(name = "-output", usage = "Defines output directory", metaVar = "<folder>")
     public Path outputFolder;

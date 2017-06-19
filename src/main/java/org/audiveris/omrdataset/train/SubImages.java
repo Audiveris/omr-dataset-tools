@@ -23,6 +23,7 @@ package org.audiveris.omrdataset.train;
 
 import org.audiveris.omrdataset.api.OmrShape;
 import static org.audiveris.omrdataset.train.App.*;
+import static org.audiveris.omrdataset.train.AppPaths.*;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;

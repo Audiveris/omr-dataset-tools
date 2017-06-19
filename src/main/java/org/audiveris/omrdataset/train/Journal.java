@@ -22,6 +22,7 @@
 package org.audiveris.omrdataset.train;
 
 import org.audiveris.omrdataset.api.OmrShape;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class Journal
      */
     public Journal ()
     {
-        load(App.JOURNAL_PATH);
+        load(AppPaths.JOURNAL_PATH);
     }
 
     //~ Methods ------------------------------------------------------------------------------------
@@ -193,7 +194,7 @@ public class Journal
         //~ Constructors ---------------------------------------------------------------------------
         public SheetIndex ()
         {
-            load(App.SHEETS_PATH);
+            load(AppPaths.SHEETS_PATH);
         }
 
         //~ Methods --------------------------------------------------------------------------------

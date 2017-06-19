@@ -44,6 +44,7 @@ this will display:
      -controls        : Generates control images
      -features        : Generates .csv and .dat files
      -help            : Displays general help then stops
+     -mistakes        : Saves mistaken images to disk
      -names           : Prints all possible symbol names
      -nones           : Generates none symbols
      -output <folder> : Defines output directory
@@ -67,9 +68,9 @@ To generate features, with all options, using input from `data/input-images`, us
     gradle run -PcmdLineArgs="-output,data/output,-features,-nones,-controls,-subimages,--,data/input-images"
 ```
 
-To launch training on generated features, use:
+To launch training on generated features, while saving mistaken images, use:
 ```
-    gradle run -PcmdLineArgs="-output,data/output,-training"
+    gradle run -PcmdLineArgs="-output,data/output,-training,-mistakes"
 ```
 
 Remark: the training task lasts about 15 minutes (on the toy example `data/input-images` folder).

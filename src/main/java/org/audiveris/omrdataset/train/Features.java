@@ -25,12 +25,16 @@ import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SheetAnnotations.SheetInfo;
-
 import static org.audiveris.omrdataset.train.App.*;
+import static org.audiveris.omrdataset.train.AppPaths.*;
 
-import org.audiveris.omrdataset.math.Populations;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.buffer.util.DataTypeUtil;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
+import org.nd4j.linalg.dataset.api.preprocessor.serializer.NormalizerSerializer;
+import org.nd4j.linalg.dataset.api.preprocessor.stats.DistributionStats;
+import org.nd4j.linalg.factory.Nd4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +54,9 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 
@@ -78,18 +85,19 @@ public class Features
 
     private static final Logger logger = LoggerFactory.getLogger(Features.class);
 
-    private static final int shapeCount = OmrShape.values().length;
+    private static final int SHAPE_COUNT = OmrShape.values().length;
 
     static {
         DataTypeUtil.setDTypeForContext(DataBuffer.Type.DOUBLE);
     }
 
     //~ Instance fields ----------------------------------------------------------------------------
-    private final Populations pixels = new Populations(1); // For pixels
+    /** Cumulate values for mean/std of pixels. */
+    private final DistributionStats.Builder pixels = new DistributionStats.Builder();
 
-    private final Populations widths = new Populations(shapeCount); // For symbols widths
-
-    private final Populations heights = new Populations(shapeCount); // For symbols heights
+    /** Cumulate values for mean/std of width and height per shape. */
+    private final Map<OmrShape, DistributionStats.Builder> dimMap = new EnumMap<OmrShape, DistributionStats.Builder>(
+            OmrShape.class);
 
     private PrintWriter features; // For features.csv
 
@@ -162,12 +170,34 @@ public class Features
             sheets.flush();
             sheets.close();
 
-            // Store populations
-            widths.store(WIDTHS_PATH);
-            heights.store(HEIGHTS_PATH);
-            pixels.store(PIXELS_PATH);
+            // Store dim stats per shape
+            storeDims();
+
+            // pixels.store(PIXELS_PATH);
+            DistributionStats stats = pixels.build();
+            NormalizerStandardize normalizer = new NormalizerStandardize(
+                    stats.getMean(),
+                    stats.getStd());
+            NormalizerSerializer.getDefault().write(normalizer, PIXELS_PATH.toFile());
         } catch (Throwable ex) {
             logger.warn("Error loading data", ex);
+        }
+    }
+
+    /**
+     * Remove the ending extension of the provided file name
+     *
+     * @param name file name such as "foo.ext"
+     * @return radix such as "foo"
+     */
+    private static String sansExtension (String name)
+    {
+        int i = name.lastIndexOf('.');
+
+        if (i >= 0) {
+            return name.substring(0, i);
+        } else {
+            return name;
         }
     }
 
@@ -272,8 +302,7 @@ public class Features
                     annotations,
                     true, // leaves
                     pixels,
-                    widths,
-                    heights);
+                    dimMap);
             processor.extractFeatures(features, journal, rowBuffer);
 
             if (Main.cli.controls) {
@@ -289,22 +318,10 @@ public class Features
     }
 
     /**
-     * Remove the ending extension of the provided file name
+     * Process a folder (all its files, and recursively all its sub-folders).
      *
-     * @param name file name such as "foo.ext"
-     * @return radix such as "foo"
+     * @param folder the folder to process
      */
-    private static String sansExtension (String name)
-    {
-        int i = name.lastIndexOf('.');
-
-        if (i >= 0) {
-            return name.substring(0, i);
-        } else {
-            return name;
-        }
-    }
-
     private void processFolder (Path folder)
     {
         try {
@@ -336,5 +353,44 @@ public class Features
         } catch (Throwable ex) {
             logger.warn("Error processing folder {}", folder, ex);
         }
+    }
+
+    /**
+     * Store the mean/std values for width/height of each (populated) omr shape.
+     *
+     * @throws IOException on IO error
+     */
+    private void storeDims ()
+            throws IOException
+    {
+        INDArray dimStats = Nd4j.zeros(4, SHAPE_COUNT);
+        logger.info("Symbol dimensions for populated shapes:");
+
+        for (Entry<OmrShape, DistributionStats.Builder> entry : dimMap.entrySet()) {
+            OmrShape shape = entry.getKey();
+            DistributionStats.Builder builder = entry.getValue();
+            DistributionStats stats = builder.build();
+            INDArray means = stats.getMean();
+            INDArray stds = stats.getStd();
+            int index = shape.ordinal();
+            double meanWidth = means.getDouble(0);
+            double stdWidth = stds.getDouble(0);
+            double meanHeight = means.getDouble(1);
+            double stdHeight = stds.getDouble(1);
+            dimStats.putScalar(new int[]{0, index}, meanWidth);
+            dimStats.putScalar(new int[]{1, index}, stdWidth);
+            dimStats.putScalar(new int[]{2, index}, meanHeight);
+            dimStats.putScalar(new int[]{3, index}, stdHeight);
+            logger.info(
+                    String.format(
+                            "%27s width{mean:%.2f std:%.2f} height{mean:%.2f std:%.2f}",
+                            shape,
+                            meanWidth,
+                            stdWidth,
+                            meanHeight,
+                            stdHeight));
+        }
+
+        Nd4j.saveBinary(dimStats, DIMS_PATH.toFile());
     }
 }

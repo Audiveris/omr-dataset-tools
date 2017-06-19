@@ -21,7 +21,7 @@
 // </editor-fold>
 package org.audiveris.omrdataset.train;
 
-import static org.audiveris.omrdataset.train.App.OUTPUT_PATH;
+import static org.audiveris.omrdataset.train.AppPaths.OUTPUT_PATH;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

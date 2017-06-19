@@ -24,10 +24,6 @@ package org.audiveris.omrdataset.train;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import org.audiveris.omrdataset.Main;
-
 /**
  * Class {@code App} defines constants for the whole {@code OmrDataSet} application.
  *
@@ -83,39 +79,32 @@ public abstract class App
     /** File extension for page info. */
     public static final String INFO_EXT = ".xml";
 
-    /** Path to where the data is written. */
-    public static final Path OUTPUT_PATH = (Main.cli.outputFolder != null) ? Main.cli.outputFolder
-            : Paths.get("data/output");
+    /** Folder name for control-images. */
+    public static final String CONTROL_IMAGES_NAME = "control-images";
 
-    /** Path to created control-images. */
-    public static final Path CONTROL_IMAGES_PATH = OUTPUT_PATH.resolve("control-images");
+    /** Folder name for sub-images. */
+    public static final String SUB_IMAGES_NAME = "sub-images";
 
-    /** Path to created sub-images. */
-    public static final Path SUB_IMAGES_PATH = OUTPUT_PATH.resolve("sub-images");
+    /** Folder name for mistakes. */
+    public static final String MISTAKES_NAME = "mistakes";
 
-    /** Path to mistakes. */
-    public static final Path MISTAKES_PATH = OUTPUT_PATH.resolve("mistakes");
+    /** File name for features. */
+    public static final String FEATURES_NAME = "features.csv";
 
-    /** Path to single features file. */
-    public static final Path FEATURES_PATH = OUTPUT_PATH.resolve("features.csv");
+    /** FIle name for journal. */
+    public static final String JOURNAL_NAME = "journal.csv";
 
-    /** Path to single journal file. */
-    public static final Path JOURNAL_PATH = OUTPUT_PATH.resolve("journal.csv");
+    /** File name for sheets. */
+    public static final String SHEETS_NAME = "sheets.csv";
 
-    /** Path to single sheets file. */
-    public static final Path SHEETS_PATH = OUTPUT_PATH.resolve("sheets.csv");
+    /** File name for pixel standards. */
+    public static final String PIXELS_NAME = "pixels.dat";
 
-    /** Path to pixels populations. */
-    public static final Path PIXELS_PATH = OUTPUT_PATH.resolve("pixels.dat");
+    /** File name for symbol dimensions standards. */
+    public static final String DIMS_NAME = "dims.dat";
 
-    /** Path to symbol widths populations. */
-    public static final Path WIDTHS_PATH = OUTPUT_PATH.resolve("widths.dat");
-
-    /** Path to symbol heights populations. */
-    public static final Path HEIGHTS_PATH = OUTPUT_PATH.resolve("heights.dat");
-
-    /** Path to neural network model. */
-    public static final Path MODEL_PATH = OUTPUT_PATH.resolve("img-model.zip");
+    /** File name for neural network model. */
+    public static final String MODEL_NAME = "img-classifier.zip";
 
     //~ Methods ------------------------------------------------------------------------------------
     /**

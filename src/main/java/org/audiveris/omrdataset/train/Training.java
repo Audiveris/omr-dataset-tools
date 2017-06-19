@@ -21,11 +21,11 @@
 // </editor-fold>
 package org.audiveris.omrdataset.train;
 
+import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.OmrShapes;
-import org.audiveris.omrdataset.math.Norms;
-import org.audiveris.omrdataset.math.Populations;
 import static org.audiveris.omrdataset.train.App.*;
+import static org.audiveris.omrdataset.train.AppPaths.*;
 
 import org.datavec.api.records.Record;
 import org.datavec.api.records.metadata.RecordMetaData;
@@ -62,6 +62,8 @@ import org.nd4j.linalg.api.buffer.util.DataTypeUtil;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
+import org.nd4j.linalg.dataset.api.preprocessor.serializer.NormalizerSerializer;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
@@ -133,7 +135,9 @@ public class Training
         int seed = 123; //
 
         // Pixel norms
-        final Norms pixelNorms = Populations.load(PIXELS_PATH).toNorms();
+        ///final Norms pixelNorms = Populations.load(PIXELS_PATH).toNorms();
+        NormalizerStandardize normalizer = NormalizerSerializer.getDefault().restore(
+                PIXELS_PATH.toFile());
 
         // Get the dataset using the record reader. CSVRecordReader handles loading/parsing
         logger.info("Getting dataset...");
@@ -165,7 +169,7 @@ public class Training
         testIter.setCollectMetaData(true); //Instruct the iterator to collect metadata, and store it in the DataSet objects
 
         // Normalization
-        DataSetPreProcessor preProcessor = new MyPreProcessor(pixelNorms);
+        DataSetPreProcessor preProcessor = new MyPreProcessor(normalizer);
         trainIter.setPreProcessor(preProcessor);
         testIter.setPreProcessor(preProcessor);
 
@@ -279,9 +283,7 @@ public class Training
             logger.info("Training model...");
 
             for (int epoch = 1; epoch <= nEpochs; epoch++) {
-                Path epochFolder = MISTAKES_PATH.resolve("epoch#" + epoch);
-                Files.createDirectories(epochFolder);
-
+                Path epochFolder = Main.cli.mistakes ? MISTAKES_PATH.resolve("epoch#" + epoch) : null;
                 long start = System.currentTimeMillis();
                 model.fit(trainIter);
 
@@ -327,7 +329,8 @@ public class Training
 
                 // Save model
                 ModelSerializer.writeModel(model, MODEL_PATH.toFile(), false);
-                logger.info("Model stored as {}", MODEL_PATH.toAbsolutePath());
+                ModelSerializer.addNormalizerToModel(MODEL_PATH.toFile(), normalizer);
+                logger.info("Model+normalizer stored as {}", MODEL_PATH.toAbsolutePath());
 
                 // To avoid long useless sessions...
                 if (mistakes.isEmpty()) {
@@ -366,19 +369,23 @@ public class Training
         final Journal.Record record = journal.getRecord(line);
         System.out.println(record + " mistaken for " + predicted);
 
-        // Generate subimage
-        double[] pixels = new double[rawData.size()];
+        if (folder != null) {
+            Files.createDirectories(folder);
 
-        for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = rawData.get(i).toDouble();
+            // Generate mistaken subimage
+            double[] pixels = new double[rawData.size()];
+
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = rawData.get(i).toDouble();
+            }
+
+            INDArray row = Nd4j.create(pixels);
+            BufferedImage img = SubImages.buildSubImage(row);
+
+            // Save subimage to disk, with proper naming
+            String name = actual + "-" + line + "-" + predicted + OUTPUT_IMAGES_EXT;
+            ImageIO.write(img, OUTPUT_IMAGES_FORMAT, folder.resolve(name).toFile());
         }
-
-        INDArray row = Nd4j.create(pixels);
-        BufferedImage img = SubImages.buildSubImage(row);
-
-        // Save subimage to disk, with proper naming
-        String name = actual + "-" + line + "-" + predicted + OUTPUT_IMAGES_EXT;
-        ImageIO.write(img, OUTPUT_IMAGES_FORMAT, folder.resolve(name).toFile());
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
@@ -398,10 +405,11 @@ public class Training
         final double std;
 
         //~ Constructors ---------------------------------------------------------------------------
-        public MyPreProcessor (Norms norms)
+        public MyPreProcessor (NormalizerStandardize normalizer)
         {
-            mean = norms.getMean(0);
-            std = norms.getStd(0);
+            ///mean = norms.getMean(0);
+            mean = normalizer.getMean().getDouble(0);
+            std = normalizer.getStd().getDouble(0);
             logger.info(String.format("Pixel pre-processor mean:%.2f std:%.2f", mean, std));
         }
 
