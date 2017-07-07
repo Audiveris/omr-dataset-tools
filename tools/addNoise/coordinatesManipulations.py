@@ -3,7 +3,7 @@ __author__ = 'Pulimootil'
 
 """
 This script is a part of the addNoise tool.
-It performs operations related to coordinates (and also Bounding boxes).
+It performs operations related to coordinates.
 """
 
 import numpy as np

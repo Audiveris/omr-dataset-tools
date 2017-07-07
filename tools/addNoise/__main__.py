@@ -18,215 +18,138 @@ output:
         newxmlFile (containing changed coordinates of musical symbols)
 
 usage:
-        python __main__.py path/imageFile.png path/XMLFile.xml
-        python __main__.py path/imageFile.png (If both the filenames are the same and are located in the same folder)
+        python mainT.py path/imageFile.png path/XMLFile.xml -sp -speckle
+        python mainT.py path/imageFile.png (If both the filenames are the same and are located in the same folder) -sp
 """
 
-import sys
-import os
-import logging
-
-from geometricTransformations import *
-from morphologicalOperations import *
+import argparse
+from argparse import RawTextHelpFormatter
+from saltAndPepperNoise import *
+from speckleNoise import *
+from gaussianNoise import *
+from Rotation import *
+from FileOperations import *
 from xmlOperations import *
-from coordinatesManipulations import transformBB
-
-''' Output Dir '''
-outputDir = 'output'
-
-''' Read the image '''
 
 
-def callImage(imgFile, color):
-    if color:
-        logging.info('Loading ' + imgFile + ' in Color mode.')
-        img = cv2.imread(imgFile, 1)
-    else:
-        logging.info('Loading ' + imgFile + ' in Grayscale mode.')
-        img = cv2.imread(imgFile, 0)
-    return img
+def main():
+    # argument parser
+    parser = argparse.ArgumentParser(description='Add noise to the image', formatter_class=RawTextHelpFormatter)
+
+    # input arg
+    # Salt and pepper arguments
+    required = parser.add_argument_group('required arguments', '')
+    required.add_argument('-i', dest='imageFile', help='Input image file to which noise should be added', required=True)
+
+    # xml arg
+    parser.add_argument('-x', dest='xmlFile', help='XML file which contain the annotaions', required=False)
+
+    # Salt and pepper arguments
+    group1 = parser.add_argument_group('Salt and Pepper Noise', 'Add salt and pepper noise to the image')
+    group1.add_argument('-sp',
+                        nargs='*',
+                        type=float,
+                        help='parameters :'
+                             '[saltVsPepperRatio, amount]'
+                             '\nsaltVsPepperRatio should be in the range of 0 and 1'
+                             '\n%(prog)s default=[0.5, 0.01] ',
+                        required=False)
+
+    # Speckle Noise arguments
+    group2 = parser.add_argument_group('Speckle Noise', 'Add speckle noise to the image')
+    group2.add_argument('-speckle',
+                        nargs='*',
+                        type=float,
+                        # default=[0.5, 0.01],
+                        help='parameter : [amount] '
+                             '\n%(prog)s default=[0.1] ',
+                        required=False)
+
+    # Gaussian Noise arguments
+    group2 = parser.add_argument_group('Gaussian Noise', 'Add Gaussian noise to the image')
+    group2.add_argument('-g',
+                        nargs='*',
+                        type=float,
+                        help='parameter : [mean, standardDeviation]'
+                        '\nMean and standard deviation of the random noise that should be added to the image'
+                        '\n%(prog)s by default= Zero mean with standard deviation of the original image is used for the noise',
+                        required=False)
+
+    # Rotation arguments
+    group2 = parser.add_argument_group('Rotation', 'Rotate the image by the angle specified')
+    group2.add_argument('-r',
+                        nargs='*',
+                        type=float,
+                        help='parameter : angle'
+                        '\nThe rotation angle in degrees can be specified as parameter'
+                        '\n%(prog)s by default= 1°',
+                        required=False)
 
 
-''' Display Image '''
+    args, leftovers = parser.parse_known_args()
 
+    print args
 
-def Display(orig, distorted, name):
-    cv2.namedWindow("Original Image")
-    cv2.imshow("Original Image", orig)
+    ## Object to do file operations
+    if args.xmlFile is None:
+        args.xmlFile = os.path.splitext(args.imageFile)[0] + '.xml'
 
-    cv2.namedWindow(name)
-    cv2.imshow(name, distorted)
+    file = FileOperatoins(args.imageFile, args.xmlFile)
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # Salt and Pepper Argument
+    if args.sp is not None:
+        # Salt and pepper object
+        sp = SaltAndPepperNoise(file.getImage(0), args.sp)
+        # Adding distortion to the image
+        file.setDistortedImage(sp.addDistortion())
+        # Set the output filename
+        file.setOutputImageName('_' + sp.tag)
+        # Write the image
+        file.writeImage()
+        # Write XML annotation
+        addDeteriorationInXML(args.xmlFile, sp.tag, sp.parameters)
 
+    # Speckle Noise Argument
+    if args.speckle is not None:
+        # Speckle object
+        speckle = speckleNoise(file.getImage(0), args.speckle)
+        # Adding distortion to the image
+        file.setDistortedImage(speckle.addDistortion())
+        # Set the output filename
+        file.setOutputImageName('_' + speckle.tag)
+        # Write the image
+        file.writeImage()
+        # Write XML annotation
+        addDeteriorationInXML(args.xmlFile, speckle.tag, speckle.parameters)
 
-''' Gaussian Noise '''
+    # Gaussian Noise Argument
+    if args.g is not None:
+        # Gaussian object
+        gaussian = GaussianNoise(file.getImage(0), args.g)
+        # Adding distortion to the image
+        file.setDistortedImage(gaussian.addDistortion())
+        # Set the output filename
+        file.setOutputImageName('_' + gaussian.tag)
+        # Write the image
+        file.writeImage()
+        # Write XML annotation
+        addDeteriorationInXML(args.xmlFile, gaussian.tag, gaussian.parameters)
 
-
-def gaussian(img):
-    logging.info('Adding Gaussian Noise')
-    # img = callImage(file,0)
-    row, col = img.shape
-    noise = np.zeros((row, col), np.int8)
-    meanSD = cv2.meanStdDev(img)
-    cv2.randn(noise, 0, meanSD[1])  # zero mean
-    return cv2.add(img, noise, dtype=cv2.CV_8UC3)
-
-
-''' Salt and pepper Noise '''
-
-
-def saltAndPepper(img):
-    logging.info('Adding Salt and Pepper Noise')
-    sp = 0.5  # salt and pepper ratio
-    amount = 0.01
-    out = img
-    ## Salt mode
-    numSalt = np.ceil(amount * img.size * sp)
-    coords = [np.random.randint(0, i - 1, int(numSalt)) for i in img.shape]
-    out[coords] = 255
-    ## Pepper mode
-    numPepper = np.ceil(amount * img.size * (1. - sp))
-    coords = [np.random.randint(0, i - 1, int(numPepper)) for i in img.shape]
-    out[coords] = 0
-    return img
-
-
-''' Speckle Noise '''
-
-
-def speckle(img):
-    logging.info('Adding Speckle Noise')
-    row, col = img.shape
-    gauss = np.random.randn(row, col)
-    gauss = gauss.reshape(row, col)
-    return cv2.add(img, img * gauss * 0.4, dtype=cv2.CV_8UC3)
-
-
-''' Process Bounding boxes for display '''
-
-
-def processBBDisplay(bboxes, transform, orgImg, rotImg, mode):
-    img = orgImg
-    for bbox in bboxes:
-        x = int(bbox[0])
-        y = int(bbox[1])
-        w = int(bbox[2])
-        h = int(bbox[3])
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 100, 0), 1)
-        x, y, w, h = transformBB(x, y, w, h, transform, mode)
-        cv2.rectangle(rotImg, (x, y), (x + w, y + h), (0, 0, 255), 1)
-    Display(img, rotImg, "Transformed Image")
-
-
-''' Main process '''
-
-
-
-def main(argv):
-    logging.basicConfig(filename='logFile.log',
-                        level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(funcName)s :: %(message)s',
-                        filemode='w')  # Change filemode to append later
-
-    ## Processing arguments
-    if len(argv) == 3:
-        imgFile = argv[1]
-        xmlFile = argv[2]
-
-    elif len(argv) == 2:
-        dirName = os.path.dirname(os.path.realpath(argv[1]))
-        imgFile = dirName + os.path.sep + os.path.basename(argv[1])
-        xmlFile = dirName + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '.xml'
-
-    else:
-        msg = 'Invalid number of Input arguments passed'
-        logging.error(msg)
-        raise msg
-
-    logging.info('Detected Filename: ' + imgFile)
-    logging.info('Detected Annotation File: ' + xmlFile)
-
-    ## Checking for valid files
-    if not os.path.isfile(imgFile):
-        msg = 'Invalid Image file: ' + imgFile
-        logging.error(msg)
-        raise IOError(msg)
-    if not os.path.isfile(xmlFile):
-        msg = 'Invalid XML file: ' + xmlFile
-        logging.error(msg)
-        raise IOError(msg)
-
-    ## Checking output directory
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
-
-    ## Salt and Pepper Noise
-
-    saltAndPepperDist = saltAndPepper(callImage(imgFile, 0))
-    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_salt_pepper'
-    cv2.imwrite(outputName + '.png', saltAndPepperDist)
-    copyXML(xmlFile, outputName + '.xml')
-    deteriorationXML(xmlFile, mode='', parameters='')
-    # Display(callImage(imgFile, True), saltAndPepperDist, "Salt and Pepper Distortion")
-
-    ## Gaussian Noise
-
-    gaussianDist = gaussian(callImage(imgFile, 0))
-    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_gaussian'
-    cv2.imwrite(outputName + '.png', gaussianDist)
-    copyXML(xmlFile, outputName + '.xml')
-    # Display(callImage(imgFile, True), gaussianDist, "Gaussian Distortion")
-
-    ## Speckle: Multiplicative Noise
-
-    speckleDist = speckle(callImage(imgFile, 0))
-    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_speckle'
-    cv2.imwrite(outputName + '.png', speckleDist)
-    copyXML(xmlFile, outputName + '.xml')
-    # Display(callImage(imgFile, True), speckleDist, "Speckle Distortion")
-
-    ## rotation: rotate by a specified angle
-    rotImage, transform = rotate(callImage(imgFile, 1), 2)
-    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_rotate'
-    copyXML(xmlFile, outputName + '.xml')
-    cv2.imwrite(outputName + '.png', rotImage)
-    bboxes = replaceBBoxXML(outputName + '.xml', transform, mode='rotation')
-    # processBBDisplay(bboxes, transform, callImage(imgFile, True), rotImage) # Display the rotated iamges with the coordinates
-
-    # Radial distortion: straight lines will appear curved
-    radDist, transform = radialDistortion(callImage(imgFile, 0))
-    # Display(callImage(imgFile, True), radDist, "Radial Distortion")
-    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_radial'
-    copyXML(xmlFile, outputName + '.xml')
-    cv2.imwrite(outputName + '.png', radDist)
-    bboxes = replaceBBoxXML(outputName + '.xml', transform, mode='distortion')
-    #processBBDisplay(bboxes, transform, callImage(imgFile, True), radDist, mode='distortion')
-    '''To do: Write the new coordinates to the xml file'''
-
-    # Tangential distortion : occurs because image taking lense is not aligned perfectly parallel to the imaging plane.
-    tangDist = tangentialDistortion(callImage(imgFile, 0))
-    # Display(callImage(imgFile, True), tangDist, "Tangential Distortion")
-    '''To do: Write the new coordinates to the xml file'''
-
-    # Localvar: Zero-mean Gaussian white noise with an intensity-dependent variance
-    # Skew: measure of the asymmetry of the probability distribution of a real-valued random variable about its mean.
-
-    # Morphological Closing to connect the close objects.
-    # Opening us used instead of closing since the background is white and the foreground is black
-    openImg = opening(callImage(imgFile, 0), size=5)
-    # Display(callImage(imgFile, True), openImg, "Opening Operation")
-    outputName = outputDir + os.path.sep + os.path.splitext(os.path.basename(argv[1]))[0] + '_opening'
-    cv2.imwrite(outputName + '.png', openImg)
-    copyXML(xmlFile, outputName + '.xml')
-
-    ## Perspective Transform
-    perspectiveImage, transform = perspective(callImage(imgFile, 1))
-    # Display(callImage(imgFile, True), perspectiveImage, "Persective Transform")
-
-    logging.info('----------------------------------------')
+    # Rotation Argument
+    if args.r is not None:
+        # Rotation object
+        rotation = Rotation(file.getImage(0), args.r)
+        # Adding distortion to the image
+        file.setDistortedImage(rotation.addDistortion())
+        # Set the output filename
+        file.setOutputImageName('_' + rotation.tag)
+        # Write the image
+        file.writeImage()
+        # Write XML annotation
+        addDeteriorationInXML(args.xmlFile, rotation.tag, rotation.parameters)
+        # Update the coordinate information
+        replaceBBoxXML(args.xmlFile, rotation.transformationMatrix, mode='rotation')
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()

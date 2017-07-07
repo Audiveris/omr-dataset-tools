@@ -24,9 +24,9 @@ def copyXML(xmlinput, xmlFilename):
 
 def replaceBBoxXML(filename, transform, mode):
     tree = ET.parse(filename)
-    museScore = tree.getroot()
+    root = tree.getroot()
     bboxes = []
-    for symbol in museScore:
+    for symbol in root:
         for bbox in symbol:
             if bbox.tag == "bbox":
                 x = bbox.attrib["x"]
@@ -48,23 +48,24 @@ def replaceBBoxXML(filename, transform, mode):
 ''' Edit/Add Deterioration information to the XML file'''
 
 
-def deteriorationXML(filename, mode, parameters):
+def addDeteriorationInXML(filename, mode, parameters):
     # mode should contain the name of the noise string
-    # Parameters should contain a dict of noise paramters
+    # Parameters should contain a dict of noise parameters
 
     tree = ET.parse(filename)
-    museScore = tree.getroot()
-    deterioration = museScore.find('deterioration')
+    root = tree.getroot()
+    deterioration = root.find('deterioration')
+
+    test = ''.join('{}{}'.format(key, val) for key, val in parameters.items())
 
     # Create deterioration node if not available in xml file
     if deterioration is None:
-        print 'Not Found'
         child = ET.Element('deterioration')
-        museScore.insert(2, child)
+        root.insert(2, child)
 
     # Adding parameters to deterioration
-    det = museScore.find('deterioration')
-    child = ET.Element(mode, attrib=parameters)
+    det = root.find('deterioration')
+    child = ET.Element(mode, attrib= parameters)
     det.insert(0, child)
 
     # Writing the new file

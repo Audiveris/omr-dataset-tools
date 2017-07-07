@@ -22,14 +22,15 @@ Following tutorials might be helpful in setting up OpenCV and python
 ## How to use ?
 In order to use this tool, the following command should be executed on the terminal. Make sure to provide the path to all the required files if they are not in working directory.
 
-**python main.py** <*imageFile*\> <*xmlFile*\>.
+**python main.py** -i <*imageFile*\> -x <*xmlFile*\> -sp <*parameters*\> 
+|-speckle <*parameters*\>
+| -g <*parameters*\>
+| -r <*parameters*\>.
 <br>
-For example `python main.py path/imageFile.png path/XMLFile.xml`
+For example `python __main__.py -i path/imageFile.png -x path/XMLFile.xml -sp  0.1 0.05`<br>
+`python __main__.py -i path/imageFile.png -x path/XMLFile.xml -sp  0.1 0.05 -r 4`
 
-If both image file and the xml file have the same basename and are in the same directory, then you only need to specify the image file, i.e. `python main.py path/imageFile.png`.
+Use `python __main__.py -h` to get the details about the parameters
 
-### Note
-- Most of the parameters are hard coded for the purpose of Hackday (Will be changed soon).
-- Some of the distortion functions are not yet complete.
-- More meaningful noise functions will be added.
-- Features to combine different distortions are not yet implemented.
+If both image file and the xml file have the same basename and are in the same directory,
+ then you only need to specify the image file, i.e. `python main.py -i path/imageFile.png -sp`.
