@@ -44,6 +44,9 @@ def main():
     # xml arg
     parser.add_argument('-x', dest='xmlFile', help='XML file which contain the annotaions', required=False)
 
+    # output folder arg
+    parser.add_argument('-o', dest='outputFolder', help='Output folder where the processed images should be saved', required=False)
+
     # Salt and pepper arguments
     group1 = parser.add_argument_group('Salt and Pepper Noise', 'Add salt and pepper noise to the image')
     group1.add_argument('-sp',
@@ -90,11 +93,15 @@ def main():
 
     print args
 
-    ## Object to do file operations
+    # Object to do file operations
     if args.xmlFile is None:
         args.xmlFile = os.path.splitext(args.imageFile)[0] + '.xml'
 
     file = FileOperatoins(args.imageFile, args.xmlFile)
+
+    # Check for output folder
+    if args.outputFolder is not None:
+        file.setOutput(args.outputFolder)
 
     # Salt and Pepper Argument
     if args.sp is not None:

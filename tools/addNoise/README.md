@@ -27,10 +27,38 @@ In order to use this tool, the following command should be executed on the termi
 | -g <*parameters*\>
 | -r <*parameters*\>.
 <br>
-For example `python __main__.py -i path/imageFile.png -x path/XMLFile.xml -sp  0.1 0.05`<br>
-`python __main__.py -i path/imageFile.png -x path/XMLFile.xml -sp  0.1 0.05 -r 4`
 
-Use `python __main__.py -h` to get the details about the parameters
+##### Optional Arguments
 
-If both image file and the xml file have the same basename and are in the same directory,
- then you only need to specify the image file, i.e. `python main.py -i path/imageFile.png -sp`.
+- **-h** or **--help** show this help message and exit
+- **-x XMLFILE** XML file which contain the annotaions
+- **-o OUTPUTFOLDER** Output folder where the processed images should be saved
+
+##### Required Arguments
+
+1. **-i IMAGEFILE** Input image file to which noise should be added
+2. One or more of the following arguments should be present:
+    * **-sp** parameters: *saltVsPepperRatio, amount*.
+    * **-speckle** parameters: *amount*
+    * **-g** parameters: *mean, standardDeviation*
+    * **-r** parameters: *angle*
+
+
+**Example syntax** <br>
+`python __main__.py -i path/imageFile.png -x path/xmlFile.xml -sp  0.1 0.05`
+will take the input image `path/imageFile.png` and adds salt and pepper noise to it with 
+*saltVsPepperRatio = 0.1* and *amount=0.05*. 
+This image will be saved in the current working directory.
+The noise information added to the image will be added in the `path/xmlFile.xml` 
+<br><br>
+`python __main__.py -i somePath/imageFile.png -sp -r 4`
+will take the input image `somePath/imageFile.png` and adds salt and pepper noise to it with the default parameters.
+This image will be saved in the current working directory.
+An image rotated by *angle=4* will also be created in the working directory. 
+The noise information added to the image will be added in the `somePath/imageFile.xml`.
+ If this file is not available, then the program will raise an error.
+<br><br>
+If the image file and the xml file have the same basename and are in the same directory,
+ then you only need to specify the image file, i.e. `python __main__.py -i path/imageFile.png -sp`.
+ 
+ Use `python __main__.py -h` to get the details about the parameters.

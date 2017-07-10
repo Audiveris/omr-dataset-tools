@@ -44,8 +44,7 @@ def getDistortedCoordinates(distCoefficients, points, center):
 
 
 def transformBB(x, y, w, h, transform, mode):
-    print '---' + mode
-    print x, y, w, h
+
     ## Making the coordinates
     coord1 = [x, y]
     coord2 = [x, y + h]
@@ -53,8 +52,6 @@ def transformBB(x, y, w, h, transform, mode):
     coord4 = [x + w, y]
     ## to delete
     contour = np.array([coord1, coord2, coord4, coord3])
-    print 'Before'
-    print contour
     ############
 
     if mode == 'rotation':
@@ -73,13 +70,12 @@ def transformBB(x, y, w, h, transform, mode):
 
         # Get the distorted Coordinates
         #coord1 = cv2.undistortPoints(coord1, transform[0], transform[1])
-        print coord1
+
         pass
 
     ## to delete
     contour = [coord1, coord2, coord4, coord3]
-    print 'After'
-    print contour
+
     ############
 
     if mode == 'distortion':
@@ -101,8 +97,6 @@ def transformBB(x, y, w, h, transform, mode):
     maxx = max([pts[0] for pts in box])
     miny = min([pts[1] for pts in box])
     maxy = max([pts[1] for pts in box])
-    print minx, miny, maxx - minx, maxy - miny
-    print '--------------------'
     return minx, miny, maxx - minx, maxy - miny
 
 
