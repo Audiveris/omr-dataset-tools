@@ -1,0 +1,2228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Annotations version="1.0">
+    <Source>Audiveris 5.0.0</Source>
+    <Page>
+        <Image>IMSLP06053#1.png</Image>
+        <Size w="2447" h="3475"/>
+    </Page>
+    <Symbol interline="18" id="10" shape="barlineSingle">
+        <Bounds x="325.0" y="793.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="14" shape="barlineSingle">
+        <Bounds x="1112.0" y="807.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="16" shape="barlineSingle">
+        <Bounds x="1717.0" y="816.0" w="4.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="18" shape="barlineSingle">
+        <Bounds x="2343.0" y="827.0" w="4.0" h="69.0"/>
+    </Symbol>
+    <Symbol interline="18" id="20" shape="barlineSingle">
+        <Bounds x="322.0" y="1040.0" w="5.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="24" shape="barlineSingle">
+        <Bounds x="1109.0" y="1054.0" w="5.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="26" shape="barlineSingle">
+        <Bounds x="1714.0" y="1065.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="28" shape="barlineSingle">
+        <Bounds x="2341.0" y="1075.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="197" shape="fClef">
+        <Bounds x="342.0" y="790.0" w="53.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="231" shape="fClef">
+        <Bounds x="340.0" y="1038.0" w="53.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="233" shape="keyFlat">
+        <Bounds x="403.0" y="810.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="236" shape="keyFlat">
+        <Bounds x="400.0" y="1058.0" w="17.0" h="51.0"/>
+    </Symbol>
+    <Symbol interline="18" id="277" shape="timeSig4over4">
+        <Bounds x="444.0" y="796.0" w="26.0" h="68.0"/>
+        <Symbol interline="18" id="254" shape="timeSig4">
+            <Bounds x="444.0" y="796.0" w="25.0" h="32.0"/>
+        </Symbol>
+        <Symbol interline="18" id="257" shape="timeSig4">
+            <Bounds x="445.0" y="832.0" w="25.0" h="32.0"/>
+        </Symbol>
+    </Symbol>
+    <Symbol interline="18" id="278" shape="timeSig4over4">
+        <Bounds x="443.0" y="1044.0" w="26.0" h="69.0"/>
+        <Symbol interline="18" id="275" shape="timeSig4">
+            <Bounds x="443.0" y="1044.0" w="25.0" h="32.0"/>
+        </Symbol>
+        <Symbol interline="18" id="276" shape="timeSig4">
+            <Bounds x="444.0" y="1081.0" w="25.0" h="32.0"/>
+        </Symbol>
+    </Symbol>
+    <Symbol interline="18" id="1312" shape="ledger">
+        <Bounds x="1573.0" y="793.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1314" shape="ledger">
+        <Bounds x="968.0" y="783.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1330" shape="ledger">
+        <Bounds x="2184.0" y="912.0" w="58.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1344" shape="ledger">
+        <Bounds x="1304.0" y="1036.0" w="43.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1348" shape="ledger">
+        <Bounds x="1920.0" y="1048.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1350" shape="ledger">
+        <Bounds x="2130.0" y="1050.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1352" shape="ledger">
+        <Bounds x="2196.0" y="1050.0" w="41.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1354" shape="ledger">
+        <Bounds x="692.0" y="1025.0" w="40.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1356" shape="ledger">
+        <Bounds x="1509.0" y="1040.0" w="40.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1358" shape="ledger">
+        <Bounds x="1247.0" y="1036.0" w="38.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1360" shape="ledger">
+        <Bounds x="628.0" y="1025.0" w="37.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1362" shape="ledger">
+        <Bounds x="903.0" y="1030.0" w="37.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1364" shape="ledger">
+        <Bounds x="1862.0" y="1047.0" w="37.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1366" shape="ledger">
+        <Bounds x="2264.0" y="1052.0" w="37.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1384" shape="ledger">
+        <Bounds x="1130.0" y="1144.0" w="83.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1388" shape="ledger">
+        <Bounds x="520.0" y="1133.0" w="47.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1404" shape="ledger">
+        <Bounds x="521.0" y="1151.0" w="47.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1406" shape="ledger">
+        <Bounds x="1757.0" y="1174.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1412" shape="ledger">
+        <Bounds x="517.0" y="1168.0" w="52.0" h="7.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1414" shape="ledger">
+        <Bounds x="1134.0" y="1181.0" w="44.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1416" shape="ledger">
+        <Bounds x="1757.0" y="1192.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1422" shape="ledger">
+        <Bounds x="1135.0" y="1198.0" w="42.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1424" shape="ledger">
+        <Bounds x="1759.0" y="1210.0" w="40.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1428" shape="ledger">
+        <Bounds x="1132.0" y="1216.0" w="46.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1952" shape="noteheadHalf">
+        <Bounds x="540.0" y="776.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1963" shape="noteheadHalf">
+        <Bounds x="1154.0" y="786.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1971" shape="noteheadHalf">
+        <Bounds x="540.0" y="794.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1978" shape="noteheadHalf">
+        <Bounds x="1153.0" y="805.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1982" shape="noteheadHalf">
+        <Bounds x="1459.0" y="811.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1996" shape="noteheadBlack">
+        <Bounds x="1767.0" y="861.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2004" shape="noteheadBlack">
+        <Bounds x="2207.0" y="876.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2008" shape="noteheadBlack">
+        <Bounds x="2074.0" y="883.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2018" shape="noteheadBlack">
+        <Bounds x="1458.0" y="783.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2026" shape="noteheadBlack">
+        <Bounds x="1583.0" y="767.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2032" shape="noteheadHalf">
+        <Bounds x="1767.0" y="898.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2034" shape="noteheadBlack">
+        <Bounds x="2074.0" y="902.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2038" shape="noteheadBlack">
+        <Bounds x="2207.0" y="915.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2042" shape="noteheadBlack">
+        <Bounds x="848.0" y="784.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2044" shape="noteheadHalf">
+        <Bounds x="847.0" y="800.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2060" shape="noteheadBlack">
+        <Bounds x="1994.0" y="873.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2068" shape="noteheadBlack">
+        <Bounds x="979.0" y="757.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2074" shape="noteheadBlack">
+        <Bounds x="1039.0" y="1037.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2078" shape="noteheadBlack">
+        <Bounds x="1646.0" y="1046.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2086" shape="noteheadBlack">
+        <Bounds x="2202.0" y="1064.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2090" shape="noteheadBlack">
+        <Bounds x="635.0" y="1055.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2094" shape="noteheadBlack">
+        <Bounds x="700.0" y="1056.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2098" shape="noteheadBlack">
+        <Bounds x="1253.0" y="1066.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2102" shape="noteheadBlack">
+        <Bounds x="1314.0" y="1067.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2110" shape="noteheadBlack">
+        <Bounds x="1930.0" y="1077.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2114" shape="noteheadBlack">
+        <Bounds x="974.0" y="1070.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2120" shape="noteheadBlack">
+        <Bounds x="1580.0" y="1080.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2124" shape="noteheadBlack">
+        <Bounds x="767.0" y="1075.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2132" shape="noteheadBlack">
+        <Bounds x="1039.0" y="1080.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2136" shape="noteheadBlack">
+        <Bounds x="1376.0" y="1086.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2140" shape="noteheadBlack">
+        <Bounds x="1645.0" y="1090.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2148" shape="noteheadBlack">
+        <Bounds x="843.0" y="1085.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2152" shape="noteheadBlack">
+        <Bounds x="1457.0" y="1096.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2158" shape="noteheadBlack">
+        <Bounds x="2072.0" y="1106.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2162" shape="noteheadBlack">
+        <Bounds x="566.0" y="1116.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2170" shape="noteheadBlack">
+        <Bounds x="700.0" y="1007.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2174" shape="noteheadBlack">
+        <Bounds x="910.0" y="1012.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2178" shape="noteheadBlack">
+        <Bounds x="975.0" y="1022.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2182" shape="noteheadBlack">
+        <Bounds x="1253.0" y="1017.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2186" shape="noteheadBlack">
+        <Bounds x="1314.0" y="1020.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2190" shape="noteheadBlack">
+        <Bounds x="1517.0" y="1022.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2200" shape="noteheadBlack">
+        <Bounds x="1930.0" y="1030.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2204" shape="noteheadBlack">
+        <Bounds x="2139.0" y="1034.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2208" shape="noteheadBlack">
+        <Bounds x="2272.0" y="1034.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2212" shape="noteheadBlack">
+        <Bounds x="2204.0" y="1025.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2220" shape="noteheadBlack">
+        <Bounds x="1180.0" y="1157.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2224" shape="noteheadBlack">
+        <Bounds x="1580.0" y="1054.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2226" shape="noteheadBlack">
+        <Bounds x="1870.0" y="1076.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2230" shape="noteheadBlack">
+        <Bounds x="1994.0" y="1096.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2240" shape="noteheadWhole">
+        <Bounds x="531.0" y="1115.0" w="29.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2242" shape="noteheadBlack">
+        <Bounds x="636.0" y="1008.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2244" shape="noteheadBlack">
+        <Bounds x="1869.0" y="1028.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2246" shape="noteheadBlack">
+        <Bounds x="1800.0" y="1148.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2248" shape="noteheadWhole">
+        <Bounds x="1764.0" y="1147.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2250" shape="noteheadWhole">
+        <Bounds x="1141.0" y="1155.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2254" shape="noteheadWhole">
+        <Bounds x="529.0" y="1179.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2258" shape="noteheadWhole">
+        <Bounds x="1766.0" y="1212.0" w="29.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2260" shape="noteheadWhole">
+        <Bounds x="1142.0" y="1219.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2" shape="brace">
+        <Bounds x="293.0" y="793.0" w="24.0" h="319.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3700" shape="stem">
+        <Bounds x="562.0" y="727.0" w="5.0" h="62.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3701" shape="stem">
+        <Bounds x="537.0" y="801.0" w="6.0" h="68.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3708" shape="stem">
+        <Bounds x="584.0" y="954.0" w="5.0" h="174.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3709" shape="stem">
+        <Bounds x="654.0" y="955.0" w="5.0" h="113.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3710" shape="stem">
+        <Bounds x="720.0" y="957.0" w="4.0" h="113.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3712" shape="stem">
+        <Bounds x="785.0" y="958.0" w="6.0" h="131.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3713" shape="stem">
+        <Bounds x="842.0" y="1094.0" w="4.0" h="75.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3714" shape="stem">
+        <Bounds x="866.0" y="729.0" w="4.0" h="68.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3715" shape="stem">
+        <Bounds x="844.0" y="809.0" w="5.0" h="65.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3721" shape="stem">
+        <Bounds x="909.0" y="1018.0" w="4.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3722" shape="stem">
+        <Bounds x="974.0" y="1029.0" w="4.0" h="114.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3723" shape="stem">
+        <Bounds x="999.0" y="705.0" w="4.0" h="65.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3724" shape="stem">
+        <Bounds x="1037.0" y="1048.0" w="4.0" h="111.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3726" shape="stem">
+        <Bounds x="1151.0" y="813.0" w="4.0" h="67.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3728" shape="stem">
+        <Bounds x="1175.0" y="736.0" w="4.0" h="64.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3730" shape="stem">
+        <Bounds x="1200.0" y="966.0" w="4.0" h="202.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3731" shape="stem">
+        <Bounds x="1274.0" y="966.0" w="4.0" h="112.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3732" shape="stem">
+        <Bounds x="1334.0" y="967.0" w="5.0" h="112.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3734" shape="stem">
+        <Bounds x="1396.0" y="966.0" w="4.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3735" shape="stem">
+        <Bounds x="1479.0" y="730.0" w="4.0" h="65.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3736" shape="stem">
+        <Bounds x="1456.0" y="1101.0" w="4.0" h="74.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3737" shape="stem">
+        <Bounds x="1458.0" y="819.0" w="4.0" h="66.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3738" shape="stem">
+        <Bounds x="1516.0" y="1027.0" w="4.0" h="135.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3739" shape="stem">
+        <Bounds x="1579.0" y="1061.0" w="3.0" h="96.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3741" shape="stem">
+        <Bounds x="1604.0" y="721.0" w="4.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3742" shape="stem">
+        <Bounds x="1644.0" y="1055.0" w="4.0" h="114.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3795" shape="stem">
+        <Bounds x="1787.0" y="804.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3796" shape="stem">
+        <Bounds x="1766.0" y="906.0" w="5.0" h="66.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3797" shape="stem">
+        <Bounds x="1820.0" y="976.0" w="4.0" h="185.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3798" shape="stem">
+        <Bounds x="1889.0" y="976.0" w="4.0" h="113.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3799" shape="stem">
+        <Bounds x="1950.0" y="990.0" w="5.0" h="101.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3801" shape="stem">
+        <Bounds x="2012.0" y="977.0" w="5.0" h="118.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3802" shape="stem">
+        <Bounds x="2013.0" y="818.0" w="4.0" h="68.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3805" shape="stem">
+        <Bounds x="2071.0" y="1112.0" w="4.0" h="75.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3806" shape="stem">
+        <Bounds x="2095.0" y="832.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3808" shape="stem">
+        <Bounds x="2138.0" y="1039.0" w="5.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3809" shape="stem">
+        <Bounds x="2202.0" y="1070.0" w="4.0" h="66.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3810" shape="stem">
+        <Bounds x="2225.0" y="979.0" w="4.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3813" shape="stem">
+        <Bounds x="2228.0" y="823.0" w="4.0" h="101.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3814" shape="stem">
+        <Bounds x="2292.0" y="987.0" w="4.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5615" shape="accidentalNatural">
+        <Bounds x="515.0" y="756.0" w="14.0" h="60.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5616" shape="accidentalFlat">
+        <Bounds x="614.0" y="980.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5617" shape="accidentalFlat">
+        <Bounds x="744.0" y="1047.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5629" shape="accidentalFlat">
+        <Bounds x="949.0" y="1043.0" w="18.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5630" shape="accidentalFlat">
+        <Bounds x="1019.0" y="1007.0" w="18.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5631" shape="accidentalNatural">
+        <Bounds x="1126.0" y="771.0" w="13.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5634" shape="accidentalFlat">
+        <Bounds x="1230.0" y="989.0" w="18.0" h="47.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5635" shape="accidentalFlat">
+        <Bounds x="1356.0" y="1058.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5637" shape="accidentalFlat">
+        <Bounds x="1558.0" y="1054.0" w="16.0" h="46.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5640" shape="accidentalFlat">
+        <Bounds x="1623.0" y="1018.0" w="17.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5646" shape="gClefChange">
+        <Bounds x="1663.0" y="805.0" w="37.0" h="101.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5656" shape="accidentalNatural">
+        <Bounds x="1733.0" y="1134.0" w="12.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5665" shape="accidentalNatural">
+        <Bounds x="1734.0" y="1199.0" w="10.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5672" shape="accidentalFlat">
+        <Bounds x="1847.0" y="1001.0" w="18.0" h="47.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5673" shape="accidentalFlat">
+        <Bounds x="1971.0" y="1068.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5676" shape="accidentalFlat">
+        <Bounds x="2181.0" y="998.0" w="18.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5994" shape="dynamicPiano">
+        <Bounds x="523.0" y="934.0" w="38.0" h="35.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5996" shape="accidentalNatural">
+        <Bounds x="946.0" y="745.0" w="11.0" h="43.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5997" shape="accidentalNatural">
+        <Bounds x="2184.0" y="897.0" w="14.0" h="54.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5678" shape="augmentationDot">
+        <Bounds x="1809.0" y="878.0" w="8.0" h="7.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5675" shape="flag8thUp">
+        <Bounds x="2017.0" y="828.0" w="16.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="30" shape="barlineSingle">
+        <Bounds x="79.0" y="1435.0" w="6.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="34" shape="barlineSingle">
+        <Bounds x="907.0" y="1451.0" w="5.0" h="69.0"/>
+    </Symbol>
+    <Symbol interline="18" id="36" shape="barlineSingle">
+        <Bounds x="1624.0" y="1463.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="40" shape="barlineSingle">
+        <Bounds x="2338.0" y="1475.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="42" shape="barlineSingle">
+        <Bounds x="77.0" y="1687.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="46" shape="barlineSingle">
+        <Bounds x="905.0" y="1702.0" w="4.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="48" shape="barlineSingle">
+        <Bounds x="1621.0" y="1715.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="52" shape="barlineSingle">
+        <Bounds x="2336.0" y="1726.0" w="5.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="286" shape="gClef">
+        <Bounds x="88.0" y="1406.0" w="46.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="327" shape="fClef">
+        <Bounds x="89.0" y="1684.0" w="53.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="328" shape="keyFlat">
+        <Bounds x="144.0" y="1435.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="330" shape="keyFlat">
+        <Bounds x="143.0" y="1705.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1434" shape="ledger">
+        <Bounds x="719.0" y="1535.0" w="57.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1436" shape="ledger">
+        <Bounds x="1996.0" y="1558.0" w="57.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1438" shape="ledger">
+        <Bounds x="1443.0" y="1548.0" w="53.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1440" shape="ledger">
+        <Bounds x="204.0" y="1528.0" w="57.0" h="3.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1442" shape="ledger">
+        <Bounds x="1113.0" y="1543.0" w="51.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1444" shape="ledger">
+        <Bounds x="399.0" y="1529.0" w="49.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1446" shape="ledger">
+        <Bounds x="1830.0" y="1555.0" w="49.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1478" shape="ledger">
+        <Bounds x="1762.0" y="1695.0" w="44.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1480" shape="ledger">
+        <Bounds x="1834.0" y="1697.0" w="44.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1482" shape="ledger">
+        <Bounds x="2165.0" y="1702.0" w="44.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1484" shape="ledger">
+        <Bounds x="1049.0" y="1684.0" w="43.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1486" shape="ledger">
+        <Bounds x="1117.0" y="1683.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1488" shape="ledger">
+        <Bounds x="2087.0" y="1701.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1490" shape="ledger">
+        <Bounds x="2243.0" y="1703.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1492" shape="ledger">
+        <Bounds x="329.0" y="1671.0" w="41.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1494" shape="ledger">
+        <Bounds x="401.0" y="1673.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1496" shape="ledger">
+        <Bounds x="1374.0" y="1690.0" w="40.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1498" shape="ledger">
+        <Bounds x="657.0" y="1676.0" w="38.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1510" shape="ledger">
+        <Bounds x="1642.0" y="1806.0" w="84.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1516" shape="ledger">
+        <Bounds x="212.0" y="1780.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1540" shape="ledger">
+        <Bounds x="926.0" y="1810.0" w="46.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1542" shape="ledger">
+        <Bounds x="210.0" y="1796.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1546" shape="ledger">
+        <Bounds x="926.0" y="1828.0" w="46.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1548" shape="ledger">
+        <Bounds x="208.0" y="1814.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1550" shape="ledger">
+        <Bounds x="1649.0" y="1841.0" w="44.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1554" shape="ledger">
+        <Bounds x="928.0" y="1846.0" w="45.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1556" shape="ledger">
+        <Bounds x="1650.0" y="1859.0" w="41.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1558" shape="ledger">
+        <Bounds x="1649.0" y="1875.0" w="45.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2266" shape="noteheadBlack">
+        <Bounds x="1666.0" y="1472.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2272" shape="noteheadBlack">
+        <Bounds x="949.0" y="1469.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2276" shape="noteheadBlack">
+        <Bounds x="2256.0" y="1490.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2280" shape="noteheadBlack">
+        <Bounds x="743.0" y="1474.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2288" shape="noteheadBlack">
+        <Bounds x="1464.0" y="1487.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2292" shape="noteheadBlack">
+        <Bounds x="2021.0" y="1495.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2300" shape="noteheadBlack">
+        <Bounds x="2177.0" y="1497.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2306" shape="noteheadHalf">
+        <Bounds x="1129.0" y="1487.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2310" shape="noteheadBlack">
+        <Bounds x="1847.0" y="1502.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2314" shape="noteheadBlack">
+        <Bounds x="228.0" y="1482.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2318" shape="noteheadBlack">
+        <Bounds x="949.0" y="1495.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2322" shape="noteheadBlack">
+        <Bounds x="1666.0" y="1508.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2328" shape="noteheadBlack">
+        <Bounds x="743.0" y="1500.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2340" shape="noteheadBlack">
+        <Bounds x="1464.0" y="1513.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2344" shape="noteheadBlack">
+        <Bounds x="2021.0" y="1522.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2354" shape="noteheadBlack">
+        <Bounds x="2187.0" y="1525.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2358" shape="noteheadBlack">
+        <Bounds x="228.0" y="1499.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2368" shape="noteheadHalf">
+        <Bounds x="1129.0" y="1515.0" w="24.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2374" shape="noteheadBlack">
+        <Bounds x="1666.0" y="1536.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2378" shape="noteheadBlack">
+        <Bounds x="228.0" y="1530.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2384" shape="noteheadBlack">
+        <Bounds x="743.0" y="1539.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2396" shape="noteheadBlack">
+        <Bounds x="1464.0" y="1552.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2402" shape="noteheadBlack">
+        <Bounds x="2021.0" y="1561.0" w="22.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2412" shape="noteheadHalf">
+        <Bounds x="413.0" y="1539.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2422" shape="noteheadBlack">
+        <Bounds x="2188.0" y="1463.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2426" shape="noteheadHalf">
+        <Bounds x="414.0" y="1475.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2432" shape="noteheadBlack">
+        <Bounds x="1847.0" y="1528.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2434" shape="noteheadHalf">
+        <Bounds x="415.0" y="1501.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2440" shape="noteheadBlack">
+        <Bounds x="949.0" y="1534.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2444" shape="noteheadHalf">
+        <Bounds x="1128.0" y="1552.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2446" shape="noteheadBlack">
+        <Bounds x="1846.0" y="1566.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2448" shape="noteheadBlack">
+        <Bounds x="739.0" y="1691.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2456" shape="noteheadBlack">
+        <Bounds x="2173.0" y="1714.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2460" shape="noteheadBlack">
+        <Bounds x="338.0" y="1700.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2464" shape="noteheadBlack">
+        <Bounds x="411.0" y="1702.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2468" shape="noteheadBlack">
+        <Bounds x="1058.0" y="1713.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2472" shape="noteheadBlack">
+        <Bounds x="1128.0" y="1715.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2484" shape="noteheadBlack">
+        <Bounds x="1844.0" y="1727.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2496" shape="noteheadBlack">
+        <Bounds x="820.0" y="1727.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2500" shape="noteheadBlack">
+        <Bounds x="1212.0" y="1734.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2504" shape="noteheadBlack">
+        <Bounds x="1538.0" y="1740.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2508" shape="noteheadBlack">
+        <Bounds x="582.0" y="1731.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2512" shape="noteheadBlack">
+        <Bounds x="1303.0" y="1744.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2516" shape="noteheadBlack">
+        <Bounds x="2018.0" y="1756.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2528" shape="noteheadBlack">
+        <Bounds x="251.0" y="1760.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2532" shape="noteheadBlack">
+        <Bounds x="338.0" y="1656.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2536" shape="noteheadBlack">
+        <Bounds x="411.0" y="1655.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2540" shape="noteheadBlack">
+        <Bounds x="663.0" y="1659.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2544" shape="noteheadBlack">
+        <Bounds x="1058.0" y="1666.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2548" shape="noteheadBlack">
+        <Bounds x="1128.0" y="1666.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2552" shape="noteheadBlack">
+        <Bounds x="1383.0" y="1671.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2556" shape="noteheadBlack">
+        <Bounds x="1773.0" y="1677.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2564" shape="noteheadBlack">
+        <Bounds x="1845.0" y="1679.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2568" shape="noteheadBlack">
+        <Bounds x="2095.0" y="1684.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2572" shape="noteheadBlack">
+        <Bounds x="2253.0" y="1685.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2576" shape="noteheadBlack">
+        <Bounds x="2176.0" y="1675.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2580" shape="noteheadBlack">
+        <Bounds x="972.0" y="1786.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2586" shape="noteheadBlack">
+        <Bounds x="1693.0" y="1817.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2590" shape="noteheadBlack">
+        <Bounds x="1461.0" y="1703.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2592" shape="noteheadBlack">
+        <Bounds x="1773.0" y="1726.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2594" shape="noteheadBlack">
+        <Bounds x="740.0" y="1717.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2596" shape="noteheadBlack">
+        <Bounds x="1461.0" y="1730.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2604" shape="noteheadBlack">
+        <Bounds x="1926.0" y="1764.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2606" shape="noteheadBlack">
+        <Bounds x="489.0" y="1738.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2608" shape="noteheadWhole">
+        <Bounds x="217.0" y="1760.0" w="30.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2610" shape="noteheadWhole">
+        <Bounds x="936.0" y="1784.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2612" shape="noteheadWhole">
+        <Bounds x="1657.0" y="1816.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2614" shape="noteheadWhole">
+        <Bounds x="216.0" y="1826.0" w="31.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2618" shape="noteheadWhole">
+        <Bounds x="937.0" y="1848.0" w="30.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2620" shape="noteheadWhole">
+        <Bounds x="1658.0" y="1877.0" w="30.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4" shape="brace">
+        <Bounds x="51.0" y="1435.0" w="20.0" h="323.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3817" shape="stem">
+        <Bounds x="248.0" y="1425.0" w="5.0" h="117.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3818" shape="stem">
+        <Bounds x="270.0" y="1616.0" w="5.0" h="158.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3821" shape="stem">
+        <Bounds x="358.0" y="1605.0" w="4.0" h="108.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3822" shape="stem">
+        <Bounds x="431.0" y="1607.0" w="6.0" h="106.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3823" shape="stem">
+        <Bounds x="434.0" y="1419.0" w="5.0" h="136.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3824" shape="stem">
+        <Bounds x="507.0" y="1609.0" w="5.0" h="143.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3825" shape="stem">
+        <Bounds x="580.0" y="1740.0" w="5.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3826" shape="stem">
+        <Bounds x="662.0" y="1666.0" w="4.0" h="126.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3831" shape="stem">
+        <Bounds x="759.0" y="1640.0" w="5.0" h="63.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3833" shape="stem">
+        <Bounds x="738.0" y="1725.0" w="4.0" h="68.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3835" shape="stem">
+        <Bounds x="763.0" y="1415.0" w="5.0" h="133.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3837" shape="stem">
+        <Bounds x="818.0" y="1734.0" w="5.0" h="76.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3838" shape="stem">
+        <Bounds x="969.0" y="1410.0" w="5.0" h="136.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3839" shape="stem">
+        <Bounds x="992.0" y="1611.0" w="5.0" h="188.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3840" shape="stem">
+        <Bounds x="1078.0" y="1612.0" w="5.0" h="114.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3841" shape="stem">
+        <Bounds x="1148.0" y="1614.0" w="4.0" h="112.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3842" shape="stem">
+        <Bounds x="1150.0" y="1435.0" w="5.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3844" shape="stem">
+        <Bounds x="1232.0" y="1616.0" w="4.0" h="130.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3845" shape="stem">
+        <Bounds x="1302.0" y="1750.0" w="4.0" h="69.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3846" shape="stem">
+        <Bounds x="1382.0" y="1676.0" w="5.0" h="129.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3850" shape="stem">
+        <Bounds x="1480.0" y="1659.0" w="4.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3852" shape="stem">
+        <Bounds x="1460.0" y="1737.0" w="3.0" h="67.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3853" shape="stem">
+        <Bounds x="1484.0" y="1433.0" w="5.0" h="130.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3854" shape="stem">
+        <Bounds x="1537.0" y="1747.0" w="3.0" h="74.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3856" shape="stem">
+        <Bounds x="1687.0" y="1423.0" w="4.0" h="107.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3859" shape="stem">
+        <Bounds x="1714.0" y="1629.0" w="4.0" h="200.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3860" shape="stem">
+        <Bounds x="1793.0" y="1630.0" w="4.0" h="109.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3861" shape="stem">
+        <Bounds x="1866.0" y="1631.0" w="3.0" h="108.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3862" shape="stem">
+        <Bounds x="1866.0" y="1448.0" w="5.0" h="130.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3863" shape="stem">
+        <Bounds x="1945.0" y="1633.0" w="4.0" h="145.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3864" shape="stem">
+        <Bounds x="2041.0" y="1437.0" w="4.0" h="135.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3865" shape="stem">
+        <Bounds x="2017.0" y="1761.0" w="5.0" h="75.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3866" shape="stem">
+        <Bounds x="2094.0" y="1690.0" w="5.0" h="128.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3867" shape="stem">
+        <Bounds x="2172.0" y="1721.0" w="4.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3868" shape="stem">
+        <Bounds x="2197.0" y="1626.0" w="3.0" h="62.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3869" shape="stem">
+        <Bounds x="2177.0" y="1503.0" w="3.0" h="76.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3870" shape="stem">
+        <Bounds x="2208.0" y="1412.0" w="4.0" h="125.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3871" shape="stem">
+        <Bounds x="2274.0" y="1640.0" w="3.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3872" shape="stem">
+        <Bounds x="2255.0" y="1495.0" w="4.0" h="74.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5689" shape="accidentalFlat">
+        <Bounds x="204.0" y="1504.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5695" shape="accidentalFlat">
+        <Bounds x="315.0" y="1627.0" w="19.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5696" shape="accidentalNatural">
+        <Bounds x="467.0" y="1719.0" w="14.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5697" shape="accidentalSharp">
+        <Bounds x="695.0" y="1480.0" w="21.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5703" shape="accidentalNatural">
+        <Bounds x="722.0" y="1464.0" w="14.0" h="46.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5707" shape="accidentalFlat">
+        <Bounds x="713.0" y="1690.0" w="18.0" h="47.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5708" shape="accidentalFlat">
+        <Bounds x="797.0" y="1699.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5713" shape="accidentalFlat">
+        <Bounds x="1033.0" y="1637.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5716" shape="accidentalFlat">
+        <Bounds x="1188.0" y="1706.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5717" shape="accidentalNatural">
+        <Bounds x="1442.0" y="1468.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5727" shape="accidentalSharp">
+        <Bounds x="1414.0" y="1492.0" w="20.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5729" shape="accidentalFlat">
+        <Bounds x="1436.0" y="1699.0" w="16.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5730" shape="accidentalFlat">
+        <Bounds x="1638.0" y="1509.0" w="18.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5731" shape="accidentalFlat">
+        <Bounds x="1642.0" y="1446.0" w="17.0" h="47.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5736" shape="accidentalFlat">
+        <Bounds x="1750.0" y="1649.0" w="17.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5739" shape="accidentalNatural">
+        <Bounds x="1903.0" y="1745.0" w="14.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5741" shape="accidentalFlat">
+        <Bounds x="1996.0" y="1535.0" w="18.0" h="47.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5750" shape="accidentalNatural">
+        <Bounds x="1975.0" y="1503.0" w="13.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5758" shape="accidentalFlat">
+        <Bounds x="1997.0" y="1468.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5760" shape="accidentalFlat">
+        <Bounds x="2151.0" y="1649.0" w="18.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5761" shape="accidentalNatural">
+        <Bounds x="2152.0" y="1479.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5998" shape="accidentalNatural">
+        <Bounds x="1442.0" y="1531.0" w="14.0" h="54.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6000" shape="dynamicMP">
+        <Bounds x="926.0" y="1581.0" w="66.0" h="39.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6001" shape="accidentalNatural">
+        <Bounds x="720.0" y="1518.0" w="14.0" h="54.0"/>
+    </Symbol>
+    <Symbol interline="18" id="54" shape="barlineSingle">
+        <Bounds x="72.0" y="2084.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="58" shape="barlineSingle">
+        <Bounds x="875.0" y="2100.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="64" shape="barlineSingle">
+        <Bounds x="1608.0" y="2114.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="66" shape="barlineSingle">
+        <Bounds x="2334.0" y="2127.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="68" shape="barlineSingle">
+        <Bounds x="67.0" y="2324.0" w="5.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="72" shape="barlineSingle">
+        <Bounds x="872.0" y="2340.0" w="4.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="78" shape="barlineSingle">
+        <Bounds x="1604.0" y="2353.0" w="4.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="80" shape="barlineSingle">
+        <Bounds x="2331.0" y="2366.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="335" shape="gClef">
+        <Bounds x="85.0" y="2054.0" w="46.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="372" shape="fClef">
+        <Bounds x="80.0" y="2322.0" w="53.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="374" shape="keyFlat">
+        <Bounds x="140.0" y="2084.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="377" shape="keyFlat">
+        <Bounds x="136.0" y="2342.0" w="17.0" h="51.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1560" shape="ledger">
+        <Bounds x="1388.0" y="2088.0" w="71.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1564" shape="ledger">
+        <Bounds x="225.0" y="2066.0" w="62.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1566" shape="ledger">
+        <Bounds x="1640.0" y="2094.0" w="56.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1572" shape="ledger">
+        <Bounds x="1814.0" y="2097.0" w="44.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1574" shape="ledger">
+        <Bounds x="1168.0" y="2085.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1576" shape="ledger">
+        <Bounds x="1247.0" y="2087.0" w="40.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1580" shape="ledger">
+        <Bounds x="909.0" y="2081.0" w="39.0" h="3.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1614" shape="ledger">
+        <Bounds x="221.0" y="2047.0" w="65.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1618" shape="ledger">
+        <Bounds x="1642.0" y="2074.0" w="53.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1620" shape="ledger">
+        <Bounds x="1244.0" y="2066.0" w="44.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1628" shape="ledger">
+        <Bounds x="1813.0" y="2079.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1630" shape="ledger">
+        <Bounds x="908.0" y="2061.0" w="40.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1636" shape="ledger">
+        <Bounds x="1410.0" y="2053.0" w="52.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1644" shape="ledger">
+        <Bounds x="1644.0" y="2056.0" w="35.0" h="3.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1668" shape="ledger">
+        <Bounds x="978.0" y="2302.0" w="48.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1670" shape="ledger">
+        <Bounds x="1718.0" y="2315.0" w="39.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1672" shape="ledger">
+        <Bounds x="537.0" y="2423.0" w="58.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1674" shape="ledger">
+        <Bounds x="1629.0" y="2444.0" w="50.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1680" shape="ledger">
+        <Bounds x="895.0" y="2429.0" w="48.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1686" shape="ledger">
+        <Bounds x="311.0" y="2417.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1688" shape="ledger">
+        <Bounds x="470.0" y="2421.0" w="45.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1696" shape="ledger">
+        <Bounds x="239.0" y="2418.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1744" shape="ledger">
+        <Bounds x="460.0" y="2439.0" w="54.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1748" shape="ledger">
+        <Bounds x="312.0" y="2435.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1752" shape="ledger">
+        <Bounds x="236.0" y="2434.0" w="44.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1764" shape="ledger">
+        <Bounds x="235.0" y="2452.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2622" shape="noteheadBlack">
+        <Bounds x="254.0" y="2069.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2626" shape="noteheadHalf">
+        <Bounds x="406.0" y="2071.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2640" shape="noteheadBlack">
+        <Bounds x="1427.0" y="2092.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2654" shape="noteheadBlack">
+        <Bounds x="717.0" y="2088.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2658" shape="noteheadBlack">
+        <Bounds x="913.0" y="2092.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2662" shape="noteheadBlack">
+        <Bounds x="1253.0" y="2098.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2670" shape="noteheadBlack">
+        <Bounds x="254.0" y="2086.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2696" shape="noteheadBlack">
+        <Bounds x="2151.0" y="2123.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2700" shape="noteheadBlack">
+        <Bounds x="913.0" y="2109.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2711" shape="noteheadBlack">
+        <Bounds x="1253.0" y="2116.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2723" shape="noteheadBlack">
+        <Bounds x="717.0" y="2114.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2731" shape="noteheadBlack">
+        <Bounds x="1174.0" y="2123.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2737" shape="noteheadBlack">
+        <Bounds x="2151.0" y="2140.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2745" shape="noteheadBlack">
+        <Bounds x="716.0" y="2131.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2751" shape="noteheadHalf">
+        <Bounds x="384.0" y="2059.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2753" shape="noteheadBlack">
+        <Bounds x="717.0" y="2068.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2757" shape="noteheadBlack">
+        <Bounds x="914.0" y="2064.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2763" shape="noteheadBlack">
+        <Bounds x="1254.0" y="2070.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2769" shape="noteheadHalf">
+        <Bounds x="1662.0" y="2076.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2773" shape="noteheadBlack">
+        <Bounds x="233.0" y="2030.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2785" shape="noteheadBlack">
+        <Bounds x="915.0" y="2044.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2789" shape="noteheadBlack">
+        <Bounds x="1175.0" y="2058.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2797" shape="noteheadBlack">
+        <Bounds x="1255.0" y="2051.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2801" shape="noteheadBlack">
+        <Bounds x="1427.0" y="2063.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2807" shape="noteheadBlack">
+        <Bounds x="1406.0" y="2053.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2813" shape="noteheadHalf">
+        <Bounds x="1662.0" y="2058.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2815" shape="noteheadBlack">
+        <Bounds x="255.0" y="2023.0" w="23.0" h="17.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2817" shape="noteheadBlack">
+        <Bounds x="1650.0" y="2039.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2823" shape="noteheadHalf">
+        <Bounds x="1821.0" y="2051.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2825" shape="noteheadBlack">
+        <Bounds x="1427.0" y="2027.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2829" shape="noteheadBlack">
+        <Bounds x="2152.0" y="2105.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2833" shape="noteheadBlack">
+        <Bounds x="1651.0" y="2106.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2837" shape="noteheadBlack">
+        <Bounds x="1177.0" y="2105.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2839" shape="noteheadHalf">
+        <Bounds x="1823.0" y="2117.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2848" shape="noteheadHalf">
+        <Bounds x="408.0" y="2106.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2856" shape="noteheadHalf">
+        <Bounds x="408.0" y="2039.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2860" shape="noteheadBlack">
+        <Bounds x="639.0" y="2353.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2870" shape="noteheadBlack">
+        <Bounds x="786.0" y="2356.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2878" shape="noteheadBlack">
+        <Bounds x="562.0" y="2360.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2888" shape="noteheadBlack">
+        <Bounds x="1174.0" y="2372.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2892" shape="noteheadBlack">
+        <Bounds x="1309.0" y="2375.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2900" shape="noteheadBlack">
+        <Bounds x="1898.0" y="2385.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2904" shape="noteheadBlack">
+        <Bounds x="2035.0" y="2387.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2908" shape="noteheadBlack">
+        <Bounds x="2229.0" y="2390.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2912" shape="noteheadBlack">
+        <Bounds x="912.0" y="2376.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2928" shape="noteheadBlack">
+        <Bounds x="1647.0" y="2390.0" w="22.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2932" shape="noteheadBlack">
+        <Bounds x="482.0" y="2376.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2942" shape="noteheadBlack">
+        <Bounds x="2085.0" y="2406.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2946" shape="noteheadBlack">
+        <Bounds x="325.0" y="2382.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2952" shape="noteheadBlack">
+        <Bounds x="1096.0" y="2397.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2956" shape="noteheadBlack">
+        <Bounds x="1251.0" y="2400.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2966" shape="noteheadBlack">
+        <Bounds x="1423.0" y="2403.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2970" shape="noteheadBlack">
+        <Bounds x="1818.0" y="2411.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2980" shape="noteheadBlack">
+        <Bounds x="2148.0" y="2415.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2984" shape="noteheadBlack">
+        <Bounds x="249.0" y="2400.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2988" shape="noteheadBlack">
+        <Bounds x="991.0" y="2314.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2992" shape="noteheadBlack">
+        <Bounds x="1725.0" y="2328.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="2996" shape="noteheadBlack">
+        <Bounds x="993.0" y="2284.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3002" shape="noteheadBlack">
+        <Bounds x="1726.0" y="2297.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3006" shape="noteheadBlack">
+        <Bounds x="639.0" y="2419.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3010" shape="noteheadBlack">
+        <Bounds x="786.0" y="2422.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3014" shape="noteheadBlack">
+        <Bounds x="1096.0" y="2427.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3018" shape="noteheadBlack">
+        <Bounds x="1251.0" y="2429.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3028" shape="noteheadBlack">
+        <Bounds x="1817.0" y="2440.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3036" shape="noteheadBlack">
+        <Bounds x="2147.0" y="2445.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3040" shape="noteheadBlack">
+        <Bounds x="482.0" y="2442.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3052" shape="noteheadBlack">
+        <Bounds x="1646.0" y="2456.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3056" shape="noteheadBlack">
+        <Bounds x="325.0" y="2447.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3060" shape="noteheadBlack">
+        <Bounds x="248.0" y="2464.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3085" shape="noteheadBlack">
+        <Bounds x="1501.0" y="2378.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3110" shape="noteheadBlack">
+        <Bounds x="1363.0" y="2393.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3118" shape="noteheadBlack">
+        <Bounds x="1980.0" y="2412.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3136" shape="noteheadBlack">
+        <Bounds x="562.0" y="2425.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3138" shape="noteheadBlack">
+        <Bounds x="1424.0" y="2430.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3140" shape="noteheadBlack">
+        <Bounds x="1979.0" y="2443.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3142" shape="noteheadBlack">
+        <Bounds x="911.0" y="2441.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6012" shape="noteheadBlack">
+        <Bounds x="2153.0" y="2074.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6" shape="brace">
+        <Bounds x="37.0" y="2084.0" w="30.0" h="312.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3874" shape="stem">
+        <Bounds x="253.0" y="2026.0" w="5.0" h="134.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3875" shape="stem">
+        <Bounds x="269.0" y="2371.0" w="5.0" h="106.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3880" shape="stem">
+        <Bounds x="346.0" y="2354.0" w="4.0" h="106.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3884" shape="stem">
+        <Bounds x="404.0" y="2048.0" w="5.0" h="137.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3888" shape="stem">
+        <Bounds x="503.0" y="2314.0" w="4.0" h="140.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3894" shape="stem">
+        <Bounds x="582.0" y="2328.0" w="5.0" h="108.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3900" shape="stem">
+        <Bounds x="659.0" y="2295.0" w="5.0" h="137.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3901" shape="stem">
+        <Bounds x="715.0" y="2075.0" w="5.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3911" shape="stem">
+        <Bounds x="807.0" y="2322.0" w="4.0" h="112.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3917" shape="stem">
+        <Bounds x="932.0" y="2243.0" w="5.0" h="210.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3922" shape="stem">
+        <Bounds x="912.0" y="2052.0" w="4.0" h="135.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3925" shape="stem">
+        <Bounds x="1012.0" y="2230.0" w="5.0" h="95.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3963" shape="stem">
+        <Bounds x="1116.0" y="2320.0" w="4.0" h="119.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3970" shape="stem">
+        <Bounds x="1173.0" y="2076.0" w="5.0" h="125.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3974" shape="stem">
+        <Bounds x="1195.0" y="2307.0" w="5.0" h="78.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3983" shape="stem">
+        <Bounds x="1272.0" y="2316.0" w="4.0" h="125.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3984" shape="stem">
+        <Bounds x="1252.0" y="2059.0" w="4.0" h="136.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3995" shape="stem">
+        <Bounds x="1330.0" y="2316.0" w="4.0" h="72.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4002" shape="stem">
+        <Bounds x="1382.0" y="2316.0" w="5.0" h="88.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4010" shape="stem">
+        <Bounds x="1426.0" y="2051.0" w="4.0" h="117.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4012" shape="stem">
+        <Bounds x="1443.0" y="2330.0" w="4.0" h="114.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4022" shape="stem">
+        <Bounds x="1521.0" y="2314.0" w="4.0" h="76.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4025" shape="stem">
+        <Bounds x="1666.0" y="2260.0" w="5.0" h="207.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4026" shape="stem">
+        <Bounds x="1649.0" y="2047.0" w="4.0" h="133.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4033" shape="stem">
+        <Bounds x="1684.0" y="2005.0" w="4.0" h="83.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4038" shape="stem">
+        <Bounds x="1746.0" y="2240.0" w="6.0" h="100.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4051" shape="stem">
+        <Bounds x="1839.0" y="2335.0" w="4.0" h="116.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4052" shape="stem">
+        <Bounds x="1821.0" y="2059.0" w="4.0" h="131.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4054" shape="stem">
+        <Bounds x="1919.0" y="2319.0" w="4.0" h="78.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4055" shape="stem">
+        <Bounds x="2000.0" y="2330.0" w="3.0" h="125.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4056" shape="stem">
+        <Bounds x="2055.0" y="2330.0" w="4.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4057" shape="stem">
+        <Bounds x="2106.0" y="2328.0" w="4.0" h="89.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4059" shape="stem">
+        <Bounds x="2169.0" y="2344.0" w="3.0" h="113.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4073" shape="stem">
+        <Bounds x="2150.0" y="2115.0" w="3.0" h="102.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4082" shape="stem">
+        <Bounds x="2249.0" y="2324.0" w="4.0" h="77.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5763" shape="accidentalNatural">
+        <Bounds x="211.0" y="2003.0" w="15.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5772" shape="accidentalFlat">
+        <Bounds x="191.0" y="2008.0" w="17.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5774" shape="accidentalNatural">
+        <Bounds x="215.0" y="2066.0" w="14.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5779" shape="dynamicPiano">
+        <Bounds x="250.0" y="2189.0" w="37.0" h="35.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5781" shape="dynamicPiano">
+        <Bounds x="218.0" y="2185.0" w="36.0" h="34.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5783" shape="accidentalFlat">
+        <Bounds x="357.0" y="2046.0" w="17.0" h="47.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5785" shape="accidentalNatural">
+        <Bounds x="459.0" y="2424.0" w="14.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5786" shape="accidentalNatural">
+        <Bounds x="460.0" y="2357.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5789" shape="accidentalFlat">
+        <Bounds x="536.0" y="2400.0" w="18.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5790" shape="accidentalFlat">
+        <Bounds x="537.0" y="2331.0" w="18.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5792" shape="accidentalFlat">
+        <Bounds x="614.0" y="2394.0" w="17.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5794" shape="accidentalFlat">
+        <Bounds x="616.0" y="2324.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5795" shape="accidentalSharp">
+        <Bounds x="689.0" y="2093.0" w="21.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5796" shape="accidentalNatural">
+        <Bounds x="761.0" y="2403.0" w="14.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5797" shape="accidentalNatural">
+        <Bounds x="767.0" y="2336.0" w="13.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5799" shape="accidentalNatural">
+        <Bounds x="890.0" y="2024.0" w="14.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5800" shape="accidentalNatural">
+        <Bounds x="890.0" y="2090.0" w="13.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5804" shape="accidentalSharp">
+        <Bounds x="965.0" y="2258.0" w="22.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5806" shape="accidentalSharp">
+        <Bounds x="1068.0" y="2376.0" w="22.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5807" shape="accidentalFlat">
+        <Bounds x="1143.0" y="2352.0" w="15.0" h="39.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5815" shape="accidentalNatural">
+        <Bounds x="1150.0" y="2039.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5817" shape="accidentalNatural">
+        <Bounds x="1150.0" y="2103.0" w="15.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5832" shape="accidentalNatural">
+        <Bounds x="1403.0" y="2383.0" w="13.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5839" shape="accidentalNatural">
+        <Bounds x="1483.0" y="2359.0" w="12.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5845" shape="fClefChange">
+        <Bounds x="1547.0" y="2357.0" w="42.0" h="44.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5862" shape="dynamicPiano">
+        <Bounds x="1627.0" y="2231.0" w="39.0" h="33.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5863" shape="accidentalSharp">
+        <Bounds x="1698.0" y="2273.0" w="21.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5877" shape="gClefChange">
+        <Bounds x="1754.0" y="2345.0" w="37.0" h="103.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5903" shape="accidentalFlat">
+        <Bounds x="1875.0" y="2357.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5906" shape="accidentalNatural">
+        <Bounds x="2127.0" y="2394.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5911" shape="fClefChange">
+        <Bounds x="2277.0" y="2364.0" w="43.0" h="44.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6002" shape="gClefChange">
+        <Bounds x="1027.0" y="2328.0" w="39.0" h="103.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6003" shape="accidentalNatural">
+        <Bounds x="1388.0" y="2071.0" w="14.0" h="54.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6004" shape="accidentalSharp">
+        <Bounds x="1795.0" y="2392.0" w="18.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5782" shape="flag8thUp">
+        <Bounds x="269.0" y="2340.0" w="21.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5787" shape="flag8thUp">
+        <Bounds x="506.0" y="2319.0" w="18.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5791" shape="flag8thUp">
+        <Bounds x="583.0" y="2303.0" w="21.0" h="60.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5798" shape="flag8thUp">
+        <Bounds x="807.0" y="2299.0" w="21.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5927" shape="augmentationDot">
+        <Bounds x="962.0" y="2069.0" w="7.0" h="8.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5928" shape="augmentationDot">
+        <Bounds x="962.0" y="2107.0" w="7.0" h="8.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5929" shape="augmentationDot">
+        <Bounds x="963.0" y="2049.0" w="8.0" h="8.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5819" shape="flag8thDown">
+        <Bounds x="1176.0" y="2144.0" w="20.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5824" shape="tuplet3">
+        <Bounds x="1320.0" y="2287.0" w="19.0" h="24.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5931" shape="augmentationDot">
+        <Bounds x="1705.0" y="2084.0" w="7.0" h="7.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5932" shape="augmentationDot">
+        <Bounds x="1707.0" y="2065.0" w="8.0" h="7.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5904" shape="tuplet3">
+        <Bounds x="2042.0" y="2297.0" w="21.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="82" shape="barlineSingle">
+        <Bounds x="62.0" y="2726.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="90" shape="barlineSingle">
+        <Bounds x="881.0" y="2742.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" id="94" shape="barlineSingle">
+        <Bounds x="1612.0" y="2755.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" shape="barlineDouble">
+        <Bounds x="2269.0" y="2765.0" w="13.0" h="70.0"/>
+        <Symbol interline="18" id="96" shape="barlineSingle">
+            <Bounds x="2269.0" y="2765.0" w="5.0" h="70.0"/>
+        </Symbol>
+        <Symbol interline="18" id="98" shape="barlineSingle">
+            <Bounds x="2278.0" y="2765.0" w="4.0" h="70.0"/>
+        </Symbol>
+    </Symbol>
+    <Symbol interline="18" id="102" shape="barlineSingle">
+        <Bounds x="59.0" y="2941.0" w="6.0" h="71.0"/>
+    </Symbol>
+    <Symbol interline="18" id="110" shape="barlineSingle">
+        <Bounds x="878.0" y="2955.0" w="5.0" h="72.0"/>
+    </Symbol>
+    <Symbol interline="18" id="114" shape="barlineSingle">
+        <Bounds x="1608.0" y="2968.0" w="5.0" h="70.0"/>
+    </Symbol>
+    <Symbol interline="18" shape="barlineDouble">
+        <Bounds x="2266.0" y="2978.0" w="13.0" h="70.0"/>
+        <Symbol interline="18" id="116" shape="barlineSingle">
+            <Bounds x="2266.0" y="2978.0" w="3.0" h="70.0"/>
+        </Symbol>
+        <Symbol interline="18" id="118" shape="barlineSingle">
+            <Bounds x="2275.0" y="2978.0" w="4.0" h="70.0"/>
+        </Symbol>
+    </Symbol>
+    <Symbol interline="18" id="385" shape="gClef">
+        <Bounds x="76.0" y="2697.0" w="46.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="426" shape="fClef">
+        <Bounds x="73.0" y="2941.0" w="53.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="428" shape="keyFlat">
+        <Bounds x="131.0" y="2726.0" w="17.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="431" shape="keyFlat">
+        <Bounds x="128.0" y="2958.0" w="17.0" h="51.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1772" shape="ledger">
+        <Bounds x="1797.0" y="2738.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1776" shape="ledger">
+        <Bounds x="717.0" y="2717.0" w="41.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1778" shape="ledger">
+        <Bounds x="1647.0" y="2735.0" w="36.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1780" shape="ledger">
+        <Bounds x="2106.0" y="2741.0" w="36.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1798" shape="ledger">
+        <Bounds x="2103.0" y="2723.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1800" shape="ledger">
+        <Bounds x="1647.0" y="2717.0" w="37.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1816" shape="ledger">
+        <Bounds x="591.0" y="2927.0" w="42.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1818" shape="ledger">
+        <Bounds x="1298.0" y="2941.0" w="41.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1820" shape="ledger">
+        <Bounds x="458.0" y="2927.0" w="40.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1822" shape="ledger">
+        <Bounds x="1162.0" y="2938.0" w="40.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1876" shape="ledger">
+        <Bounds x="1717.0" y="3059.0" w="52.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1878" shape="ledger">
+        <Bounds x="2160.0" y="3065.0" w="52.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1880" shape="ledger">
+        <Bounds x="1861.0" y="3059.0" w="51.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1882" shape="ledger">
+        <Bounds x="201.0" y="3032.0" w="47.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1884" shape="ledger">
+        <Bounds x="907.0" y="3045.0" w="47.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1886" shape="ledger">
+        <Bounds x="1637.0" y="3055.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1888" shape="ledger">
+        <Bounds x="2021.0" y="3063.0" w="45.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1890" shape="ledger">
+        <Bounds x="2092.0" y="3063.0" w="45.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1892" shape="ledger">
+        <Bounds x="1944.0" y="3061.0" w="45.0" h="6.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1908" shape="ledger">
+        <Bounds x="2008.0" y="3081.0" w="58.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1910" shape="ledger">
+        <Bounds x="1721.0" y="3077.0" w="46.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1912" shape="ledger">
+        <Bounds x="1863.0" y="3078.0" w="46.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1914" shape="ledger">
+        <Bounds x="1943.0" y="3078.0" w="44.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1932" shape="ledger">
+        <Bounds x="1708.0" y="3094.0" w="60.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1938" shape="ledger">
+        <Bounds x="1639.0" y="3093.0" w="42.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1942" shape="ledger">
+        <Bounds x="1638.0" y="3110.0" w="44.0" h="5.0"/>
+    </Symbol>
+    <Symbol interline="18" id="1944" shape="ledger">
+        <Bounds x="1639.0" y="3129.0" w="43.0" h="4.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3144" shape="noteheadBlack">
+        <Bounds x="217.0" y="2712.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3148" shape="noteheadHalf">
+        <Bounds x="1690.0" y="2737.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3150" shape="noteheadBlack">
+        <Bounds x="2089.0" y="2744.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3154" shape="noteheadBlack">
+        <Bounds x="467.0" y="2725.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3158" shape="noteheadBlack">
+        <Bounds x="704.0" y="2730.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3166" shape="noteheadBlack">
+        <Bounds x="1259.0" y="2741.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3176" shape="noteheadHalf">
+        <Bounds x="1668.0" y="2747.0" w="24.0" h="20.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3178" shape="noteheadBlack">
+        <Bounds x="2110.0" y="2754.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3188" shape="noteheadBlack">
+        <Bounds x="725.0" y="2739.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3200" shape="noteheadBlack">
+        <Bounds x="1171.0" y="2747.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3210" shape="noteheadBlack">
+        <Bounds x="1425.0" y="2752.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3220" shape="noteheadBlack">
+        <Bounds x="1959.0" y="2761.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3244" shape="noteheadBlack">
+        <Bounds x="2110.0" y="2771.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3254" shape="noteheadBlack">
+        <Bounds x="1424.0" y="2769.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3258" shape="noteheadBlack">
+        <Bounds x="1501.0" y="2771.0" w="22.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3262" shape="noteheadBlack">
+        <Bounds x="1804.0" y="2776.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3268" shape="noteheadHalf">
+        <Bounds x="229.0" y="2754.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3286" shape="noteheadHalf">
+        <Bounds x="924.0" y="2777.0" w="24.0" h="21.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3288" shape="noteheadBlack">
+        <Bounds x="1247.0" y="2783.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3292" shape="noteheadBlack">
+        <Bounds x="1424.0" y="2787.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3296" shape="noteheadBlack">
+        <Bounds x="1521.0" y="2788.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3300" shape="noteheadBlack">
+        <Bounds x="1959.0" y="2796.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3307" shape="noteheadBlack">
+        <Bounds x="216.0" y="2772.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3311" shape="noteheadBlack">
+        <Bounds x="1500.0" y="2797.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3317" shape="noteheadBlack">
+        <Bounds x="466.0" y="2786.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3329" shape="noteheadBlack">
+        <Bounds x="522.0" y="2788.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3335" shape="noteheadBlack">
+        <Bounds x="938.0" y="2796.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3341" shape="noteheadBlack">
+        <Bounds x="1259.0" y="2801.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3347" shape="noteheadBlack">
+        <Bounds x="543.0" y="2797.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3351" shape="noteheadBlack">
+        <Bounds x="1171.0" y="2808.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3355" shape="noteheadBlack">
+        <Bounds x="1340.0" y="2811.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3359" shape="noteheadBlack">
+        <Bounds x="1424.0" y="2813.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3365" shape="noteheadBlack">
+        <Bounds x="725.0" y="2702.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3369" shape="noteheadBlack">
+        <Bounds x="1959.0" y="2731.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3373" shape="noteheadBlack">
+        <Bounds x="1654.0" y="2701.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3381" shape="noteheadBlack">
+        <Bounds x="2111.0" y="2707.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3385" shape="noteheadBlack">
+        <Bounds x="1500.0" y="2835.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3389" shape="noteheadBlack">
+        <Bounds x="940.0" y="2734.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3391" shape="noteheadBlack">
+        <Bounds x="545.0" y="2735.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3393" shape="noteheadBlack">
+        <Bounds x="1341.0" y="2750.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3403" shape="noteheadBlack">
+        <Bounds x="1249.0" y="2757.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3405" shape="noteheadBlack">
+        <Bounds x="1655.0" y="2765.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3407" shape="noteheadHalf">
+        <Bounds x="926.0" y="2749.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3411" shape="noteheadHalf">
+        <Bounds x="252.0" y="2745.0" w="24.0" h="22.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3417" shape="noteheadBlack">
+        <Bounds x="727.0" y="2765.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3419" shape="noteheadBlack">
+        <Bounds x="545.0" y="2762.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3431" shape="noteheadBlack">
+        <Bounds x="1806.0" y="2712.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3433" shape="noteheadBlack">
+        <Bounds x="292.0" y="2927.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3437" shape="noteheadBlack">
+        <Bounds x="387.0" y="2930.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3445" shape="noteheadBlack">
+        <Bounds x="660.0" y="2935.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3449" shape="noteheadBlack">
+        <Bounds x="997.0" y="2939.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3469" shape="noteheadBlack">
+        <Bounds x="1243.0" y="2953.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3491" shape="noteheadBlack">
+        <Bounds x="291.0" y="2954.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3495" shape="noteheadBlack">
+        <Bounds x="387.0" y="2955.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3499" shape="noteheadBlack">
+        <Bounds x="541.0" y="2958.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3511" shape="noteheadBlack">
+        <Bounds x="997.0" y="2967.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3515" shape="noteheadBlack">
+        <Bounds x="1090.0" y="2968.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3519" shape="noteheadBlack">
+        <Bounds x="1243.0" y="2971.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3523" shape="noteheadBlack">
+        <Bounds x="1421.0" y="2974.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3529" shape="noteheadBlack">
+        <Bounds x="724.0" y="2971.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3551" shape="noteheadBlack">
+        <Bounds x="1499.0" y="2983.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3557" shape="noteheadBlack">
+        <Bounds x="1421.0" y="2991.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3563" shape="noteheadBlack">
+        <Bounds x="2181.0" y="3003.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3571" shape="noteheadBlack">
+        <Bounds x="922.0" y="2992.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3575" shape="noteheadBlack">
+        <Bounds x="2106.0" y="3011.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3579" shape="noteheadBlack">
+        <Bounds x="2033.0" y="3018.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3583" shape="noteheadBlack">
+        <Bounds x="1877.0" y="3025.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3593" shape="noteheadBlack">
+        <Bounds x="1956.0" y="3026.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3599" shape="noteheadBlack">
+        <Bounds x="1736.0" y="3032.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3605" shape="noteheadBlack">
+        <Bounds x="465.0" y="2911.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3613" shape="noteheadBlack">
+        <Bounds x="600.0" y="2912.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3623" shape="noteheadBlack">
+        <Bounds x="1169.0" y="2921.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3627" shape="noteheadBlack">
+        <Bounds x="1307.0" y="2924.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3633" shape="noteheadBlack">
+        <Bounds x="2181.0" y="3069.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3637" shape="noteheadBlack">
+        <Bounds x="214.0" y="3045.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3641" shape="noteheadBlack">
+        <Bounds x="922.0" y="3057.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3645" shape="noteheadBlack">
+        <Bounds x="1651.0" y="3069.0" w="23.0" h="18.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3649" shape="noteheadBlack">
+        <Bounds x="2032.0" y="3085.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3653" shape="noteheadBlack">
+        <Bounds x="2106.0" y="3075.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3657" shape="noteheadBlack">
+        <Bounds x="1735.0" y="3097.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3661" shape="noteheadBlack">
+        <Bounds x="1877.0" y="3091.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3665" shape="noteheadBlack">
+        <Bounds x="1955.0" y="3092.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3669" shape="noteheadBlack">
+        <Bounds x="1650.0" y="3133.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3673" shape="noteheadBlack">
+        <Bounds x="543.0" y="2930.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3675" shape="noteheadBlack">
+        <Bounds x="1092.0" y="2941.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3677" shape="noteheadBlack">
+        <Bounds x="1361.0" y="2955.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3679" shape="noteheadBlack">
+        <Bounds x="726.0" y="2953.0" w="22.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3681" shape="noteheadBlack">
+        <Bounds x="797.0" y="2963.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="3687" shape="noteheadBlack">
+        <Bounds x="216.0" y="2979.0" w="23.0" h="19.0"/>
+    </Symbol>
+    <Symbol interline="18" id="8" shape="brace">
+        <Bounds x="33.0" y="2726.0" w="19.0" h="286.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4083" shape="stem">
+        <Bounds x="234.0" y="2882.0" w="6.0" h="174.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4084" shape="stem">
+        <Bounds x="215.0" y="2718.0" w="5.0" h="144.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4085" shape="stem">
+        <Bounds x="250.0" y="2691.0" w="5.0" h="78.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4086" shape="stem">
+        <Bounds x="311.0" y="2872.0" w="4.0" h="95.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4087" shape="stem">
+        <Bounds x="386.0" y="2935.0" w="4.0" h="97.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4089" shape="stem">
+        <Bounds x="464.0" y="2731.0" w="6.0" h="133.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4091" shape="stem">
+        <Bounds x="464.0" y="2917.0" w="5.0" h="105.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4093" shape="stem">
+        <Bounds x="542.0" y="2741.0" w="4.0" h="128.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4094" shape="stem">
+        <Bounds x="540.0" y="2955.0" w="5.0" h="80.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4101" shape="stem">
+        <Bounds x="598.0" y="2917.0" w="5.0" h="112.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4102" shape="stem">
+        <Bounds x="659.0" y="2940.0" w="5.0" h="85.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4103" shape="stem">
+        <Bounds x="723.0" y="2959.0" w="5.0" h="90.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4105" shape="stem">
+        <Bounds x="724.0" y="2706.0" w="5.0" h="135.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4109" shape="stem">
+        <Bounds x="795.0" y="2970.0" w="4.0" h="73.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4112" shape="stem">
+        <Bounds x="923.0" y="2758.0" w="4.0" h="95.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4113" shape="stem">
+        <Bounds x="942.0" y="2899.0" w="5.0" h="170.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4118" shape="stem">
+        <Bounds x="959.0" y="2679.0" w="4.0" h="131.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4121" shape="stem">
+        <Bounds x="1017.0" y="2886.0" w="5.0" h="94.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4123" shape="stem">
+        <Bounds x="1090.0" y="2947.0" w="4.0" h="103.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4126" shape="stem">
+        <Bounds x="1168.0" y="2924.0" w="5.0" h="115.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4127" shape="stem">
+        <Bounds x="1191.0" y="2706.0" w="4.0" h="116.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4130" shape="stem">
+        <Bounds x="1242.0" y="2960.0" w="4.0" h="88.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4131" shape="stem">
+        <Bounds x="1245.0" y="2764.0" w="5.0" h="97.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4135" shape="stem">
+        <Bounds x="1279.0" y="2687.0" w="5.0" h="128.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4136" shape="stem">
+        <Bounds x="1306.0" y="2929.0" w="4.0" h="111.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4137" shape="stem">
+        <Bounds x="1360.0" y="2700.0" w="5.0" h="125.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4138" shape="stem">
+        <Bounds x="1359.0" y="2962.0" w="4.0" h="75.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4139" shape="stem">
+        <Bounds x="1421.0" y="2979.0" w="4.0" h="98.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4142" shape="stem">
+        <Bounds x="1445.0" y="2696.0" w="3.0" h="129.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4146" shape="stem">
+        <Bounds x="1521.0" y="2711.0" w="4.0" h="136.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4147" shape="stem">
+        <Bounds x="1498.0" y="2989.0" w="4.0" h="77.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4149" shape="stem">
+        <Bounds x="1671.0" y="3027.0" w="5.0" h="118.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4155" shape="stem">
+        <Bounds x="1652.0" y="2706.0" w="5.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4157" shape="stem">
+        <Bounds x="1689.0" y="2685.0" w="5.0" h="76.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4161" shape="stem">
+        <Bounds x="1756.0" y="2980.0" w="4.0" h="127.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4162" shape="stem">
+        <Bounds x="1803.0" y="2719.0" w="5.0" h="130.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4163" shape="stem">
+        <Bounds x="1898.0" y="2997.0" w="4.0" h="106.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4168" shape="stem">
+        <Bounds x="1975.0" y="2969.0" w="5.0" h="135.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4170" shape="stem">
+        <Bounds x="1959.0" y="2738.0" w="4.0" h="128.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4171" shape="stem">
+        <Bounds x="2052.0" y="2960.0" w="6.0" h="137.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4172" shape="stem">
+        <Bounds x="2109.0" y="2712.0" w="5.0" h="132.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4173" shape="stem">
+        <Bounds x="2126.0" y="2951.0" w="5.0" h="137.0"/>
+    </Symbol>
+    <Symbol interline="18" id="4175" shape="stem">
+        <Bounds x="2201.0" y="2943.0" w="5.0" h="138.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5937" shape="accidentalFlat">
+        <Bounds x="441.0" y="2882.0" w="17.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5940" shape="accidentalFlat">
+        <Bounds x="499.0" y="2768.0" w="18.0" h="50.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5943" shape="accidentalFlat">
+        <Bounds x="515.0" y="2706.0" w="18.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5946" shape="accidentalFlat">
+        <Bounds x="700.0" y="2943.0" w="19.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5948" shape="accidentalFlat">
+        <Bounds x="895.0" y="2724.0" w="19.0" h="49.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5949" shape="accidentalFlat">
+        <Bounds x="1144.0" y="2896.0" w="18.0" h="48.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5950" shape="accidentalNatural">
+        <Bounds x="1146.0" y="2726.0" w="15.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5951" shape="accidentalNatural">
+        <Bounds x="1146.0" y="2790.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5955" shape="accidentalNatural">
+        <Bounds x="1478.0" y="2965.0" w="14.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5959" shape="fClefChange">
+        <Bounds x="1560.0" y="2759.0" w="41.0" h="45.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5974" shape="accidentalSharp">
+        <Bounds x="1705.0" y="3012.0" w="22.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5979" shape="accidentalSharp">
+        <Bounds x="1929.0" y="3072.0" w="22.0" h="59.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5980" shape="accidentalSharp">
+        <Bounds x="1936.0" y="2741.0" w="18.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5981" shape="accidentalSharp">
+        <Bounds x="1936.0" y="3006.0" w="17.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5983" shape="accidentalNatural">
+        <Bounds x="2008.0" y="3065.0" w="15.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5984" shape="accidentalNatural">
+        <Bounds x="2011.0" y="2999.0" w="13.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5986" shape="accidentalNatural">
+        <Bounds x="2160.0" y="3050.0" w="14.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5987" shape="accidentalNatural">
+        <Bounds x="2161.0" y="2984.0" w="13.0" h="57.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6005" shape="accidentalSharp">
+        <Bounds x="1708.0" y="3080.0" w="18.0" h="58.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6006" shape="accidentalFlat">
+        <Bounds x="1402.0" y="2963.0" w="16.0" h="51.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5990" shape="augmentationDot">
+        <Bounds x="263.0" y="2787.0" w="7.0" h="9.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5991" shape="augmentationDot">
+        <Bounds x="266.0" y="2715.0" w="7.0" h="8.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5939" shape="flag8thDown">
+        <Bounds x="469.0" y="2803.0" w="21.0" h="53.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5944" shape="tuplet3">
+        <Bounds x="593.0" y="3038.0" w="19.0" h="24.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5992" shape="augmentationDot">
+        <Bounds x="979.0" y="2803.0" w="8.0" h="13.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5993" shape="augmentationDot">
+        <Bounds x="981.0" y="2731.0" w="8.0" h="9.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5952" shape="flag8thUp">
+        <Bounds x="1192.0" y="2682.0" w="20.0" h="61.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5953" shape="tuplet3">
+        <Bounds x="1298.0" y="3051.0" w="20.0" h="23.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5969" shape="flag8thUp">
+        <Bounds x="1672.0" y="3003.0" w="21.0" h="56.0"/>
+    </Symbol>
+    <Symbol interline="18" id="5976" shape="flag8thUp">
+        <Bounds x="1898.0" y="2971.0" w="22.0" h="62.0"/>
+    </Symbol>
+    <Symbol interline="18" id="6009" shape="accidentalNatural">
+        <Bounds x="1628.0" y="2720.0" w="15.0" h="57.0"/>
+    </Symbol>
+</Annotations>

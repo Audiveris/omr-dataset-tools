@@ -19,15 +19,26 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
+package org.audiveris.omrdataset.train;
 
+import org.audiveris.omrdataset.Main;
+import org.audiveris.omrdataset.api.OmrShape;
+import org.audiveris.omrdataset.api.OmrShapes;
+import static org.audiveris.omrdataset.train.App.*;
+import static org.audiveris.omrdataset.train.AppPaths.*;
+
+import org.datavec.api.records.Record;
+import org.datavec.api.records.metadata.RecordMetaData;
+import org.datavec.api.records.metadata.RecordMetaDataLine;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
+import org.datavec.api.writable.Writable;
 
 import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.eval.meta.Prediction;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -46,18 +57,26 @@ import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.buffer.util.DataTypeUtil;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
+import org.nd4j.linalg.dataset.api.preprocessor.serializer.NormalizerSerializer;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import static org.omrdataset.App.*;
-import org.omrdataset.util.Norms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
 
 /**
  * Class {@code Training} performs the training of the classifier neural network based
@@ -73,88 +92,108 @@ public class Training
 
     private static final int numClasses = OmrShape.values().length;
 
+    private static final OmrShape[] shapeValues = OmrShape.values();
+
+    static {
+        DataTypeUtil.setDTypeForContext(DataBuffer.Type.DOUBLE);
+    }
+
+    //~ Instance fields ----------------------------------------------------------------------------
+    /** Needed to point to origin of mistaken samples. */
+    private final Journal journal = new Journal();
+
     //~ Methods ------------------------------------------------------------------------------------
+    /**
+     * Direct entry point.
+     *
+     * @param args not used
+     * @throws Exception in case of problem encountered
+     */
+    public static void main (String[] args)
+            throws Exception
+    {
+        new Training().process();
+    }
+
+    /**
+     * Perform the training of the neural network.
+     * <p>
+     * Before training is launched, if the network model exists on disk it is reloaded, otherwise a
+     * brand new one is created.
+     *
+     * @throws Exception in case of IO problem or interruption
+     */
     public void process ()
             throws Exception
     {
+        Files.createDirectories(MISTAKES_PATH);
+
         int nChannels = 1; // Number of input channels
         int batchSize = 64; // Batch size
-        int nEpochs = 2; // Number of training epochs
-        int iterations = 10; // Number of training iterations
+        int nEpochs = 10; //2; // Number of training epochs
+        int iterations = 2; //10; // Number of training iterations
         int seed = 123; //
 
         // Pixel norms
-        final Norms pixelNorms = Norms.load(DATA_PATH, PIXELS_NORMS);
+        ///final Norms pixelNorms = Populations.load(PIXELS_PATH).toNorms();
+        NormalizerStandardize normalizer = NormalizerSerializer.getDefault().restore(
+                PIXELS_PATH.toFile());
 
         // Get the dataset using the record reader. CSVRecordReader handles loading/parsing
         logger.info("Getting dataset...");
 
         int labelIndex = CONTEXT_WIDTH * CONTEXT_HEIGHT; // format: all cells then label
-        int numLinesToSkip = 0;
+        int numLinesToSkip = 1; // Because of header comment line
         String delimiter = ",";
 
         RecordReader trainRecordReader = new CSVRecordReader(numLinesToSkip, delimiter);
-        trainRecordReader.initialize(new FileSplit(CSV_PATH.toFile()));
+        trainRecordReader.initialize(new FileSplit(FEATURES_PATH.toFile()));
 
-        DataSetIterator trainIter = new RecordReaderDataSetIterator(
+        RecordReaderDataSetIterator trainIter = new RecordReaderDataSetIterator(
                 trainRecordReader,
                 batchSize,
                 labelIndex,
                 numClasses,
                 -1);
+        trainIter.setCollectMetaData(true); //Instruct the iterator to collect metadata, and store it in the DataSet objects
 
         RecordReader testRecordReader = new CSVRecordReader(numLinesToSkip, delimiter);
-        testRecordReader.initialize(new FileSplit(CSV_PATH.toFile()));
+        testRecordReader.initialize(new FileSplit(FEATURES_PATH.toFile()));
 
-        DataSetIterator testIter = new RecordReaderDataSetIterator(
+        RecordReaderDataSetIterator testIter = new RecordReaderDataSetIterator(
                 testRecordReader,
                 batchSize,
                 labelIndex,
                 numClasses,
                 -1);
-        DataSetPreProcessor preProcessor = new MyPreProcessor(pixelNorms);
+        testIter.setCollectMetaData(true); //Instruct the iterator to collect metadata, and store it in the DataSet objects
+
+        // Normalization
+        DataSetPreProcessor preProcessor = new MyPreProcessor(normalizer);
         trainIter.setPreProcessor(preProcessor);
         testIter.setPreProcessor(preProcessor);
 
-        //
-        //        if (false) {
-        //            // Debugging
-        //            DataSet ds = trainIter.next();
-        //            logger.info("ds:\n{}", ds);
-        //            logger.info("numExamples:{}", ds.numExamples());
-        //
-        //            INDArray labels = ds.getLabels();
-        //            logger.info("labels rows:{} cols:{}", labels.rows(), labels.columns());
-        //            logger.info("labels:\n{}", labels);
-        //
-        //            INDArray features = ds.getFeatures();
-        //            int rows = features.rows();
-        //            int cols = features.columns();
-        //            logger.info("features rows:{} cols:{}", rows, cols);
-        //            logger.info("features:\n{}", features);
-        //
-        //            INDArray r0 = features.getRow(0);
-        //            logger.info("r0:\n{}", r0);
-        //            logger.info("r0 rows:{} cols:{}", r0.rows(), r0.columns());
-        //
-        //            for (int i = 0; i < r0.columns(); i++) {
-        //                logger.info("i:{} val:{}", i, r0.getColumn(i));
-        //            }
-        //
-        //            trainIter.reset();
-        //        }
-        //
-        //        ///System.exit(0);
-        //
-        MultiLayerNetwork model = null;
+        if (false) {
+            System.out.println("\n  +++++ Test Set Examples MetaData +++++");
+
+            while (testIter.hasNext()) {
+                DataSet ds = testIter.next();
+                List<RecordMetaData> testMetaData = ds.getExampleMetaData(RecordMetaData.class);
+
+                for (RecordMetaData recordMetaData : testMetaData) {
+                    System.out.println(recordMetaData.getLocation());
+                }
+            }
+
+            testIter.reset();
+        }
+
+        final MultiLayerNetwork model;
 
         if (Files.exists(MODEL_PATH)) {
             model = ModelSerializer.restoreMultiLayerNetwork(MODEL_PATH.toFile(), false);
             logger.info("Model restored from {}", MODEL_PATH.toAbsolutePath());
         } else {
-            /*
-             * Construct the neural network
-             */
             logger.info("Building model from scratch");
 
             MultiLayerConfiguration.Builder builder = new NeuralNetConfiguration.Builder() //
@@ -243,14 +282,14 @@ public class Training
 
             logger.info("Training model...");
 
-            for (int i = 0; i < nEpochs; i++) {
+            for (int epoch = 1; epoch <= nEpochs; epoch++) {
+                Path epochFolder = Main.cli.mistakes ? MISTAKES_PATH.resolve("epoch#" + epoch) : null;
                 long start = System.currentTimeMillis();
                 model.fit(trainIter);
 
                 long stop = System.currentTimeMillis();
                 double dur = stop - start;
-                logger.info(
-                        String.format("*** Completed epoch %d, time: %.0f sec ***", i, dur / 1000));
+                logger.info(String.format("*** End epoch#%d, time: %.0f sec", epoch, dur / 1000));
 
                 logger.info("Evaluating model...");
 
@@ -258,17 +297,48 @@ public class Training
 
                 while (testIter.hasNext()) {
                     DataSet ds = testIter.next();
+                    List<RecordMetaData> testMetaData = ds.getExampleMetaData(RecordMetaData.class);
                     INDArray output = model.output(ds.getFeatureMatrix(), false);
-                    eval.eval(ds.getLabels(), output);
+                    eval.eval(ds.getLabels(), output, testMetaData);
                 }
 
-                logger.info(eval.stats());
+                System.out.println(eval.stats());
                 testIter.reset();
-            }
 
-            // Save model
-            ModelSerializer.writeModel(model, MODEL_PATH.toFile(), false);
-            logger.info("Model stored as {}", MODEL_PATH.toAbsolutePath());
+                //Get a list of prediction errors, from the Evaluation object
+                //Prediction errors like this are only available after calling iterator.setCollectMetaData(true)
+                List<Prediction> mistakes = eval.getPredictionErrors();
+                logger.info("Epoch#{} Prediction Errors: {}", epoch, mistakes.size());
+
+                //We can also load a subset of the data, to a DataSet object:
+                //Here we load the raw data:
+                List<RecordMetaData> predictionErrorMetaData = new ArrayList<RecordMetaData>();
+
+                for (Prediction p : mistakes) {
+                    predictionErrorMetaData.add(p.getRecordMetaData(RecordMetaData.class));
+                }
+
+                List<Record> predictionErrorRawData = testRecordReader.loadFromMetaData(
+                        predictionErrorMetaData);
+
+                for (int ie = 0; ie < mistakes.size(); ie++) {
+                    Prediction p = mistakes.get(ie);
+                    List<Writable> rawData = predictionErrorRawData.get(ie).getRecord();
+                    saveMistake(p, rawData, epochFolder);
+                }
+
+                // Save model
+                ModelSerializer.writeModel(model, MODEL_PATH.toFile(), false);
+                ModelSerializer.addNormalizerToModel(MODEL_PATH.toFile(), normalizer);
+                logger.info("Model+normalizer stored as {}", MODEL_PATH.toAbsolutePath());
+
+                // To avoid long useless sessions...
+                if (mistakes.isEmpty()) {
+                    logger.info("No mistakes left, training stopped.");
+
+                    break;
+                }
+            }
         } finally {
             // Stop monitoring
             if (uiServer != null) {
@@ -280,18 +350,48 @@ public class Training
     }
 
     /**
-     * Direct entry point.
+     * Save to disk the image for a shape not correctly recognized.
      *
-     * @param args not used
+     * @param prediction the (wrong) prediction
+     * @param rawData    pixels raw data
+     * @param folder     target folder for current epoch
      * @throws Exception
      */
-    public static void main (String[] args)
+    private void saveMistake (Prediction prediction,
+                              List<Writable> rawData,
+                              Path folder)
             throws Exception
     {
-        new Training().process();
+        RecordMetaDataLine meta = prediction.getRecordMetaData(RecordMetaDataLine.class);
+        final int line = meta.getLineNumber();
+        final OmrShape predicted = shapeValues[prediction.getPredictedClass()];
+        final OmrShape actual = shapeValues[prediction.getActualClass()];
+        final Journal.Record record = journal.getRecord(line);
+        System.out.println(record + " mistaken for " + predicted);
+
+        if (folder != null) {
+            Files.createDirectories(folder);
+
+            // Generate mistaken subimage
+            double[] pixels = new double[rawData.size()];
+
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = rawData.get(i).toDouble();
+            }
+
+            INDArray row = Nd4j.create(pixels);
+            BufferedImage img = SubImages.buildSubImage(row);
+
+            // Save subimage to disk, with proper naming
+            String name = actual + "-" + line + "-" + predicted + OUTPUT_IMAGES_EXT;
+            ImageIO.write(img, OUTPUT_IMAGES_FORMAT, folder.resolve(name).toFile());
+        }
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
+    //----------------//
+    // MyPreProcessor //
+    //----------------//
     /**
      * Normalize pixel data on the fly.
      */
@@ -305,10 +405,11 @@ public class Training
         final double std;
 
         //~ Constructors ---------------------------------------------------------------------------
-        public MyPreProcessor (Norms norms)
+        public MyPreProcessor (NormalizerStandardize normalizer)
         {
-            mean = norms.getMean(0);
-            std = norms.getStd(0);
+            ///mean = norms.getMean(0);
+            mean = normalizer.getMean().getDouble(0);
+            std = normalizer.getStd().getDouble(0);
             logger.info(String.format("Pixel pre-processor mean:%.2f std:%.2f", mean, std));
         }
 

@@ -13,8 +13,10 @@
     </root>
     
     <!-- Define DEBUG loggers here below: -->
-        <logger name="org.nd4j.nativeblas.Nd4jBlas" level="WARN"/>
-        <logger name="org.nd4j.nativeblas.NativeOps" level="WARN"/>
-        <logger name="org.reflections.Reflections" level="WARN"/>
+    <logger name="org.nd4j.nativeblas.Nd4jBlas" level="WARN"/>
+    <logger name="org.nd4j.nativeblas.NativeOps" level="WARN"/>
+    <logger name="org.reflections.Reflections" level="WARN"/>
+    
+<!--    <logger name="org.omrdataset.train.SheetProcessor" level="DEBUG"/>-->
 
 </configuration>

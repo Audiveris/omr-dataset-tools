@@ -19,13 +19,20 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.omrdataset;
+package org.audiveris.omrdataset;
+
+import org.audiveris.omrdataset.api.OmrShapes;
+import org.audiveris.omrdataset.train.Clean;
+import org.audiveris.omrdataset.train.Features;
+import org.audiveris.omrdataset.train.SubImages;
+import org.audiveris.omrdataset.train.Training;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class {@code Main} reads the CSV file and
+ * Class {@code Main} handles the whole processing from images and annotations inputs
+ * to features, sub-images if desired, and classifier model.
  *
  * @author Hervé Bitteur
  */
@@ -35,19 +42,46 @@ public class Main
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    /** CLI Parameters. */
+    public static CLI cli;
+
     //~ Methods ------------------------------------------------------------------------------------
     public static void main (String[] args)
             throws Exception
     {
-        OmrShapes.printOmrShapes();
+        cli = CLI.create(args);
 
-        // Extract features
-        new Features().process();
+        if (cli.help) {
+            return; // Help has been printed by CLI itself
+        }
 
-        // Extract subimages for visual check (not mandatory)
-        new Subimages().process();
+        if (cli.outputFolder == null) {
+            logger.warn("Output location not specified, please use -output option");
 
-        // Train the classifier
-        new Training().process();
+            return;
+        }
+
+        if (cli.names) {
+            OmrShapes.printOmrShapes();
+        }
+
+        if (cli.clean) {
+            new Clean().process();
+        }
+
+        if (cli.features) {
+            // Extract features
+            new Features().process();
+        }
+
+        if (cli.subimages) {
+            // Extract subimages for visual check (not mandatory)
+            new SubImages().process();
+        }
+
+        if (cli.training) {
+            // Train the classifier
+            new Training().process();
+        }
     }
 }

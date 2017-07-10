@@ -55,10 +55,9 @@ The noise information added to the image will be added in the `path/xmlFile.xml`
 will take the input image `somePath/imageFile.png` and adds salt and pepper noise to it with the default parameters.
 This image will be saved in the current working directory.
 An image rotated by *angle=4* will also be created in the working directory. 
-The noise information added to the image will be added in the `somePath/imageFile.xml`.
- If this file is not available, then the program will raise an error.
+The noise information added to the image will be added in the `somePath/xmlFile.xml`. 
 <br><br>
-If the image file and the xml file have the same basename and are in the same directory,
+Use `python __main__.py -h` to get the details about the parameters.
+
+If both image file and the xml file have the same basename and are in the same directory,
  then you only need to specify the image file, i.e. `python __main__.py -i path/imageFile.png -sp`.
- 
- Use `python __main__.py -h` to get the details about the parameters.

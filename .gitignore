@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /.nb-gradle/
 /.gradle/
 /build/
@@ -6,3 +7,9 @@
 /tools/addNoise/*.pyc
 /tools/addNoise/output/
 /tools/addNoise/testResource/mops-1 (copy).xml
+=======
+/.nb-gradle/
+/.gradle/
+/build/
+/data/output/
+>>>>>>> f097756b147106395aab9c0dc527bccf5da86447
