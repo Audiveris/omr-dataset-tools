@@ -91,8 +91,6 @@ def main():
 
     args, leftovers = parser.parse_known_args()
 
-    print args
-
     # Object to do file operations
     if args.xmlFile is None:
         args.xmlFile = os.path.splitext(args.imageFile)[0] + '.xml'

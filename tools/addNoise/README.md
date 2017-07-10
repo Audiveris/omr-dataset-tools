@@ -22,7 +22,7 @@ Following tutorials might be helpful in setting up OpenCV and python
 ## How to use ?
 In order to use this tool, the following command should be executed on the terminal. Make sure to provide the path to all the required files if they are not in working directory.
 
-**python main.py** -i <*imageFile*\> -x <*xmlFile*\> -sp <*parameters*\> 
+**python __main__.py** -i <*imageFile*\> -x <*xmlFile*\> -sp <*parameters*\> 
 |-speckle <*parameters*\>
 | -g <*parameters*\>
 | -r <*parameters*\>.
