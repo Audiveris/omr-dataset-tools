@@ -11,6 +11,7 @@ import cv2
 
 ''' Rotation Class'''
 
+
 class Rotation(object):
     def __init__(self, img, parameters):
         self.tag = "rotation"
@@ -34,18 +35,17 @@ class Rotation(object):
 
     def checkParameters(self, parameters):
         parameterStr = []
-
         if len(parameters) > 1:
             raise "Invalid number of Arguments"
-
         if len(parameters) == 1:
             parameterStr = [str(x) for x in parameters]
         elif len(parameters) == 0:
             parameterStr.append('1')
-
         self.parameters = {
             'angle': parameterStr[0]
         }
+
+    '''Set the tranformation matrix '''
 
     def setTransformationMatrix(self, M):
         self.transformationMatrix = M

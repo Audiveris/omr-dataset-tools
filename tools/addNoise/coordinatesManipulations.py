@@ -50,9 +50,7 @@ def transformBB(x, y, w, h, transform, mode):
     coord2 = [x, y + h]
     coord3 = [x + w, y + h]
     coord4 = [x + w, y]
-    ## to delete
     contour = np.array([coord1, coord2, coord4, coord3])
-    ############
 
     if mode == 'rotation':
 
@@ -62,24 +60,7 @@ def transformBB(x, y, w, h, transform, mode):
         coord3 = getRotatedCoordinates(transform, coord3)
         coord4 = getRotatedCoordinates(transform, coord4)
 
-    elif mode == 'distortion':
-        def reshape(coord):
-            return np.array((coord), dtype=np.float32, ndmin=3)
-
-        coord1 = reshape(coord1)
-
-        # Get the distorted Coordinates
-        #coord1 = cv2.undistortPoints(coord1, transform[0], transform[1])
-
-        pass
-
-    ## to delete
-    contour = [coord1, coord2, coord4, coord3]
-
-    ############
-
     if mode == 'distortion':
-        # print contour
         pass
     contour = np.array(contour).reshape((-1, 1, 2)).astype(np.int32)
 
@@ -90,7 +71,6 @@ def transformBB(x, y, w, h, transform, mode):
         box = cv2.boxPoints(rect)
         box = np.int0(box)
     except:
-
         print contour
     ## Finding the Coordinates of the minimum area rectangle
     minx = min([pts[0] for pts in box])

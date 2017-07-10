@@ -31,6 +31,8 @@ from Rotation import *
 from FileOperations import *
 from xmlOperations import *
 
+''' Main '''
+
 
 def main():
     # argument parser
@@ -45,7 +47,8 @@ def main():
     parser.add_argument('-x', dest='xmlFile', help='XML file which contain the annotaions', required=False)
 
     # output folder arg
-    parser.add_argument('-o', dest='outputFolder', help='Output folder where the processed images should be saved', required=False)
+    parser.add_argument('-o', dest='outputFolder', help='Output folder where the processed images should be saved',
+                        required=False)
 
     # Salt and pepper arguments
     group1 = parser.add_argument_group('Salt and Pepper Noise', 'Add salt and pepper noise to the image')
@@ -74,8 +77,8 @@ def main():
                         nargs='*',
                         type=float,
                         help='parameter : [mean, standardDeviation]'
-                        '\nMean and standard deviation of the random noise that should be added to the image'
-                        '\n%(prog)s by default= Zero mean with standard deviation of the original image is used for the noise',
+                             '\nMean and standard deviation of the random noise that should be added to the image'
+                             '\n%(prog)s by default= Zero mean with standard deviation of the original image is used for the noise',
                         required=False)
 
     # Rotation arguments
@@ -84,10 +87,9 @@ def main():
                         nargs='*',
                         type=float,
                         help='parameter : angle'
-                        '\nThe rotation angle in degrees can be specified as parameter'
-                        '\n%(prog)s by default= 1°',
+                             '\nThe rotation angle in degrees can be specified as parameter'
+                             '\n%(prog)s by default= 1°',
                         required=False)
-
 
     args, leftovers = parser.parse_known_args()
 

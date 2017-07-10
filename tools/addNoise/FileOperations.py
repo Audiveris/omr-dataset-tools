@@ -15,8 +15,12 @@ class FileOperatoins(object):
     def __init__(self, filename, xmlFile):
         self.checkFile(filename, xmlFile)
 
+    ''' Set the output folder '''
+
     def setOutput(self, outputFolder):
         self.outputFolder = outputFolder
+
+    ''' Get the image file '''
 
     def getImage(self, color):
         if color:
@@ -25,8 +29,12 @@ class FileOperatoins(object):
             self.img = cv2.imread(self.imgFilename, 0)
         return self.img
 
+    ''' Set the distorted image '''
+
     def setDistortedImage(self, img):
         self.distortedImage = img
+
+    ''' Set the output image filename '''
 
     def setOutputImageName(self, tag):
         try:
@@ -34,9 +42,11 @@ class FileOperatoins(object):
                               os.path.splitext(os.path.basename(self.imgFilename))[0] + tag + \
                               os.path.splitext(self.imgFilename)[1]
         except AttributeError:
-
-            self.setOutput(os.path.join(os.getcwd(),'output'))
+            # if output folder not set, current working directory will be used.
+            self.setOutput(os.path.join(os.getcwd(), 'output'))
             self.setOutputImageName(tag)
+
+    ''' Save the distorted image file '''
 
     def writeImage(self):
         try:
@@ -44,12 +54,15 @@ class FileOperatoins(object):
         except AttributeError:
             print "Make sure that OutputImageName and Distorted images are set"
 
-    def show(self,orig):
-        cv2.namedWindow("Original Image")
-        cv2.imshow("Original Image", orig)
+    ''' Display the image '''
 
+    def show(self, orig):
+        cv2.namedWindow("Image")
+        cv2.imshow("Image", orig)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+    ''' Check for valid files '''
 
     def checkFile(self, imgfilename, xmlFilename):
         if os.path.isfile(imgfilename):

@@ -7,7 +7,6 @@ __author__ = 'Pulimootil'
 This script will handle Gaussian Noise
 """
 
-
 import numpy as np
 import cv2
 
@@ -34,14 +33,11 @@ class GaussianNoise(object):
     ''' Check the passed parameters are valid'''
 
     def checkParameters(self, parameters):
-
+        # Compute the meand and std of the original image
         meanSD = cv2.meanStdDev(self.img)
-
         parameterStr = []
-
         if len(parameters) > 2:
             raise "Invalid number of Arguments"
-
         if len(parameters) == 2:
             parameterStr = [str(x) for x in parameters]
         elif len(parameters) == 1:
@@ -57,4 +53,3 @@ class GaussianNoise(object):
             'mean': parameterStr[0],
             'standardDeviation': parameterStr[1]
         }
-

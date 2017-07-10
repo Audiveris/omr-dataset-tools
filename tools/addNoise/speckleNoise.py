@@ -31,17 +31,13 @@ class speckleNoise(object):
     ''' Check the passed parameters are valid'''
 
     def checkParameters(self, parameters):
-
         parameterStr = []
-
         if len(parameters) > 1:
             raise "Invalid number of Arguments"
-
         if len(parameters) == 1:
             parameterStr = [str(x) for x in parameters]
         elif len(parameters) == 0:
             parameterStr.append('0.01')
-
         self.parameters = {
             'amount': parameterStr[0]
         }

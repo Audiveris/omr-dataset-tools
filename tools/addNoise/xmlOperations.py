@@ -65,7 +65,7 @@ def addDeteriorationInXML(filename, mode, parameters):
 
     # Adding parameters to deterioration
     det = root.find('deterioration')
-    child = ET.Element(mode, attrib= parameters)
+    child = ET.Element(mode, attrib=parameters)
     det.insert(0, child)
 
     # Writing the new file
