@@ -154,6 +154,9 @@ public enum OmrShape
     noteheadWholeSmall("Whole notehead (small staff)"),
     noteheadDoubleWhole("Double whole (breve) notehead"),
     noteheadDoubleWholeSmall("Double whole note (breve) (small staff)"),
+    noteheadXBlack("X notehead black"),
+    noteheadXHalf("X notehead half"),
+    noteheadXWhole("X notehead whole"),
     augmentationDot("Augmentation dot"),
     //
     // 4.15 Stems
@@ -171,6 +174,7 @@ public enum OmrShape
     // 4.17 Flags
     //
     flag8thUp("Combining flag 1 (8th) above"),
+    flag8thUpSmall("Combining flag 1 (8th) above (small staff)"),
     flag16thUp("Combining flag 2 (16th) above"),
     flag32ndUp("Combining flag 3 (32nd) above"),
     flag64thUp("Combining flag 4 (64th) above"),
@@ -179,6 +183,7 @@ public enum OmrShape
     flag512thUp("Combining flag 7 (512th) above"),
     flag1024thUp("Combining flag 8 (1024th) above"),
     flag8thDown("Combining flag 1 (8th) below"),
+    flag8thDownSmall("Combining flag 1 (8th) below (small staff)"),
     flag16thDown("Combining flag 2 (16th) below"),
     flag32ndDown("Combining flag 3 (32nd) below"),
     flag64thDown("Combining flag 4 (64th) below"),
@@ -190,8 +195,11 @@ public enum OmrShape
     // 4.18 Standard accidentals
     //
     accidentalFlat("Flat"),
+    accidentalFlatSmall("Flat (for small staves)"),
     accidentalNatural("Natural"),
+    accidentalNaturalSmall("Natural (for small staves)"),
     accidentalSharp("Sharp"),
+    accidentalSharpSmall("Sharp (for small staves)"),
     accidentalDoubleSharp("Double sharp"),
     accidentalDoubleFlat("Double flat"),
 

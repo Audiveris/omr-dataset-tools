@@ -119,7 +119,7 @@ public class SheetAnnotations
     }
 
     /**
-     * Report the (live)list of symbols in sheet.
+     * Report the (live) list of symbols in sheet.
      *
      * @return symbols list
      */

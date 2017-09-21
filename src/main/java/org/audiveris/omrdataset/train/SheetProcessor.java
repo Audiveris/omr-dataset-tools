@@ -280,16 +280,16 @@ public class SheetProcessor
             }
 
             Rectangle2D box = symbol.getBounds();
-            BufferedImage img = null;
 
             // Pick up image properly scaled
-            final int interline = symbol.getInterline();
-            final boolean rescale = interline != INTERLINE;
-            final double ratio = (double) INTERLINE / interline;
-            img = imgMap.get(interline);
+            final double interline = symbol.getInterline();
+            final int roundedInterline = (int) Math.rint(interline);
+            final boolean rescale = roundedInterline != INTERLINE;
+            final double ratio = INTERLINE / interline;
+            BufferedImage img = imgMap.get(roundedInterline);
 
             if (img == null) {
-                imgMap.put(interline, img = rescale ? scale(initialImg, ratio) : initialImg);
+                imgMap.put(roundedInterline, img = rescale ? scale(initialImg, ratio) : initialImg);
             }
 
             final int imgWidth = img.getWidth();
@@ -372,7 +372,7 @@ public class SheetProcessor
             journal.print(",");
             journal.print(symbol.getId());
             journal.print(",");
-            journal.print(symbol.getInterline());
+            journal.print(decimal.format(symbol.getInterline()));
             journal.print(",");
 
             Rectangle2D bounds = symbol.getBounds();

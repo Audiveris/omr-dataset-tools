@@ -51,14 +51,19 @@ public class SymbolInfo
 
     //~ Instance fields ----------------------------------------------------------------------------
     @XmlAttribute(name = "interline")
-    private final int interline;
+    @XmlJavaTypeAdapter(value = Double3Adapter.class, type = double.class)
+    private final double interline;
 
     @XmlAttribute(name = "id")
     private final Integer id;
 
+    @XmlAttribute(name = "scale")
+    @XmlJavaTypeAdapter(value = Double3Adapter.class)
+    private final Double scale;
+
     @XmlAttribute(name = "shape")
     @XmlJavaTypeAdapter(OmrShapeAdapter.class)
-    private final OmrShape omrShape;
+    private OmrShape omrShape;
 
     @XmlElement(name = "Bounds")
     @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
@@ -75,16 +80,19 @@ public class SymbolInfo
      * @param omrShape  symbol OMR shape
      * @param interline related interline
      * @param id        symbol id, if any
+     * @param scale     ratio WRT standard symbol size, optional
      * @param bounds    symbol bounding box within containing image
      */
     public SymbolInfo (OmrShape omrShape,
                        int interline,
                        Integer id,
+                       Double scale,
                        Rectangle2D bounds)
     {
         this.omrShape = omrShape;
         this.interline = interline;
         this.id = id;
+        this.scale = scale;
         this.bounds = bounds;
     }
 
@@ -93,10 +101,11 @@ public class SymbolInfo
      */
     private SymbolInfo ()
     {
-        this.omrShape = null;
-        this.interline = 0;
-        this.id = null;
-        this.bounds = null;
+        omrShape = null;
+        interline = 0;
+        id = null;
+        scale = null;
+        bounds = null;
     }
 
     //~ Methods ------------------------------------------------------------------------------------
@@ -156,17 +165,25 @@ public class SymbolInfo
     /**
      * @return the interline
      */
-    public int getInterline ()
+    public double getInterline ()
     {
         return interline;
     }
 
     /**
-     * @return the omrShape
+     * @return the omrShape, perhaps null
      */
     public OmrShape getOmrShape ()
     {
         return omrShape;
+    }
+
+    /**
+     * @return the scale, perhaps null
+     */
+    public Double getScale ()
+    {
+        return scale;
     }
 
     @Override
@@ -185,11 +202,27 @@ public class SymbolInfo
             sb.append(" id:").append(id);
         }
 
+        if (scale != null) {
+            sb.append(" scale:").append(scale);
+        }
+
         sb.append(" ").append(bounds);
 
         sb.append("}");
 
         return sb.toString();
+    }
+
+    /**
+     * If there is a special name for a smaller version of this symbol, use it.
+     */
+    public void useSmallName ()
+    {
+        OmrShape smallShape = getSmallShape(omrShape);
+
+        if (smallShape != null) {
+            setOmrShape(smallShape);
+        }
     }
 
     /**
@@ -203,6 +236,69 @@ public class SymbolInfo
         if (omrShape == null) {
             logger.warn("*** Null shape {}", this);
         }
+    }
+
+    /**
+     * Report the name, if any, for a small version of the provided shape
+     *
+     * @param omrShape the provided shape
+     * @return the shape for small version, or null
+     */
+    private OmrShape getSmallShape (OmrShape omrShape)
+    {
+        switch (omrShape) {
+        // Clefs (change)
+        case cClef:
+            return OmrShape.cClefChange;
+
+        case fClef:
+            return OmrShape.fClefChange;
+
+        case gClef:
+            return OmrShape.gClefChange;
+
+        // Accidentals
+        case accidentalFlat:
+            return OmrShape.accidentalFlatSmall;
+
+        case accidentalNatural:
+            return OmrShape.accidentalNaturalSmall;
+
+        case accidentalSharp:
+            return OmrShape.accidentalSharpSmall;
+
+        // Flags
+        case flag8thUp:
+            return OmrShape.flag8thUpSmall;
+
+        case flag8thDown:
+            return OmrShape.flag8thDownSmall;
+
+        // Note heads
+        case noteheadBlack:
+            return OmrShape.noteheadBlackSmall;
+
+        case noteheadHalf:
+            return OmrShape.noteheadHalfSmall;
+
+        case noteheadWhole:
+            return OmrShape.noteheadWholeSmall;
+
+        case noteheadDoubleWhole:
+            return OmrShape.noteheadDoubleWholeSmall;
+
+        default:
+            return null;
+        }
+    }
+
+    /**
+     * @param omrShape the omrShape to set
+     */
+    private void setOmrShape (OmrShape omrShape)
+    {
+        logger.info("Renamed scaled {} as {}", this, omrShape);
+        this.omrShape = omrShape;
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------

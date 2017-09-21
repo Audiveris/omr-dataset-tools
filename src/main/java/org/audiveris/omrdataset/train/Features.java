@@ -25,6 +25,7 @@ import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SheetAnnotations.SheetInfo;
+import org.audiveris.omrdataset.api.SymbolInfo;
 import static org.audiveris.omrdataset.classifier.Context.*;
 import static org.audiveris.omrdataset.train.App.*;
 import static org.audiveris.omrdataset.train.AppPaths.*;
@@ -203,6 +204,21 @@ public class Features
         }
     }
 
+    /**
+     * Some symbols have both a shape and a scale, often to indicate a smaller version.
+     * For certain shapes with a lowering scale, we replace the original name by the small name.
+     *
+     * @param annotations
+     */
+    private void convertScaledShapes (SheetAnnotations annotations)
+    {
+        for (SymbolInfo symbol : annotations.getSymbols()) {
+            if (symbol.getScale() != null && symbol.getScale() <= MAX_SYMBOL_SCALE) {
+                symbol.useSmallName();
+            }
+        }
+    }
+
     private PrintWriter getPrintWriter (Path path)
             throws IOException
     {
@@ -232,6 +248,9 @@ public class Features
 
                 return;
             }
+
+            // Convert some scaled shapes
+            convertScaledShapes(annotations);
 
             // Rewrite annotations?
             // annotations.marshall(

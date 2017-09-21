@@ -83,11 +83,11 @@ public class Journal
                                 Integer.decode(f[0]), // row
                                 Integer.decode(f[1]), // sheetId
                                 Integer.decode(f[2]), // symbolId
-                                Integer.decode(f[3]), // interline
-                                Integer.decode(f[4]), // x
-                                Integer.decode(f[5]), // y
-                                Integer.decode(f[6]), // w
-                                Integer.decode(f[7]), // h
+                                Double.parseDouble(f[3]), // interline
+                                Double.parseDouble(f[4]), // x
+                                Double.parseDouble(f[5]), // y
+                                Double.parseDouble(f[6]), // w
+                                Double.parseDouble(f[7]), // h
                                 Integer.decode(f[8]))); // shapeId
             }
 
@@ -117,15 +117,15 @@ public class Journal
 
         final int symbolId;
 
-        final int interline;
+        final double interline;
 
-        final int x;
+        final double x;
 
-        final int y;
+        final double y;
 
-        final int w;
+        final double w;
 
-        final int h;
+        final double h;
 
         final int shapeId;
 
@@ -133,11 +133,11 @@ public class Journal
         public Record (int row,
                        int sheetId,
                        int symbolId,
-                       int interline,
-                       int x,
-                       int y,
-                       int w,
-                       int h,
+                       double interline,
+                       double x,
+                       double y,
+                       double w,
+                       double h,
                        int shapeId)
         {
             this.row = row;

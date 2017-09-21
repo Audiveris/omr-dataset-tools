@@ -68,7 +68,7 @@ public class NonesBuilder
     private final SheetAnnotations annotations;
 
     /** We need the same interline value for the whole page. */
-    private Integer interline;
+    private Integer roundedInterline;
 
     /** List of filled boxes, kept sorted on x. */
     private final List<Rectangle> filledBoxes = new ArrayList<Rectangle>();
@@ -100,7 +100,7 @@ public class NonesBuilder
         }
 
         // Adjust margin to sheet interline value
-        final double ratio = (double) INTERLINE / interline;
+        final double ratio = (double) INTERLINE / roundedInterline;
         final int xMargin = (int) Math.rint(NONE_X_MARGIN / ratio);
         final int yMargin = (int) Math.rint(NONE_Y_MARGIN / ratio);
 
@@ -131,7 +131,12 @@ public class NonesBuilder
 
                 if (tryInsertion(rect, maxWidth)) {
                     createdSymbols.add(
-                            new SymbolInfo(OmrShape.none, interline, null, new Rectangle(x, y, 0, 0)));
+                            new SymbolInfo(
+                                    OmrShape.none,
+                                    roundedInterline,
+                                    null,
+                                    null,
+                                    new Rectangle(x, y, 0, 0)));
                 }
             }
         }
@@ -147,9 +152,11 @@ public class NonesBuilder
     private boolean checkInterlineValue ()
     {
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            if ((interline == null) && (symbol.getInterline() != 0)) {
-                interline = symbol.getInterline();
-            } else if (interline != symbol.getInterline()) {
+            if (roundedInterline == null) {
+                if (symbol.getInterline() > 0) {
+                    roundedInterline = (int) Math.rint(symbol.getInterline());
+                }
+            } else if (!roundedInterline.equals((int) Math.rint(symbol.getInterline()))) {
                 return false;
             }
         }

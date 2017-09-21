@@ -56,6 +56,9 @@ public abstract class Context
                 CONTEXT_HEIGHT);
     }
 
+    /** Maximum symbol scale value to trigger a shape rename: {@value}. */
+    public static final double MAX_SYMBOL_SCALE = 0.85;
+
     /** Value used for background pixel feature: {@value}. */
     public static final int BACKGROUND = 0;
 
