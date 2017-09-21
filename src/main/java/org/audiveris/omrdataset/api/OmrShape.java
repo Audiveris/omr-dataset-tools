@@ -62,6 +62,10 @@ public enum OmrShape
     bracketBottom("Bracket bottom"),
 
     //
+    // 4.2 Staves
+    //
+    legerLine("Leger line"),
+    //
     // 4.3 Barlines
     //
     barlineSingle("Single barline"),
@@ -152,13 +156,17 @@ public enum OmrShape
     noteheadDoubleWholeSmall("Double whole note (breve) (small staff)"),
     augmentationDot("Augmentation dot"),
     //
-    // 4.7bis Ledgers (NOTA: this is an addition to SMuFL)
-    //
-    ledger("Ledger line"),
-    //
     // 4.15 Stems
     //
     stem("Combining stem"),
+    //
+    // 4.16 Tremolos
+    //
+    tremolo1("Combining tremolo 1"),
+    tremolo2("Combining tremolo 2"),
+    tremolo3("Combining tremolo 3"),
+    tremolo4("Combining tremolo 4"),
+    tremolo5("Combining tremolo 5"),
     //
     // 4.17 Flags
     //
@@ -206,7 +214,8 @@ public enum OmrShape
     articStaccatissimoBelow("Staccatissimo below"),
     articMarcatoAbove("Marcato above"),
     articMarcatoBelow("Marcato below"),
-
+    articTenutoStaccatoAbove("Louré (tenuto-staccato) above"),
+    articTenutoStaccatoBelow("Louré (tenuto-staccato) below"),
     //
     // 4.40 Holds and pauses
     //
@@ -241,9 +250,9 @@ public enum OmrShape
     //
     // 4.44 Dynamics
     //
-    dynamicPiano("Piano"),
-    dynamicMezzo("Mezzo"),
-    dynamicForte("Forte"),
+    dynamicPiano("Piano (p)"),
+    dynamicMezzo("Mezzo (m)"),
+    dynamicForte("Forte (f)"),
     dynamicRinforzando("Rinforzando (r)"),
     dynamicSforzando("Sforzando (s)"),
     dynamicZ("Z"),
@@ -261,7 +270,7 @@ public enum OmrShape
     dynamicFFFF("ffff"),
     dynamicFFFFF("fffff"),
     dynamicFFFFFF("ffffff"),
-    dynamicFortePiano("Forte-piano"),
+    dynamicFortePiano("Forte-piano (fp)"),
     dynamicForzando("Forzando (fz)"),
     dynamicSforzando1("Sforzando 1 (sf)"),
     dynamicSforzandoPiano("Sforzando-piano (sfp)"),
@@ -285,6 +294,11 @@ public enum OmrShape
     ornamentMordent("Mordent"),
     ornamentMordentInverted("Inverted mordent"),
 
+    //
+    // 4.52 String techniques
+    //
+    stringsDownBow("Down bow"),
+    stringsUpBow("Up bow"),
     //
     // 4.53 Plucked techniques (NOTA: I found only arpeggiato down and up, with an arrow head)
     //

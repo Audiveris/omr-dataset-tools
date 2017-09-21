@@ -37,7 +37,7 @@ public abstract class IgnoredShapes
     //~ Static fields/initializers -----------------------------------------------------------------
 
     /** Symbol shapes to be ignored by training (for the time being). */
-    private static final EnumSet<OmrShape> IGNORED_SHAPES = EnumSet.of(ledger, stem);
+    private static final EnumSet<OmrShape> IGNORED_SHAPES = EnumSet.of(legerLine, stem);
 
     //~ Methods ------------------------------------------------------------------------------------
     /**

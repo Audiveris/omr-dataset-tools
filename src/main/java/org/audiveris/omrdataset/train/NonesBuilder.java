@@ -24,7 +24,7 @@ package org.audiveris.omrdataset.train;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
-
+import static org.audiveris.omrdataset.classifier.Context.INTERLINE;
 import static org.audiveris.omrdataset.train.App.*;
 
 import org.slf4j.Logger;

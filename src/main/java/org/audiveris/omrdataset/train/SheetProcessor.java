@@ -25,6 +25,7 @@ import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.OmrShapes;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
+import static org.audiveris.omrdataset.classifier.Context.*;
 import static org.audiveris.omrdataset.train.App.*;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -291,6 +292,9 @@ public class SheetProcessor
                 imgMap.put(interline, img = rescale ? scale(initialImg, ratio) : initialImg);
             }
 
+            final int imgWidth = img.getWidth();
+            final int imgHeight = img.getHeight();
+
             // Cumulate symbol width/height in mean/std builder for proper shape
             DistributionStats.Builder whBuilder = dimMap.get(symbolShape);
 
@@ -308,12 +312,9 @@ public class SheetProcessor
             double sCenterY = ratio * (box.getY() + (box.getHeight() / 2.0));
 
             // Top-left corner of context
-            int left = (int) Math.rint(sCenterX - (CONTEXT_WIDTH / 2));
-            int top = (int) Math.rint(sCenterY - (CONTEXT_HEIGHT / 2));
-            logger.trace("left:{} top:{}", left, top);
-
-            final int sheetWidth = img.getWidth();
-            final int sheetHeight = img.getHeight();
+            final int axMin = (int) Math.rint(sCenterX - (CONTEXT_WIDTH / 2));
+            final int ayMin = (int) Math.rint(sCenterY - (CONTEXT_HEIGHT / 2));
+            logger.trace("left:{} top:{}", axMin, ayMin);
 
             WritableRaster raster = img.getRaster();
             DataBuffer buffer = raster.getDataBuffer();
@@ -328,10 +329,10 @@ public class SheetProcessor
             int index = 0;
 
             for (int y = 0; y < CONTEXT_HEIGHT; y++) {
-                int ay = top + y; // Absolute y
+                int ay = ayMin + y; // Absolute y
 
-                if ((ay < 0) || (ay >= sheetHeight)) {
-                    // Fill with background value
+                if ((ay < 0) || (ay >= imgHeight)) {
+                    // Fill row with background value
                     for (int x = 0; x < CONTEXT_WIDTH; x++) {
                         features.print(BACKGROUND);
                         features.print(",");
@@ -339,9 +340,9 @@ public class SheetProcessor
                     }
                 } else {
                     for (int x = 0; x < CONTEXT_WIDTH; x++) {
-                        int ax = left + x; // Absolute x
-                        int val = ((ax < 0) || (ax >= sheetWidth)) ? BACKGROUND
-                                : (255 - (bytes[(ay * sheetWidth) + ax] & 0xff));
+                        int ax = axMin + x; // Absolute x
+                        int val = ((ax < 0) || (ax >= imgWidth)) ? BACKGROUND
+                                : (255 - (bytes[(ay * imgWidth) + ax] & 0xff));
                         features.print(val);
                         features.print(",");
                         pixDoubles[index++] = val;

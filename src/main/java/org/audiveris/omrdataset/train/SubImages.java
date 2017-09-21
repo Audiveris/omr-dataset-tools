@@ -22,6 +22,7 @@
 package org.audiveris.omrdataset.train;
 
 import org.audiveris.omrdataset.api.OmrShape;
+import static org.audiveris.omrdataset.classifier.Context.*;
 import static org.audiveris.omrdataset.train.App.*;
 import static org.audiveris.omrdataset.train.AppPaths.*;
 

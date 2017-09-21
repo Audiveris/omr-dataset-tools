@@ -22,6 +22,8 @@
 package org.audiveris.omrdataset.train;
 
 import org.audiveris.omrdataset.Main;
+import static org.audiveris.omrdataset.classifier.Context.DIMS_NAME;
+import static org.audiveris.omrdataset.classifier.Context.MODEL_NAME;
 import static org.audiveris.omrdataset.train.App.*;
 
 import java.nio.file.Path;

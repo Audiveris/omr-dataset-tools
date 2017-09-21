@@ -135,6 +135,10 @@ public class CLI
         buf.append("\nSyntax:");
         buf.append("\n   [OPTIONS] -- [INPUT_FILES]\n");
 
+        buf.append("\n@file:");
+        buf.append("\n Content to be extended in line");
+        buf.append("\n");
+
         buf.append("\nOptions:\n");
 
         StringWriter writer = new StringWriter();
@@ -143,10 +147,6 @@ public class CLI
 
         buf.append("\nInput file extensions:");
         buf.append("\n .xml: annotations file");
-        buf.append("\n");
-
-        buf.append("\n@file:");
-        buf.append("\n content to be extended in line");
         buf.append("\n");
         logger.info(buf.toString());
     }

@@ -21,6 +21,8 @@
 // </editor-fold>
 package org.audiveris.omrdataset.train;
 
+import static org.audiveris.omrdataset.classifier.Context.INTERLINE;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,26 +37,6 @@ public abstract class App
 
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
-    /** Predefined interline value: {@value}. */
-    public static final int INTERLINE = 10;
-
-    /** Needed multiple for context dimensions: {@value}. */
-    public static final int MULTIPLE = 4;
-
-    /** Height for symbol context, in pixels. */
-    public static final int CONTEXT_HEIGHT = toMultiple(INTERLINE * 9.6);
-
-    /** Width for symbol context, in pixels. */
-    public static final int CONTEXT_WIDTH = toMultiple(INTERLINE * 4.8);
-
-    static {
-        logger.info(
-                "INTERLINE:{} CONTEXT_WIDTH:{} CONTEXT_HEIGHT:{}",
-                INTERLINE,
-                CONTEXT_WIDTH,
-                CONTEXT_HEIGHT);
-    }
-
     /** Abscissa margin around a None symbol location. */
     public static final int NONE_X_MARGIN = (int) Math.rint(INTERLINE * 0.5);
 
@@ -64,56 +46,33 @@ public abstract class App
     /** Ratio of None symbols created versus valid symbols found in page: {@value}. */
     public static final double NONE_RATIO = 1.0;
 
-    /** Value used for background pixel feature: {@value}. */
-    public static final int BACKGROUND = 0;
-
-    /** Value used for foreground pixel feature: {@value}. */
-    public static final int FOREGROUND = 255;
-
     /** Format for output images (sub-images and control-images): {@value}. */
     public static final String OUTPUT_IMAGES_FORMAT = "png";
 
-    /** File extension for output images. */
+    /** File extension for output images: {@value}. */
     public static final String OUTPUT_IMAGES_EXT = "." + OUTPUT_IMAGES_FORMAT;
 
-    /** File extension for page info. */
+    /** File extension for page info: {@value}. */
     public static final String INFO_EXT = ".xml";
 
-    /** Folder name for control-images. */
+    /** Folder name for control-images: {@value}. */
     public static final String CONTROL_IMAGES_NAME = "control-images";
 
-    /** Folder name for sub-images. */
+    /** Folder name for sub-images: {@value}. */
     public static final String SUB_IMAGES_NAME = "sub-images";
 
-    /** Folder name for mistakes. */
+    /** Folder name for mistakes: {@value}. */
     public static final String MISTAKES_NAME = "mistakes";
 
-    /** File name for features. */
+    /** File name for features: {@value}. */
     public static final String FEATURES_NAME = "features.csv";
 
-    /** FIle name for journal. */
+    /** FIle name for journal: {@value}. */
     public static final String JOURNAL_NAME = "journal.csv";
 
-    /** File name for sheets. */
+    /** File name for sheets: {@value}. */
     public static final String SHEETS_NAME = "sheets.csv";
 
-    /** File name for pixel standards. */
+    /** File name for pixel standards: {@value}. */
     public static final String PIXELS_NAME = "pixels.dat";
-
-    /** File name for symbol dimensions standards. */
-    public static final String DIMS_NAME = "dims.dat";
-
-    /** File name for neural network model. */
-    public static final String MODEL_NAME = "img-classifier.zip";
-
-    //~ Methods ------------------------------------------------------------------------------------
-    /**
-     * Report the integer value (as multiple of MULTIPLE).
-     *
-     * @return ceiling value, as multiple of MULTIPLE
-     */
-    private static int toMultiple (double val)
-    {
-        return MULTIPLE * (int) Math.ceil(val / MULTIPLE);
-    }
 }

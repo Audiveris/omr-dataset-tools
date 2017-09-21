@@ -25,11 +25,10 @@ import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SheetAnnotations.SheetInfo;
+import static org.audiveris.omrdataset.classifier.Context.*;
 import static org.audiveris.omrdataset.train.App.*;
 import static org.audiveris.omrdataset.train.AppPaths.*;
 
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.buffer.util.DataTypeUtil;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.dataset.api.preprocessor.serializer.NormalizerSerializer;
@@ -83,13 +82,10 @@ public class Features
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(Features.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+            Features.class);
 
     private static final int SHAPE_COUNT = OmrShape.values().length;
-
-    static {
-        DataTypeUtil.setDTypeForContext(DataBuffer.Type.DOUBLE);
-    }
 
     //~ Instance fields ----------------------------------------------------------------------------
     /** Cumulate values for mean/std of pixels. */
@@ -131,6 +127,12 @@ public class Features
     public void process ()
             throws IOException
     {
+        if (Main.cli.arguments.isEmpty()) {
+            logger.warn("No input specified for features. Exiting.");
+
+            return;
+        }
+
         try {
             features = getPrintWriter(FEATURES_PATH); // Output features file
             journal = getPrintWriter(JOURNAL_PATH); // Output journal file

@@ -24,6 +24,7 @@ package org.audiveris.omrdataset.train;
 import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.OmrShapes;
+import static org.audiveris.omrdataset.classifier.Context.*;
 import static org.audiveris.omrdataset.train.App.*;
 import static org.audiveris.omrdataset.train.AppPaths.*;
 
@@ -57,8 +58,6 @@ import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 
 import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.buffer.util.DataTypeUtil;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
@@ -93,10 +92,6 @@ public class Training
     private static final int numClasses = OmrShape.values().length;
 
     private static final OmrShape[] shapeValues = OmrShape.values();
-
-    static {
-        DataTypeUtil.setDTypeForContext(DataBuffer.Type.DOUBLE);
-    }
 
     //~ Instance fields ----------------------------------------------------------------------------
     /** Needed to point to origin of mistaken samples. */
@@ -407,7 +402,6 @@ public class Training
         //~ Constructors ---------------------------------------------------------------------------
         public MyPreProcessor (NormalizerStandardize normalizer)
         {
-            ///mean = norms.getMean(0);
             mean = normalizer.getMean().getDouble(0);
             std = normalizer.getStd().getDouble(0);
             logger.info(String.format("Pixel pre-processor mean:%.2f std:%.2f", mean, std));
