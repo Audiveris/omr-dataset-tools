@@ -47,7 +47,7 @@ this will display:
     -controls          : Generates control images (default: false)
     -features          : Generates .csv and .dat files (default: false)
     -help              : Displays general help then stops (default: true)
-    -mistakes          : Save mistake images (default: false)
+    -mistakes          : Saves mistake images (default: false)
     -model <.zip file> : Defines path to model
     -names             : Prints all possible symbol names (default: false)
     -nones             : Generates none symbols (default: false)
