@@ -35,6 +35,7 @@ To just display usage rules, use:
 
 this will display:  
 
+```
    Syntax:
       [OPTIONS] -- [INPUT_FILES]
    
@@ -56,6 +57,7 @@ this will display:
    
    Input file extensions:
     .xml: annotations file
+```
 
 To clean up output, use:
 ```
