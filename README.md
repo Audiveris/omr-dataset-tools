@@ -43,17 +43,17 @@ this will display:
     Content to be extended in line
    
    Options:
-    -clean             : Cleans up output (default: false)
-    -controls          : Generates control images (default: false)
-    -features          : Generates .csv and .dat files (default: false)
-    -help              : Displays general help then stops (default: true)
-    -mistakes          : Saves mistake images (default: false)
+    -clean             : Cleans up output
+    -controls          : Generates control images
+    -features          : Generates .csv and .dat files
+    -help              : Displays general help then stops
+    -mistakes          : Saves mistake images
     -model <.zip file> : Defines path to model
-    -names             : Prints all possible symbol names (default: false)
-    -nones             : Generates none symbols (default: false)
+    -names             : Prints all possible symbol names
+    -nones             : Generates none symbols
     -output <folder>   : Defines output directory
-    -subimages         : Generates subimages (default: false)
-    -training          : Trains classifier on features (default: false)
+    -subimages         : Generates subimages
+    -training          : Trains classifier on features
    
    Input file extensions:
     .xml: annotations file
