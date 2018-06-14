@@ -17,7 +17,7 @@
   </built-in-tasks>
   <custom-variables>
     <var>
-      <name>-help</name>
+      <name>cmd-line-args</name>
       <value/>
     </var>
   </custom-variables>
