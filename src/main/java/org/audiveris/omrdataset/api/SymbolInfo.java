@@ -190,7 +190,7 @@ public class SymbolInfo
     public String toString ()
     {
         StringBuilder sb = new StringBuilder("Symbol{");
-        sb.append(omrShape);
+        sb.append("shape:").append(omrShape);
 
         if ((innerSymbols != null) && !innerSymbols.isEmpty()) {
             sb.append(" OUTER");
@@ -246,6 +246,10 @@ public class SymbolInfo
      */
     private OmrShape getSmallShape (OmrShape omrShape)
     {
+        if (omrShape == null) {
+            return null;
+        }
+
         switch (omrShape) {
         // Clefs (change)
         case cClef:
