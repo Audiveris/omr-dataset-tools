@@ -271,12 +271,10 @@ public class SheetProcessor
                 }
             }
 
-            if (symbolShape != OmrShape.none) {
-                if (symbolShape == null) {
-                    logger.warn("Null shape {}", symbol);
+            if (symbolShape == null) {
+                logger.info("Skipping null shape {}", symbol);
 
-                    continue;
-                }
+                continue;
             }
 
             Rectangle2D box = symbol.getBounds();

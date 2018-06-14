@@ -67,5 +67,6 @@ public class AppPaths
     public static final Path DIMS_PATH = OUTPUT_PATH.resolve(DIMS_NAME);
 
     /** Path to neural network model. */
-    public static final Path MODEL_PATH = OUTPUT_PATH.resolve(MODEL_NAME);
+    public static final Path MODEL_PATH = (Main.cli.modelPath != null) ? Main.cli.modelPath
+            : OUTPUT_PATH.resolve(MODEL_NAME);
 }

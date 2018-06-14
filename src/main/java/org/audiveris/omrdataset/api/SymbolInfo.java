@@ -58,7 +58,7 @@ public class SymbolInfo
     private final Integer id;
 
     @XmlAttribute(name = "scale")
-    @XmlJavaTypeAdapter(value = Double3Adapter.class)
+    @XmlJavaTypeAdapter(Double3Adapter.class)
     private final Double scale;
 
     @XmlAttribute(name = "shape")

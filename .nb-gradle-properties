@@ -15,6 +15,12 @@
       <task-jvm-args/>
     </task>
   </built-in-tasks>
+  <custom-variables>
+    <var>
+      <name>-help</name>
+      <value/>
+    </var>
+  </custom-variables>
   <auxiliary>
     <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
       <word>unmarshalled</word>

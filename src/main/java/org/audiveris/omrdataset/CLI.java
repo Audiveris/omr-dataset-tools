@@ -82,12 +82,16 @@ public class CLI
     public boolean training;
 
     /** Mistakes. */
-    @Option(name = "-mistakes", usage = "Save mistake images")
+    @Option(name = "-mistakes", usage = "Saves mistake images")
     public boolean mistakes;
 
     /** Target directory for output data. */
     @Option(name = "-output", usage = "Defines output directory", metaVar = "<folder>")
     public Path outputFolder;
+
+    /** Target file for network model. */
+    @Option(name = "-model", usage = "Defines path to model", metaVar = "<.zip file>")
+    public Path modelPath;
 
     /** Final arguments, with optional "--" separator. */
     @Argument

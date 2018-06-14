@@ -176,8 +176,10 @@ public class Features
             // Store dim stats per shape
             storeDims();
 
-            // pixels.store(PIXELS_PATH);
+            // Store pixel stats
             DistributionStats stats = pixels.build();
+            logger.info("pixels mean:{} std:{}", stats.getMean(), stats.getStd());
+
             NormalizerStandardize normalizer = new NormalizerStandardize(
                     stats.getMean(),
                     stats.getStd());
@@ -213,7 +215,7 @@ public class Features
     private void convertScaledShapes (SheetAnnotations annotations)
     {
         for (SymbolInfo symbol : annotations.getSymbols()) {
-            if (symbol.getScale() != null && symbol.getScale() <= MAX_SYMBOL_SCALE) {
+            if ((symbol.getScale() != null) && (symbol.getScale() <= MAX_SYMBOL_SCALE)) {
                 symbol.useSmallName();
             }
         }
@@ -244,7 +246,13 @@ public class Features
             logger.info("{}", annotations);
 
             if (annotations == null) {
-                logger.warn("Skipping {} with no annotations", path);
+                logger.warn("No Annotations structure in {}", path);
+
+                return;
+            }
+
+            if (annotations.getSymbols().isEmpty()) {
+                logger.info("No symbols found in {}", path);
 
                 return;
             }

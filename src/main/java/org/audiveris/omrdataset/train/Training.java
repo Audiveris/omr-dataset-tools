@@ -23,12 +23,11 @@ package org.audiveris.omrdataset.train;
 
 import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
-import org.audiveris.omrdataset.api.OmrShapes;
+
 import static org.audiveris.omrdataset.classifier.Context.*;
 import static org.audiveris.omrdataset.train.App.*;
 import static org.audiveris.omrdataset.train.AppPaths.*;
 
-import org.datavec.api.records.Record;
 import org.datavec.api.records.metadata.RecordMetaData;
 import org.datavec.api.records.metadata.RecordMetaDataLine;
 import org.datavec.api.records.reader.RecordReader;
@@ -38,7 +37,6 @@ import org.datavec.api.writable.Writable;
 
 import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.meta.Prediction;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -72,7 +70,6 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -125,24 +122,22 @@ public class Training
 
         int nChannels = 1; // Number of input channels
         int batchSize = 64; // Batch size
-        int nEpochs = 10; //2; // Number of training epochs
-        int iterations = 2; //10; // Number of training iterations
+        int nEpochs = 1; //3; //10; //2; // Number of training epochs
+        int iterations = 1; // 2; //10; // Number of training iterations
         int seed = 123; //
 
         // Pixel norms
-        ///final Norms pixelNorms = Populations.load(PIXELS_PATH).toNorms();
         NormalizerStandardize normalizer = NormalizerSerializer.getDefault().restore(
                 PIXELS_PATH.toFile());
 
         // Get the dataset using the record reader. CSVRecordReader handles loading/parsing
-        logger.info("Getting dataset...");
-
         int labelIndex = CONTEXT_WIDTH * CONTEXT_HEIGHT; // format: all cells then label
         int numLinesToSkip = 1; // Because of header comment line
         String delimiter = ",";
 
         RecordReader trainRecordReader = new CSVRecordReader(numLinesToSkip, delimiter);
         trainRecordReader.initialize(new FileSplit(FEATURES_PATH.toFile()));
+        logger.info("Getting dataset from {} ...", FEATURES_PATH);
 
         RecordReaderDataSetIterator trainIter = new RecordReaderDataSetIterator(
                 trainRecordReader,
@@ -286,53 +281,54 @@ public class Training
                 double dur = stop - start;
                 logger.info(String.format("*** End epoch#%d, time: %.0f sec", epoch, dur / 1000));
 
-                logger.info("Evaluating model...");
-
-                Evaluation eval = new Evaluation(OmrShapes.NAMES);
-
-                while (testIter.hasNext()) {
-                    DataSet ds = testIter.next();
-                    List<RecordMetaData> testMetaData = ds.getExampleMetaData(RecordMetaData.class);
-                    INDArray output = model.output(ds.getFeatureMatrix(), false);
-                    eval.eval(ds.getLabels(), output, testMetaData);
-                }
-
-                System.out.println(eval.stats());
-                testIter.reset();
-
-                //Get a list of prediction errors, from the Evaluation object
-                //Prediction errors like this are only available after calling iterator.setCollectMetaData(true)
-                List<Prediction> mistakes = eval.getPredictionErrors();
-                logger.info("Epoch#{} Prediction Errors: {}", epoch, mistakes.size());
-
-                //We can also load a subset of the data, to a DataSet object:
-                //Here we load the raw data:
-                List<RecordMetaData> predictionErrorMetaData = new ArrayList<RecordMetaData>();
-
-                for (Prediction p : mistakes) {
-                    predictionErrorMetaData.add(p.getRecordMetaData(RecordMetaData.class));
-                }
-
-                List<Record> predictionErrorRawData = testRecordReader.loadFromMetaData(
-                        predictionErrorMetaData);
-
-                for (int ie = 0; ie < mistakes.size(); ie++) {
-                    Prediction p = mistakes.get(ie);
-                    List<Writable> rawData = predictionErrorRawData.get(ie).getRecord();
-                    saveMistake(p, rawData, epochFolder);
-                }
-
                 // Save model
                 ModelSerializer.writeModel(model, MODEL_PATH.toFile(), false);
                 ModelSerializer.addNormalizerToModel(MODEL_PATH.toFile(), normalizer);
                 logger.info("Model+normalizer stored as {}", MODEL_PATH.toAbsolutePath());
-
-                // To avoid long useless sessions...
-                if (mistakes.isEmpty()) {
-                    logger.info("No mistakes left, training stopped.");
-
-                    break;
-                }
+//
+//                logger.info("Evaluating model...");
+//
+//                Evaluation eval = new Evaluation(OmrShapes.NAMES);
+//
+//                while (testIter.hasNext()) {
+//                    DataSet ds = testIter.next();
+//                    List<RecordMetaData> testMetaData = ds.getExampleMetaData(RecordMetaData.class);
+//                    INDArray output = model.output(ds.getFeatureMatrix(), false);
+//                    eval.eval(ds.getLabels(), output, testMetaData);
+//                }
+//
+//                System.out.println(eval.stats());
+//                testIter.reset();
+//
+//                //Get a list of prediction errors, from the Evaluation object
+//                //Prediction errors like this are only available after calling iterator.setCollectMetaData(true)
+//                List<Prediction> mistakes = eval.getPredictionErrors();
+//                logger.info("Epoch#{} Prediction Errors: {}", epoch, mistakes.size());
+//
+//                //We can also load a subset of the data, to a DataSet object:
+//                //Here we load the raw data:
+//                List<RecordMetaData> predictionErrorMetaData = new ArrayList<RecordMetaData>();
+//
+//                for (Prediction p : mistakes) {
+//                    predictionErrorMetaData.add(p.getRecordMetaData(RecordMetaData.class));
+//                }
+//
+//                List<Record> predictionErrorRawData = testRecordReader.loadFromMetaData(
+//                        predictionErrorMetaData);
+//
+//                for (int ie = 0; ie < mistakes.size(); ie++) {
+//                    Prediction p = mistakes.get(ie);
+//                    List<Writable> rawData = predictionErrorRawData.get(ie).getRecord();
+//                    saveMistake(p, rawData, epochFolder);
+//                }
+//
+//
+//                // To avoid long useless sessions...
+//                if (mistakes.isEmpty()) {
+//                    logger.info("No mistakes left, training stopped.");
+//
+//                    break;
+//                }
             }
         } finally {
             // Stop monitoring

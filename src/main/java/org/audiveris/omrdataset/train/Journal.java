@@ -217,7 +217,7 @@ public class Journal
                     map.put(Integer.decode(f[0]), f[1]);
                 }
 
-                logger.info("SheetIndex sheets: {}", map.size());
+                logger.info("Sheets: {}", map.size());
             } catch (Exception ex) {
                 logger.warn("Error loading {}", path, ex);
             } finally {

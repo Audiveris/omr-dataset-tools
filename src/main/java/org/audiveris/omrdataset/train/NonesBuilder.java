@@ -202,7 +202,9 @@ public class NonesBuilder
                 Rectangle r = symbol.getBounds().getBounds();
 
                 for (int y = r.y; y < (r.y + r.height); y++) {
-                    occupied[y] = true;
+                    if (y >= 0 && y < height) {
+                        occupied[y] = true;
+                    }
                 }
             }
         }

@@ -69,7 +69,7 @@ public abstract class Context
     public static final String DIMS_NAME = "dims.dat";
 
     /** File name for neural network model: {@value}. */
-    public static final String MODEL_NAME = "img-classifier.zip";
+    public static final String MODEL_NAME = "patch-classifier.zip";
 
     //~ Methods ------------------------------------------------------------------------------------
     /**

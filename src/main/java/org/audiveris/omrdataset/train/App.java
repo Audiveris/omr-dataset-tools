@@ -44,7 +44,7 @@ public abstract class App
     public static final int NONE_Y_MARGIN = (int) Math.rint(INTERLINE * 0.5);
 
     /** Ratio of None symbols created versus valid symbols found in page: {@value}. */
-    public static final double NONE_RATIO = 1.0;
+    public static final double NONE_RATIO = 0.2; // 1.0;
 
     /** Format for output images (sub-images and control-images): {@value}. */
     public static final String OUTPUT_IMAGES_FORMAT = "png";
