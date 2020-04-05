@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------------------------//
 //                                                                                                //
-//                                    I g n o r e d S h a p e s                                   //
+//                                P i x e l P r e P r o c e s s o r                               //
 //                                                                                                //
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Audiveris 2017. All rights reserved.
+//  Copyright © Audiveris 2019. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -19,35 +19,37 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.audiveris.omrdataset.train;
+package org.audiveris.omrdataset.training;
 
-import org.audiveris.omrdataset.api.OmrShape;
-import static org.audiveris.omrdataset.api.OmrShape.*;
-
-import java.util.EnumSet;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.api.DataSet;
+import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 
 /**
- * Class {@code IgnoredShapes} handles the OmrShape names currently ignored for
- * actual training.
+ * Class {@code PixelPreProcessor} normalizes pixel data from range 0..255 to range 0..1.
  *
  * @author Hervé Bitteur
  */
-public abstract class IgnoredShapes
+public class PixelPreProcessor
+        implements DataSetPreProcessor
 {
-    //~ Static fields/initializers -----------------------------------------------------------------
 
-    /** Symbol shapes to be ignored by training (for the time being). */
-    private static final EnumSet<OmrShape> IGNORED_SHAPES = EnumSet.of(legerLine, stem);
+    //~ Constructors -------------------------------------------------------------------------------
+    public PixelPreProcessor ()
+    {
+
+    }
 
     //~ Methods ------------------------------------------------------------------------------------
-    /**
-     * Report whether the provided shape is to be ignored for standard processing.
-     *
-     * @param shape the provided shape
-     * @return true to ignore
-     */
-    public static boolean isIgnored (OmrShape shape)
+    @Override
+    public void preProcess (DataSet toPreProcess)
     {
-        return IGNORED_SHAPES.contains(shape);
+        INDArray theFeatures = toPreProcess.getFeatures();
+        preProcess(theFeatures);
+    }
+
+    public void preProcess (INDArray theFeatures)
+    {
+        theFeatures.divi(255.0);
     }
 }

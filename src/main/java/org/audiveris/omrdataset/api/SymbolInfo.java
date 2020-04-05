@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Audiveris 2017. All rights reserved.
+//  Copyright © Audiveris 2019. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -21,19 +21,22 @@
 // </editor-fold>
 package org.audiveris.omrdataset.api;
 
+import org.audiveris.omr.util.Jaxb;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -42,36 +45,44 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *
  * @author Hervé Bitteur
  */
+@XmlAccessorType(XmlAccessType.NONE)
 public class SymbolInfo
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(
-            SymbolInfo.class);
+    private static final Logger logger = LoggerFactory.getLogger(SymbolInfo.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
-    @XmlAttribute(name = "interline")
-    @XmlJavaTypeAdapter(value = Double3Adapter.class, type = double.class)
-    private final double interline;
-
     @XmlAttribute(name = "id")
-    private final Integer id;
+    private Integer id;
 
     @XmlAttribute(name = "scale")
-    @XmlJavaTypeAdapter(Double3Adapter.class)
+    @XmlJavaTypeAdapter(Jaxb.Double3Adapter.class)
     private final Double scale;
 
     @XmlAttribute(name = "shape")
     @XmlJavaTypeAdapter(OmrShapeAdapter.class)
     private OmrShape omrShape;
 
+    @XmlAttribute(name = "interline")
+    @XmlJavaTypeAdapter(value = Jaxb.Double3Adapter.class, type = double.class)
+    private final double interline;
+
     @XmlElement(name = "Bounds")
-    @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
+    @XmlJavaTypeAdapter(Jaxb.Rectangle2DAdapter.class)
     private final Rectangle2D bounds;
 
     /** Inner symbols, if any. */
     @XmlElement(name = "Symbol")
     private List<SymbolInfo> innerSymbols;
+
+    /** Modifications performed on symbol. */
+    @XmlElement(name = "Modification")
+    private List<Modification> modifications;
+
+    /** Signals an invalid symbol. */
+    @XmlElement(name = "Invalid")
+    private Invalid invalid;
 
     //~ Constructors -------------------------------------------------------------------------------
     /**
@@ -117,10 +128,24 @@ public class SymbolInfo
     public void addInnerSymbol (SymbolInfo symbol)
     {
         if (innerSymbols == null) {
-            innerSymbols = new ArrayList<SymbolInfo>();
+            innerSymbols = new ArrayList<>();
         }
 
         innerSymbols.add(symbol);
+    }
+
+    /**
+     * Register a modification done on this symbol.
+     *
+     * @param modif the modification done
+     */
+    public void addModification (Modification modif)
+    {
+        if (modifications == null) {
+            modifications = new ArrayList<>();
+        }
+
+        modifications.add(modif);
     }
 
     /**
@@ -149,6 +174,16 @@ public class SymbolInfo
     }
 
     /**
+     * Assign ID value.
+     *
+     * @param id new ID value
+     */
+    public void setId (int id)
+    {
+        this.id = id;
+    }
+
+    /**
      * Report the inner symbols, if any
      *
      * @return un-mutable list of inner symbols, perhaps empty but never null
@@ -171,11 +206,62 @@ public class SymbolInfo
     }
 
     /**
+     * Report whether symbol is invalid.
+     *
+     * @return the invalid
+     */
+    public boolean isInvalid ()
+    {
+        return invalid != null;
+    }
+
+    /**
+     * Set symbol as invalid.
+     *
+     * @param cause the reason for invalidity
+     */
+    public void setInvalid (Cause cause)
+    {
+        setInvalid(cause, false);
+    }
+
+    /**
+     * Set symbol as invalid, and recursively the inner symbols if so desired.
+     *
+     * @param cause      the reason for invalidity
+     * @param withInners true to propagate invalidity to inner symbols
+     */
+    public void setInvalid (Cause cause,
+                            boolean withInners)
+    {
+        this.invalid = new Invalid(cause);
+
+        if (withInners) {
+            for (SymbolInfo inner : getInnerSymbols()) {
+                inner.setInvalid(cause, true);
+            }
+        }
+    }
+
+    /**
+     * Report symbol shape.
+     *
      * @return the omrShape, perhaps null
      */
     public OmrShape getOmrShape ()
     {
         return omrShape;
+    }
+
+    /**
+     * Assign a new shape.
+     *
+     * @param the new omrShape
+     */
+    public void setOmrShape (OmrShape omrShape)
+    {
+        addModification(new Modification(this.omrShape));
+        this.omrShape = omrShape;
     }
 
     /**
@@ -190,7 +276,11 @@ public class SymbolInfo
     public String toString ()
     {
         StringBuilder sb = new StringBuilder("Symbol{");
-        sb.append("shape:").append(omrShape);
+        sb.append(omrShape);
+
+        if (invalid != null) {
+            sb.append(" ").append(invalid);
+        }
 
         if ((innerSymbols != null) && !innerSymbols.isEmpty()) {
             sb.append(" OUTER");
@@ -229,7 +319,7 @@ public class SymbolInfo
      * Called after all the properties (except IDREF) are unmarshalled
      * for this object, but before this object is set to the parent object.
      */
-    @PostConstruct
+    @SuppressWarnings("unused")
     private void afterUnmarshal (Unmarshaller um,
                                  Object parent)
     {
@@ -254,6 +344,12 @@ public class SymbolInfo
         // Clefs (change)
         case cClef:
             return OmrShape.cClefChange;
+
+        case cClefAlto:
+            return OmrShape.cClefAltoChange;
+
+        case cClefTenor:
+            return OmrShape.cClefTenorChange;
 
         case fClef:
             return OmrShape.fClefChange;
@@ -297,12 +393,33 @@ public class SymbolInfo
     }
 
     /**
-     * @param omrShape the omrShape to set
+     * Report the outer/inner symbols that so far are neither invalid nor ignored.
+     *
+     * @param symbols the list of symbols to browse
+     * @return the interesting symbols
      */
-    private void setOmrShape (OmrShape omrShape)
+    public static List<SymbolInfo> getGoodSymbols (List<SymbolInfo> symbols)
     {
-        logger.info("Renamed scaled {} as {}", this, omrShape);
-        this.omrShape = omrShape;
+        final List<SymbolInfo> goods = new ArrayList<>();
+
+        for (SymbolInfo symbol : symbols) {
+            final OmrShape shape = symbol.getOmrShape();
+
+            if (!symbol.isInvalid() && (shape != null) && !shape.isIgnored()) {
+                goods.add(symbol);
+            }
+            // Check the inner symbols as well, because an ignored outer can have good inners
+            // This is the case for 3 repeat signs.
+            for (SymbolInfo inner : symbol.getInnerSymbols()) {
+                final OmrShape s = inner.getOmrShape();
+
+                if (!inner.isInvalid() && (s != null) && !s.isIgnored()) {
+                    goods.add(inner);
+                }
+            }
+        }
+
+        return goods;
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
@@ -315,7 +432,6 @@ public class SymbolInfo
     public static class OmrShapeAdapter
             extends XmlAdapter<String, OmrShape>
     {
-        //~ Methods --------------------------------------------------------------------------------
 
         @Override
         public String marshal (OmrShape shape)
@@ -342,99 +458,67 @@ public class SymbolInfo
         }
     }
 
-    //----------------//
-    // Double3Adapter //
-    //----------------//
-    private static class Double3Adapter
-            extends XmlAdapter<String, Double>
+    //--------------//
+    // Modification //
+    //--------------//
+    @XmlAccessorType(XmlAccessType.NONE)
+    @XmlRootElement(name = "Modification")
+    public static class Modification
     {
-        //~ Static fields/initializers -------------------------------------------------------------
 
-        private static final DecimalFormat decimal3 = new DecimalFormat();
+        @XmlAttribute(name = "old-shape")
+        @XmlJavaTypeAdapter(OmrShapeAdapter.class)
+        public OmrShape oldShape;
 
-        static {
-            decimal3.setGroupingUsed(false);
-            decimal3.setMaximumFractionDigits(3); // For a maximum of 3 decimals
+        public Modification (OmrShape oldShape)
+        {
+            this.oldShape = oldShape;
         }
 
-        //~ Methods --------------------------------------------------------------------------------
-        @Override
-        public String marshal (Double d)
-                throws Exception
+        // Needed for JAXB
+        private Modification ()
         {
-            if (d == null) {
-                return null;
-            }
-
-            return decimal3.format(d);
-        }
-
-        @Override
-        public Double unmarshal (String s)
-                throws Exception
-        {
-            return Double.valueOf(s);
         }
     }
 
-    //--------------------//
-    // Rectangle2DAdapter //
-    //--------------------//
-    private static class Rectangle2DAdapter
-            extends XmlAdapter<Rectangle2DAdapter.Rectangle2DFacade, Rectangle2D>
+    //---------//
+    // Invalid //
+    //---------//
+    @XmlAccessorType(XmlAccessType.NONE)
+    @XmlRootElement(name = "Invalid")
+    public static class Invalid
     {
-        //~ Methods --------------------------------------------------------------------------------
 
-        @Override
-        public Rectangle2DFacade marshal (Rectangle2D rect)
-                throws Exception
+        @XmlAttribute(name = "cause")
+        public Cause cause;
+
+        public Invalid (Cause cause)
         {
-            return new Rectangle2DFacade(rect);
+            this.cause = cause;
+        }
+
+        // Needed for JAXB
+        private Invalid ()
+        {
         }
 
         @Override
-        public Rectangle2D unmarshal (Rectangle2DFacade facade)
-                throws Exception
+        public String toString ()
         {
-            return facade.getRectangle2D();
+            return "INVALID" + "-" + cause;
         }
+    }
 
-        //~ Inner Classes --------------------------------------------------------------------------
-        @XmlJavaTypeAdapter(value = Double3Adapter.class, type = double.class)
-        private static class Rectangle2DFacade
-        {
-            //~ Instance fields --------------------------------------------------------------------
-
-            @XmlAttribute(name = "x")
-            public double x;
-
-            @XmlAttribute(name = "y")
-            public double y;
-
-            @XmlAttribute(name = "w")
-            public double width;
-
-            @XmlAttribute(name = "h")
-            public double height;
-
-            //~ Constructors -----------------------------------------------------------------------
-            public Rectangle2DFacade (Rectangle2D rect)
-            {
-                x = rect.getX();
-                y = rect.getY();
-                width = rect.getWidth();
-                height = rect.getHeight();
-            }
-
-            private Rectangle2DFacade ()
-            {
-            }
-
-            //~ Methods ----------------------------------------------------------------------------
-            public Rectangle2D getRectangle2D ()
-            {
-                return new Rectangle2D.Double(x, y, width, height);
-            }
-        }
+    public static enum Cause
+    {
+        ZeroDimension,
+        NoRelatedStaff,
+        Duplication,
+        StrongOverlap,
+        InExcludedArea,
+        TooLargeInner,
+        OutOfImage,
+        TooWide,
+        TooHigh;
     }
 }

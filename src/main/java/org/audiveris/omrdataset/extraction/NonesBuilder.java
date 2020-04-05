@@ -19,13 +19,14 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.audiveris.omrdataset.train;
+package org.audiveris.omrdataset.extraction;
 
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
-import static org.audiveris.omrdataset.classifier.Context.INTERLINE;
-import static org.audiveris.omrdataset.train.App.*;
+import static org.audiveris.omrdataset.training.Context.INTERLINE;
+import static org.audiveris.omrdataset.training.App.NONE_X_MARGIN;
+import static org.audiveris.omrdataset.training.App.NONE_Y_MARGIN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,23 +65,29 @@ public class NonesBuilder
     };
 
     //~ Instance fields ----------------------------------------------------------------------------
-    /** Annotations for this page. */
+    /** Sheet id. */
+    private final int sheetId;
+
+    /** Annotations for this sheet. */
     private final SheetAnnotations annotations;
 
     /** We need the same interline value for the whole page. */
     private Integer roundedInterline;
 
     /** List of filled boxes, kept sorted on x. */
-    private final List<Rectangle> filledBoxes = new ArrayList<Rectangle>();
+    private final List<Rectangle> filledBoxes = new ArrayList<>();
 
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Creates a new {@code NoneSymbols} object.
      *
+     * @param sheetId     id of containing sheet
      * @param annotations Annotations for the page
      */
-    public NonesBuilder (SheetAnnotations annotations)
+    public NonesBuilder (int sheetId,
+                         SheetAnnotations annotations)
     {
+        this.sheetId = sheetId;
         this.annotations = annotations;
     }
 
@@ -94,7 +101,8 @@ public class NonesBuilder
     public List<SymbolInfo> insertNones (int toAdd)
     {
         if (!checkInterlineValue()) {
-            logger.info("Page has several interline values, no None symbol can be inserted.");
+            logger.info("sheetId:{} Page has several interline values, "
+                                + "no None symbol can be inserted.", sheetId);
 
             return Collections.emptyList();
         }
@@ -108,7 +116,7 @@ public class NonesBuilder
         maxWidth = Math.max(maxWidth, 2 * xMargin); // Safer
 
         // Created None symbols
-        final List<SymbolInfo> createdSymbols = new ArrayList<SymbolInfo>();
+        final List<SymbolInfo> createdSymbols = new ArrayList<>();
         final int sheetWidth = annotations.getSheetInfo().dim.width;
         final int sheetHeight = annotations.getSheetInfo().dim.height;
 
@@ -116,7 +124,7 @@ public class NonesBuilder
         final boolean[] occupiedYs = getOccupiedYs(sheetHeight);
 
         // Put a reasonable limit on creation attempts
-        for (int i = 10 * toAdd; i >= 0; i--) {
+        for (int i = 50 * toAdd; i >= 0; i--) {
             if (createdSymbols.size() >= toAdd) {
                 break; // Normal exit
             }
@@ -134,13 +142,14 @@ public class NonesBuilder
                             new SymbolInfo(
                                     OmrShape.none,
                                     roundedInterline,
-                                    null,
+                                    annotations.nextSymbolId(),
                                     null,
                                     new Rectangle(x, y, 0, 0)));
                 }
             }
         }
 
+        logger.info("sheetId:{} Created: {}", sheetId, createdSymbols.size());
         return createdSymbols;
     }
 
@@ -151,7 +160,7 @@ public class NonesBuilder
      */
     private boolean checkInterlineValue ()
     {
-        for (SymbolInfo symbol : annotations.getSymbols()) {
+        for (SymbolInfo symbol : annotations.getGoodSymbols()) {
             if (roundedInterline == null) {
                 if (symbol.getInterline() > 0) {
                     roundedInterline = (int) Math.rint(symbol.getInterline());
@@ -165,7 +174,7 @@ public class NonesBuilder
     }
 
     /**
-     * Populate the "filledBoxes" collection with the boxes of all valid symbols.
+     * Populate the "filledBoxes" collection with the boxes of all good symbols.
      *
      * @return the maximum width across all symbols
      */
@@ -173,12 +182,10 @@ public class NonesBuilder
     {
         int maxWidth = 0;
 
-        for (SymbolInfo symbol : annotations.getSymbols()) {
-            if (!IgnoredShapes.isIgnored(symbol.getOmrShape())) {
-                Rectangle r = symbol.getBounds().getBounds();
-                maxWidth = Math.max(maxWidth, r.width);
-                filledBoxes.add(r);
-            }
+        for (SymbolInfo symbol : annotations.getGoodSymbols()) {
+            Rectangle r = symbol.getBounds().getBounds();
+            maxWidth = Math.max(maxWidth, r.width);
+            filledBoxes.add(r);
         }
 
         Collections.sort(filledBoxes, byAbscissa);
@@ -187,7 +194,7 @@ public class NonesBuilder
     }
 
     /**
-     * Return which ordinate values are occupied by a valid symbol
+     * Return which ordinate values are occupied by a good symbol
      *
      * @param height page height
      * @return table of booleans indexed by y
@@ -197,14 +204,12 @@ public class NonesBuilder
         boolean[] occupied = new boolean[height];
         Arrays.fill(occupied, false);
 
-        for (SymbolInfo symbol : annotations.getSymbols()) {
-            if (!IgnoredShapes.isIgnored(symbol.getOmrShape())) {
-                Rectangle r = symbol.getBounds().getBounds();
+        for (SymbolInfo symbol : annotations.getGoodSymbols()) {
+            Rectangle r = symbol.getBounds().getBounds();
 
-                for (int y = r.y; y < (r.y + r.height); y++) {
-                    if (y >= 0 && y < height) {
-                        occupied[y] = true;
-                    }
+            for (int y = r.y; y < (r.y + r.height); y++) {
+                if (y >= 0 && y < height) {
+                    occupied[y] = true;
                 }
             }
         }
@@ -223,6 +228,33 @@ public class NonesBuilder
     private boolean tryInsertion (Rectangle rect,
                                   int maxWidth)
     {
+        // Check we are far enough from valid symbol and artificial rectangle
+        int index = checkFarEnough(rect, maxWidth);
+
+        if (index == -1) {
+            return false;
+        }
+
+        if (Math.random() < 0.9) {
+            // Check we are close enough to a valid symbol
+            Rectangle larger = new Rectangle(rect);
+            larger.grow(rect.width / 2, rect.height / 2);
+
+            if (!checkCloseEnough(larger, maxWidth)) {
+                return false;
+            }
+        }
+
+        // OK, insert rectangle at proper index
+        filledBoxes.add(index, rect);
+        logger.debug("Added None at {}", rect);
+
+        return true;
+    }
+
+    private int checkFarEnough (Rectangle rect,
+                                int maxWidth)
+    {
         final int size = filledBoxes.size();
         final int xMax = (rect.x + rect.width) - 1;
         final int xMin = (rect.x - maxWidth) + 1;
@@ -238,7 +270,7 @@ public class NonesBuilder
             if (r.x > xMax) {
                 break;
             } else if (r.intersects(rect)) {
-                return false;
+                return -1;
             }
         }
 
@@ -249,14 +281,46 @@ public class NonesBuilder
             if (r.x < xMin) {
                 break;
             } else if (r.intersects(rect)) {
-                return false;
+                return -1;
             }
         }
 
-        // No collision found, insert rectangle at proper index
-        filledBoxes.add(index, rect);
-        logger.debug("Added None at {}", rect);
+        return index;
+    }
 
-        return true;
+    private boolean checkCloseEnough (Rectangle rect,
+                                      int maxWidth)
+    {
+        final int size = filledBoxes.size();
+        final int xMax = (rect.x + rect.width) - 1;
+        final int xMin = (rect.x - maxWidth) + 1;
+
+        // Theoretical insertion index in the sorted list
+        final int result = Collections.binarySearch(filledBoxes, rect, byAbscissa);
+        final int index = (result >= 0) ? result : (-(result + 1));
+
+        // Check for collisions on right
+        for (int i = index; i < size; i++) {
+            Rectangle r = filledBoxes.get(i);
+
+            if (r.x > xMax) {
+                break;
+            } else if (r.intersects(rect)) {
+                return true;
+            }
+        }
+
+        // Check for collisions on left
+        for (int i = index - 1; i >= 0; i--) {
+            Rectangle r = filledBoxes.get(i);
+
+            if (r.x < xMin) {
+                break;
+            } else if (r.intersects(rect)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

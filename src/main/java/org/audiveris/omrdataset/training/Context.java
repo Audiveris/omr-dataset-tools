@@ -19,8 +19,9 @@
 //  program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
-package org.audiveris.omrdataset.classifier;
+package org.audiveris.omrdataset.training;
 
+import org.audiveris.omrdataset.api.OmrShape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,46 +40,61 @@ public abstract class Context
     /** Predefined interline value: {@value}. */
     public static final int INTERLINE = 10;
 
-    /** Needed multiple for context dimensions: {@value}. */
-    public static final int MULTIPLE = 4;
-
-    /** Height for symbol context, in pixels. */
-    public static final int CONTEXT_HEIGHT = toMultiple(INTERLINE * 9.6);
-
-    /** Width for symbol context, in pixels. */
-    public static final int CONTEXT_WIDTH = toMultiple(INTERLINE * 4.8);
-
-    static {
-        logger.info(
-                "Context interline:{} width:{} height:{}",
-                INTERLINE,
-                CONTEXT_WIDTH,
-                CONTEXT_HEIGHT);
-    }
-
-    /** Maximum symbol scale value to trigger a shape rename: {@value}. */
-    public static final double MAX_SYMBOL_SCALE = 0.85;
-
     /** Value used for background pixel feature: {@value}. */
     public static final int BACKGROUND = 0;
 
     /** Value used for foreground pixel feature: {@value}. */
     public static final int FOREGROUND = 255;
 
-    /** File name for symbol dimensions standards: {@value}. */
-    public static final String DIMS_NAME = "dims.dat";
+    /** Height for symbol context, in pixels. */
+    public static final int CONTEXT_HEIGHT = 112;
 
-    /** File name for neural network model: {@value}. */
-    public static final String MODEL_NAME = "patch-classifier.zip";
+    /** Width for symbol context, in pixels. */
+    public static final int CONTEXT_WIDTH = 56;
 
-    //~ Methods ------------------------------------------------------------------------------------
-    /**
-     * Report the integer value (as multiple of MULTIPLE).
-     *
-     * @return ceiling value, as multiple of MULTIPLE
-     */
-    private static int toMultiple (double val)
+    /** Number of classes handled. */
+    public static final int NUM_CLASSES = OmrShape.unknown.ordinal();
+
+    /** CSV index of Label: {@value}. */
+    public static final int CSV_LABEL = CONTEXT_HEIGHT * CONTEXT_WIDTH;
+
+    /** CSV index of Collection: {@value}. ZHAW:1 vs MuseScore:2. */
+    public static final int CSV_COLLECTION = CSV_LABEL + 1;
+
+    /** CSV index of SymbolId: {@value}. */
+    public static final int CSV_SYMBOL_ID = CSV_COLLECTION + 1;
+
+    /** CSV index of X: {@value}. */
+    public static final int CSV_X = CSV_SYMBOL_ID + 1;
+
+    /** CSV index of Y: {@value}. */
+    public static final int CSV_Y = CSV_X + 1;
+
+    /** CSV index of Width: {@value}. */
+    public static final int CSV_WIDTH = CSV_Y + 1;
+
+    /** CSV index of Height: {@value}. */
+    public static final int CSV_HEIGHT = CSV_WIDTH + 1;
+
+    /** CSV index of Interline: {@value}. */
+    public static final int CSV_INTERLINE = CSV_HEIGHT + 1;
+
+    /** CSV index of SheetId: {@value}. */
+    public static final int CSV_SHEET_ID = CSV_INTERLINE + 1;
+
+    //~ Constructors -------------------------------------------------------------------------------
+    private Context ()
     {
-        return MULTIPLE * (int) Math.ceil(val / MULTIPLE);
+    }
+
+    //~ Inner Classes ------------------------------------------------------------------------------
+    /**
+     * To remember the source training data comes from.
+     */
+    public enum SourceType
+    {
+        UNKNOWN,
+        ZHAW,
+        MUSESCORE;
     }
 }

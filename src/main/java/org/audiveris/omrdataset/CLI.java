@@ -21,6 +21,9 @@
 // </editor-fold>
 package org.audiveris.omrdataset;
 
+import org.audiveris.omr.util.IntArrayOptionHandler;
+import org.audiveris.omrdataset.training.Context.SourceType;
+
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -45,53 +48,85 @@ public class CLI
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(
-            CLI.class);
+    private static final Logger logger = LoggerFactory.getLogger(CLI.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
     /** Help mode. */
-    @Option(name = "-help", help = true, usage = "Displays general help then stops")
-    public boolean help = false;
+    @Option(name = "-help", help = true, usage = "Display general help then stop")
+    public boolean help;
 
-    /** Features. */
-    @Option(name = "-features", usage = "Generates .csv and .dat files")
-    public boolean features;
+    /** 1/ Source. */
+    @Option(name = "-filter", usage = "Step 1: Load and filter symbols according to source type")
+    public SourceType source;
 
-    /** Clean. */
-    @Option(name = "-clean", usage = "Cleans up output")
-    public boolean clean;
-
-    /** Control images. */
-    @Option(name = "-controls", usage = "Generates control images")
-    public boolean controls;
-
-    /** Sub-images. */
-    @Option(name = "-subimages", usage = "Generates subimages")
-    public boolean subimages;
-
-    /** Names. */
-    @Option(name = "-names", usage = "Prints all possible symbol names")
-    public boolean names;
-
-    /** Nones. */
-    @Option(name = "-nones", usage = "Generates none symbols")
+    /** 2/ Nones. */
+    @Option(name = "-nones", usage
+            = "Step 2: Generate none symbols (effective for control & features)")
     public boolean nones;
 
-    /** Training. */
-    @Option(name = "-training", usage = "Trains classifier on features")
-    public boolean training;
+    /** 3/ Features. */
+    @Option(name = "-features", usage = "Step 3: Generate sheet .csv (zipped) files")
+    public boolean features;
 
-    /** Mistakes. */
-    @Option(name = "-mistakes", usage = "Saves mistake images")
-    public boolean mistakes;
+    /** 4/ Split. */
+    @Option(name = "-split", usage = "Step 4: Split all sheet .csv files into few csv bins")
+    public boolean split;
+
+    /** 5/ Shuffle. */
+    @Option(name = "-shuffle", usage = "Step 5: Shuffle each csv bin in memory")
+    public boolean shuffle;
+
+    /** 6/ Train. */
+    @Option(name = "-train", usage = "Step 6: Train model on selected bins",
+            handler = IntArrayOptionHandler.class)
+    public ArrayList<Integer> train;
+
+    /** 7/ Test. */
+    @Option(name = "-test", usage = "Step 7: Evaluate model from test csv bins")
+    public boolean test;
+
+    /** Sheet histogram of shapes. */
+    @Option(name = "-histo", usage = "(optional) Print shape histogram per sheet")
+    public boolean histo;
+
+    /** Bin histogram of shapes. */
+    @Option(name = "-binhisto", usage = "(optional) Print shape histogram for provided bins",
+            handler = IntArrayOptionHandler.class)
+    public ArrayList<Integer> binHisto;
+
+    /** Control images. */
+    @Option(name = "-control", usage = "(optional) Generate control images")
+    public boolean control;
+
+    /** Patch images. */
+    @Option(name = "-patches", usage = "(optional) Generate patch images")
+    public boolean patches;
+
+    /** Shape names. */
+    @Option(name = "-names", usage = "(optional) Print all possible shape names with their index")
+    public boolean names;
+
+    /** Parallel processing. */
+    @Option(name = "-parallel", usage
+            = "(recommanded) Use parallel processing (effective on steps 1 to 4)")
+    public boolean parallel;
+
+    /** Limit. */
+    @Option(name = "-limit", usage = "(Deprecated) Limit samples per shape")
+    public boolean limit;
 
     /** Target directory for output data. */
-    @Option(name = "-output", usage = "Defines output directory", metaVar = "<folder>")
+    @Option(name = "-output", usage = "(optional) Define output directory", metaVar = "<folder>")
     public Path outputFolder;
 
-    /** Target file for network model. */
-    @Option(name = "-model", usage = "Defines path to model", metaVar = "<.zip file>")
+    /** Alternate target file for network model. */
+    @Option(name = "-model", usage = "(optional) Define path to model", metaVar = "<.zip file>")
     public Path modelPath;
+
+    /** The range of iterations to inspect. */
+    @Option(name = "-inspect", usage = "(optional) Inspect a bin for a range of iterations",
+            handler = IntArrayOptionHandler.class)
+    public ArrayList<Integer> inspect;
 
     /** Final arguments, with optional "--" separator. */
     @Argument

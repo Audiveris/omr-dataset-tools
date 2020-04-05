@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
 //
-//  Copyright © Audiveris 2017. All rights reserved.
+//  Copyright © Audiveris 2019. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify it under the terms of the
 //  GNU Affero General Public License as published by the Free Software Foundation, either version
@@ -21,6 +21,8 @@
 // </editor-fold>
 package org.audiveris.omrdataset.api;
 
+import java.util.EnumSet;
+
 /**
  * Class {@code OmrShape} is the OMR-Dataset definition of symbol shapes.
  * <p>
@@ -34,7 +36,8 @@ package org.audiveris.omrdataset.api;
  * The only exception is the <b>brace</b> symbol, which can vary in size, but we hope that a
  * classifier could recognize the brace center part.
  * <p>
- * We added a few names: <ul>
+ * We added a few names:
+ * <ul>
  * <li><b>none</b>.
  * This is a special name to indicate the absence of any valid symbol.
  * <li><b>arpeggiato</b>.
@@ -65,6 +68,7 @@ public enum OmrShape
     // 4.2 Staves
     //
     legerLine("Leger line"),
+
     //
     // 4.3 Barlines
     //
@@ -80,9 +84,6 @@ public enum OmrShape
     //
     // 4.4 Repeats
     //
-    repeatLeft("Left (start) repeat sign"),
-    repeatRight("Right (end) repeat sign"),
-    repeatRightLeft("Right and left repeat sign"),
     repeatDots("Repeat dots"),
     repeatDot("Repeat dot"),
     dalSegno("Dal segno (D.S.)"),
@@ -99,7 +100,8 @@ public enum OmrShape
     gClef8va("G clef ottava alta"),
     gClef15mb("G clef quindicesima bassa"),
     gClef15ma("G clef quindicesima alta"),
-    cClef("C clef"),
+    cClefAlto("C clef alto"),
+    cClefTenor("C clef tenor"),
     fClef("F clef"),
     fClef8vb("F clef ottava bassa"),
     fClef8va("F clef ottava alta"),
@@ -107,7 +109,8 @@ public enum OmrShape
     fClef15ma("F clef quindicesima alta"),
     unpitchedPercussionClef1("Unpitched percussion clef 1"),
     gClefChange("G clef change"),
-    cClefChange("C clef change"),
+    cClefAltoChange("C clef alto change"),
+    cClefTenorChange("C clef tenor change"),
     fClefChange("F clef change"),
     clef8("8 for clefs"),
     clef15("15 for clefs"),
@@ -158,10 +161,12 @@ public enum OmrShape
     noteheadXHalf("X notehead half"),
     noteheadXWhole("X notehead whole"),
     augmentationDot("Augmentation dot"),
+
     //
     // 4.15 Stems
     //
     stem("Combining stem"),
+
     //
     // 4.16 Tremolos
     //
@@ -170,6 +175,7 @@ public enum OmrShape
     tremolo3("Combining tremolo 3"),
     tremolo4("Combining tremolo 4"),
     tremolo5("Combining tremolo 5"),
+
     //
     // 4.17 Flags
     //
@@ -191,6 +197,7 @@ public enum OmrShape
     flag256thDown("Combining flag 6 (256th) below"),
     flag512thDown("Combining flag 7 (512th) below"),
     flag1024thDown("Combining flag 8 (1024th) below"),
+
     //
     // 4.18 Standard accidentals
     //
@@ -209,6 +216,7 @@ public enum OmrShape
     keyFlat("Flat in key signature"),
     keyNatural("Natural in key signature"),
     keySharp("Sharp in key signature"),
+
     //
     // 4.39 Articulations
     //
@@ -224,6 +232,7 @@ public enum OmrShape
     articMarcatoBelow("Marcato below"),
     articTenutoStaccatoAbove("Louré (tenuto-staccato) above"),
     articTenutoStaccatoBelow("Louré (tenuto-staccato) below"),
+
     //
     // 4.40 Holds and pauses
     //
@@ -231,6 +240,7 @@ public enum OmrShape
     fermataBelow("Fermata below staff"),
     breathMarkComma("Breath mark (comma)"),
     caesura("Caesura"),
+
     //
     // 4.41 Rests
     //
@@ -255,6 +265,7 @@ public enum OmrShape
     //
     ottavaAlta("Ottava alta (8va)"),
     ottavaBassaVb("Ottava bassa (8vb)"),
+
     //
     // 4.44 Dynamics
     //
@@ -294,6 +305,8 @@ public enum OmrShape
     //
     graceNoteAcciaccaturaStemUp("Slashed grace note stem up"),
     graceNoteAppoggiaturaStemUp("Grace note stem up"),
+    graceNoteAcciaccaturaStemDown("Slashed grace note stem down"),
+    graceNoteAppoggiaturaStemDown("Grace note stem down"),
     ornamentTrill("Trill"),
     ornamentTurn("Turn"),
     ornamentTurnInverted("Inverted turn"),
@@ -307,20 +320,24 @@ public enum OmrShape
     //
     stringsDownBow("Down bow"),
     stringsUpBow("Up bow"),
+
     //
     // 4.53 Plucked techniques (NOTA: I found only arpeggiato down and up, with an arrow head)
     //
     arpeggiato("Arpeggiato"),
+
     //
     // 4.55 Keyboard techniques
     //
     keyboardPedalPed("Pedal mark"),
     keyboardPedalUp("Pedal up mark"),
+
     //
     // 4.75 Tuplets
     //
     tuplet3("Tuplet 3"),
     tuplet6("Tuplet 6"),
+
     //
     // 4.115 Fingering
     //
@@ -333,11 +350,91 @@ public enum OmrShape
     fingeringPLower("Fingering p (pulgar; right-hand thumb "),
     fingeringILower("Fingering i (indicio; right-hand index finger for guitar)"),
     fingeringMLower("Fingering m (medio; right-hand middle finger for guitar)"),
-    fingeringALower("Fingering a (anular; right-hand ring finger for guitar)");
+    fingeringALower("Fingering a (anular; right-hand ring finger for guitar)"),
+    //
+    // NOT YET HANDLED symbols (though found in MuseScore input)
+    //
+    unknown("abnormal symbol in MuseScore input"),
+    //
+    cClef("C Clef with no precise position"), // Hack for MuseScore cClef samples
+    cClefChange("C Clef change with no precise position"), // Hack for MuseScore cClef samples
+    //
+    repeatLeft("Left (start) repeat sign"), // Collision with middle barlineSingle
+    repeatRight("Right (end) repeat sign"), // Collision with middle barlineSingle
+    repeatRightLeft("Right and left repeat sign"), // Collision with middle barlineHeavy
+    //
+    bracketedTuplet2("bracketed tuplet 2"),
+    bracketedTuplet3("bracketed tuplet 3"),
+    bracketedTuplet4("bracketed tuplet 4"),
+    bracketedTuplet5("bracketed tuplet 5"),
+    bracketedTuplet6("bracketed tuplet 6"),
+    bracketedTuplet7("bracketed tuplet 7"),
+    bracketedTuplet9("bracketed tuplet 9"),
+    bracketLine("bracket line"),
+    bracketNormal("bracket normal"),
+    bracketSquare("bracket square"),
+    brassMuteClosed("brass mute closed"),
+    brassMuteOpen("brass mute open"),
+    dynamicSforzatoPianissimo("dynamic sforzato pianissimo"),
+    fine("Fine"),
+    graceNote4("grace note 4"),
+    graceNote8("grace note 8"),
+    graceNote8_After("grace note 8 after"),
+    graceNote16("grace note 16"),
+    graceNote16_After("grace note 16 after"),
+    graceNote32("grace note 32"),
+    graceNote32_After("grace note 32 after"),
+    graceNoteSlashStemUp("grace note slash stem up"),
+    guitarFadeIn("guitar fade in"),
+    guitarFadeOut("guitar fade out"),
+    guitarVolumeSwell("guitar volume swell"),
+    luteFingeringRHFirst("lute fingering RH first"),
+    noteheadCircleX("notehead circle X"),
+    noteheadDiamondBlack("notehead diamond black"),
+    noteheadDiamondHalf("notehead diamond half"),
+    noteheadDiamondWhole("notehead diamond whole"),
+    noteheadSlashHorizontalEnds("notehead slash horizontal ends"),
+    noteheadSlashWhiteHalf("notehead slash white half"),
+    noteheadSlashWhiteWhole("notehead slash white whole"),
+    noteheadTriangleDownBlack("notehead triangle down black"),
+    noteShapeDiamondWhite("note shape diamond white"),
+    noteShapeTriangleUpBlack("note shape triangle up black"),
+    noteShapeTriangleUpWhite("note shape triangle up white"),
+    ornamentLinePrall("ornament line prall"),
+    ornamentTremblement("ornament tremblement"),
+    toCoda("to coda"),
+    timeSig11("time signature 11"),
+    timeSig13("time signature 13"),
+    timeSig14("time signature 14"),
+    timeSig4over2("4/2 time signature"),
+    timeSig5over2("5/2 time signature"),
+    timeSig6over2("6/2 time signature"),
+    timeSig9over2("9/2 time signature"),
+    timeSig1over4("1/4 time signature"),
+    timeSig7over4("7/4 time signature"),
+    timeSig8over4("8/4 time signature"),
+    timeSig9over4("9/4 time signature"),
+    timeSig14over4("14/4 time signature"),
+    timeSig4over8("4/8 time signature"),
+    timeSig8over8("8/8 time signature"),
+    timeSig11over8("11/8 time signature"),
+    timeSig13over8("13/8 time signature"),
+    tuplet2("tuplet 2"),
+    tuplet4("tuplet 4"),
+    tuplet5("tuplet 5"),
+    tuplet7("tuplet 7"),
+    tuplet9("tuplet 9"),
+    tupletBracketStart("tuplet bracket start"),
+    tupletBracketEnd("tuplet bracket end"),
+    wiggleSawtooth("wiggle sawtooth"),
+    wiggleVibratoLargeFaster("wiggle vibrato large faster"),
+    wiggleVibratoLargeSlowest("wiggle vibrato large slowest");
 
+    //~ Instance fields ----------------------------------------------------------------------------
     /** Short explanation of the symbol shape. */
     public final String description;
 
+    //~ Constructors -------------------------------------------------------------------------------
     /**
      * Define a symbol shape
      *
@@ -347,4 +444,111 @@ public enum OmrShape
     {
         this.description = description;
     }
+
+    //~ Methods ------------------------------------------------------------------------------------
+    /**
+     * Report whether this is a barline shape.
+     *
+     * @return true if so
+     */
+    public boolean isBarline ()
+    {
+        return BARLINE_SHAPES.contains(this);
+    }
+
+    /**
+     * Report whether the shape is to be ignored for standard processing.
+     *
+     * @return true to ignore
+     */
+    public boolean isIgnored ()
+    {
+        return IGNORED_SHAPES.contains(this);
+    }
+
+    private static final EnumSet<OmrShape> BARLINE_SHAPES = EnumSet.of(
+            barlineSingle,
+            barlineDouble,
+            barlineFinal,
+            barlineReverseFinal,
+            barlineHeavy,
+            barlineHeavyHeavy,
+            barlineDashed,
+            barlineDotted);
+
+    // NOTA: cClef is not ignored per se, but converted on-the-fly to cClefAlto or cClefTenor
+    private static final EnumSet<OmrShape> IGNORED_SHAPES = EnumSet.of(
+            bracketedTuplet2,
+            bracketedTuplet3,
+            bracketedTuplet4,
+            bracketedTuplet5,
+            bracketedTuplet6,
+            bracketedTuplet7,
+            bracketedTuplet9,
+            bracketLine,
+            bracketNormal,
+            bracketSquare,
+            brassMuteClosed,
+            brassMuteOpen,
+            dynamicSforzatoPianissimo,
+            fine,
+            graceNote4,
+            graceNote8,
+            graceNote8_After,
+            graceNote16,
+            graceNote16_After,
+            graceNote32,
+            graceNote32_After,
+            graceNoteSlashStemUp,
+            guitarFadeIn,
+            guitarFadeOut,
+            guitarVolumeSwell,
+            legerLine,
+            luteFingeringRHFirst,
+            noteheadCircleX,
+            noteheadDiamondBlack,
+            noteheadDiamondHalf,
+            noteheadDiamondWhole,
+            noteheadSlashHorizontalEnds,
+            noteheadSlashWhiteHalf,
+            noteheadSlashWhiteWhole,
+            noteheadTriangleDownBlack,
+            noteShapeDiamondWhite,
+            noteShapeTriangleUpBlack,
+            noteShapeTriangleUpWhite,
+            ornamentLinePrall,
+            ornamentTremblement,
+            repeatLeft,
+            repeatRight,
+            repeatRightLeft,
+            stem,
+            toCoda,
+            timeSig11,
+            timeSig13,
+            timeSig14,
+            timeSig4over2,
+            timeSig5over2,
+            timeSig6over2,
+            timeSig9over2,
+            timeSig1over4,
+            timeSig7over4,
+            timeSig8over4,
+            timeSig9over4,
+            timeSig14over4,
+            timeSig4over8,
+            timeSig8over8,
+            timeSig11over8,
+            timeSig13over8,
+            tuplet2,
+            tuplet4,
+            tuplet5,
+            tuplet7,
+            tuplet9,
+            tupletBracketStart,
+            tupletBracketEnd,
+            wiggleSawtooth,
+            wiggleVibratoLargeFaster,
+            wiggleVibratoLargeSlowest,
+            //
+            unknown);
 }

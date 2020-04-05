@@ -1,0 +1,65 @@
+
+
+[defined by -- SOURCE1 SOURCE2 arguments]
+SOURCE                              // Perhaps several source folders
+└── BOOK                            // Perhaps several levels of intermediate folders
+    ├── SHEET.xml                   // Original annotations file
+    ├── SHEET.png                   // Original image file
+    ├── SHEET.omr                   // OMR data on original image
+    ├── SHEET.tablatures.xml        // Detected tablature areas if any
+    ├── SHEET.filtered.xml          // Filtered annotations file
+    ├── SHEET.features.csv          // Symbols + nones features in CSV format (without sheet id)
+    ├── SHEET.controls.png          // Optional control image (original + symbols + nones)
+    └── SHEET.patches               // Optional patch subimages
+        ├── 1-SYMB-SHAPE.png        // First symbol patch in sheet
+        ├── ...
+        └── NN-SYMB-SHAPE.png       // Last symbol patch in sheet
+
+
+
+[defined by option -output XXXXXX]
+XXXXXX
+│
+├── training
+│   ├── global-sheets-map.xml       // Mapping sheet id <-> SHEET.xml
+│   ├── bins
+│   │   ├── bin-01.csv              // Bin #1 of CSV features (with sheet id appended)
+│   │   ├── ...
+│   │   └── bin-NN.csv              // Bin #N of CSV features (with sheet id appended)
+│   └── patch-classifier.zip        // Trained model
+│
+└── analyses                        // Data for local analyses
+    └── iter-M-N                    // Small range of iterations (1 or 2?)
+        ├── iter-M-N.features.csv   // Slice of features used for iterations range
+        ├── 1-SH-SYMB-SHAPE.png     // First patch in features slice
+        ├── ...
+        └── 64-SH-SYMB-SHAPE.png    // Last patch in features slice
+
+
+
+Command line
+Syntax:
+   [OPTIONS] -- [INPUT_FILES]
+
+@file:
+ Content to be extended in line
+
+Options:
+ -1filter           : Step 1: Filter symbols from raw source files
+ -2features         : Step 2: Generate sheet .csv files
+ -3split            : Step 3: Split all sheet .csv files into few csv bins
+ -4train            : Step 4: Train model from csv bins
+
+ -nones             : Generate none symbols (effective on steps 1 & 2)
+ -model <.zip file> : Defines path to model
+ -output <folder>   : Defines output directory
+ -parallel          : Use parallel processing (effective on steps 1 & 2)
+
+ -help              : Displays general help then stops
+ -names             : Print all possible shape names
+ -controls          : Generate control images
+ -histo             : Shape histogram per sheet
+ -patches           : Generate patch images                     
+
+Input file extensions:
+ .xml: annotations file
