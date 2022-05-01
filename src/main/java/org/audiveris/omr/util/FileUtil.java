@@ -80,18 +80,55 @@ public abstract class FileUtil
     public static Path avoidExtensions (Path path,
                                         String... toAvoid)
     {
-        final String pathStr = path.toString().toLowerCase();
+        return path.resolveSibling(avoidExtensions(path.getFileName().toString(), toAvoid));
+    }
+
+    //-------------------//
+    // avoidAnyExtension //
+    //-------------------//
+    /**
+     * Remove any extension(s) from the provided string (file name).
+     *
+     * @param name the file name to check for extensions
+     * @return the string without any extension at all
+     */
+    public static String avoidAnyExtension (String name)
+    {
+        final int li = name.indexOf('.');
+
+        if (li != -1) {
+            return name.substring(0, li);
+        }
+
+        return name;
+    }
+
+    //-----------------//
+    // avoidExtensions //
+    //-----------------//
+    /**
+     * Remove the undesired extensions from the provided string (file name).
+     *
+     * @param name    the file name to check for extensions
+     * @param toAvoid the extensions to avoid (not case-sensitive)
+     * @return the path without any of the undesired extensions
+     * @see #avoidExtensions(Path, String...)
+     */
+    public static String avoidExtensions (String name,
+                                          String... toAvoid)
+    {
+        final String low = name.toLowerCase();
 
         for (String s : toAvoid) {
             final String str = s.toLowerCase();
-            int li = pathStr.lastIndexOf(str);
+            int li = low.lastIndexOf(str);
 
-            if ((li != -1) && ((li + str.length()) == pathStr.length())) {
-                return Paths.get(path.toString().substring(0, li));
+            if ((li != -1) && ((li + str.length()) == low.length())) {
+                return name.substring(0, li);
             }
         }
 
-        return path;
+        return name;
     }
 
     //--------//

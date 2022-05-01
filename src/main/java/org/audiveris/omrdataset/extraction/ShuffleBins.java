@@ -22,7 +22,8 @@
 package org.audiveris.omrdataset.extraction;
 
 import org.audiveris.omr.util.StopWatch;
-import static org.audiveris.omrdataset.training.App.BINS_PATH;
+import org.audiveris.omr.util.ZipWrapper;
+import org.audiveris.omrdataset.Main;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.audiveris.omr.util.FileUtil;
-import org.audiveris.omr.util.ZipWrapper;
 
 /**
  * Class {@code ShuffleBins} shuffles every bin, one after the other in memory.
@@ -58,8 +57,8 @@ public class ShuffleBins
     public void process ()
             throws Exception
     {
-        if (!Files.exists(BINS_PATH)) {
-            logger.warn("Folder {} does not exist", BINS_PATH);
+        if (!Files.exists(Main.binsFolder)) {
+            logger.warn("Folder {} does not exist", Main.binsFolder);
             return;
         }
 
@@ -68,7 +67,7 @@ public class ShuffleBins
 
         // Shuffle every bin
         for (Path binPath : allBins) {
-            logger.info("Shuffling (zipped) {}", binPath);
+            logger.info("Shuffling {}", binPath);
             watch.start("Loading " + binPath);
             final List<String> lines = new ArrayList<>();
 
@@ -110,10 +109,10 @@ public class ShuffleBins
     public static List<Path> getAllBins ()
             throws IOException
     {
-        final Pattern BIN_PATTERN = Pattern.compile("bin-[0-9]+\\.zip");
+        final Pattern BIN_PATTERN = Pattern.compile("bin-[0-9]+\\.csv\\.zip");
         final List<Path> allBins = new ArrayList<>();
         Files.walkFileTree(
-                BINS_PATH,
+                Main.binsFolder,
                 new SimpleFileVisitor<Path>()
         {
             @Override
@@ -126,8 +125,7 @@ public class ShuffleBins
                 final Matcher m = BIN_PATTERN.matcher(fn);
 
                 if (m.matches()) {
-                    final String newName = FileUtil.getNameSansExtension(path) + ".csv";
-                    allBins.add(path.resolveSibling(newName));
+                    allBins.add(path);
                 }
 
                 return FileVisitResult.CONTINUE;

@@ -24,7 +24,15 @@ package org.audiveris.omrdataset.api;
 import java.util.EnumSet;
 
 /**
- * Class {@code OmrShape} is the OMR-Dataset definition of symbol shapes.
+ * Class {@code FullOmrShape} is the former version of OmrShape.
+ * <h3>Enum organization</h3>
+ * <ol>
+ * <li>the none shape.
+ * <li>the shapes used in head processing: note heads, beam hook.
+ * <li>the shapes used in general purpose processing: all DeepScores shapes except head ones.
+ * <li>the shapes potentially used by MuseScore but not by DeepScores.
+ * </ol>
+ * <h3>Genesis of this list</h3>
  * <p>
  * This is a small subset of the list of symbol names described by SMuFL specification available at
  * <a href="http://www.smufl.org/">http://www.smufl.org/</a>.
@@ -41,8 +49,8 @@ import java.util.EnumSet;
  * <li><b>none</b>.
  * This is a special name to indicate the absence of any valid symbol.
  * <li><b>arpeggiato</b>.
- * We could find only arpeggiato's ending with an arrow head, either {@code arpeggiatoUp} or
- * {@code arpeggiatoDown}.
+ * We could find only arpeggiato ending with an arrow head, either <b>arpeggiatoUp</b> or
+ * <b>arpeggiatoDown</b>.
  * <li><b>keyFlat</b>, <b>keyNatural</b>, <b>keySharp</b>.
  * They represent flat, natural and sharp signs within a key signature.
  * We hope that full-context training will allow to recognize them as such.
@@ -55,7 +63,9 @@ import java.util.EnumSet;
  */
 public enum OmrShape
 {
-    none("No valid shape"),
+
+    //~ Static fields/initializers -----------------------------------------------------------------
+    none("No valid shape for current processing"),
 
     //
     // 4.1 Staff brackets and dividers
@@ -351,10 +361,11 @@ public enum OmrShape
     fingeringILower("Fingering i (indicio; right-hand index finger for guitar)"),
     fingeringMLower("Fingering m (medio; right-hand middle finger for guitar)"),
     fingeringALower("Fingering a (anular; right-hand ring finger for guitar)"),
-    //
+    // =============================================================================================
     // NOT YET HANDLED symbols (though found in MuseScore input)
     //
     unknown("abnormal symbol in MuseScore input"),
+    // =============================================================================================
     //
     cClef("C Clef with no precise position"), // Hack for MuseScore cClef samples
     cClefChange("C Clef change with no precise position"), // Hack for MuseScore cClef samples
@@ -440,7 +451,7 @@ public enum OmrShape
      *
      * @param description textual symbol description
      */
-    OmrShape (String description)
+    private OmrShape (String description)
     {
         this.description = description;
     }
@@ -455,16 +466,17 @@ public enum OmrShape
     {
         return BARLINE_SHAPES.contains(this);
     }
-
-    /**
-     * Report whether the shape is to be ignored for standard processing.
-     *
-     * @return true to ignore
-     */
-    public boolean isIgnored ()
-    {
-        return IGNORED_SHAPES.contains(this);
-    }
+//
+//    /**
+//     * Report whether the shape is to be ignored for standard processing.
+//     *
+//     * @return true to ignore
+//     */
+//    public boolean isIgnored ()
+//    {
+//        return IGNORED_SHAPES.contains(this);
+//    }
+//
 
     private static final EnumSet<OmrShape> BARLINE_SHAPES = EnumSet.of(
             barlineSingle,

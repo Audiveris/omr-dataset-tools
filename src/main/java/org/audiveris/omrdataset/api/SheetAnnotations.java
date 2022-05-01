@@ -22,6 +22,7 @@
 package org.audiveris.omrdataset.api;
 
 import org.audiveris.omr.util.Jaxb;
+import org.audiveris.omrdataset.Main;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +144,7 @@ public class SheetAnnotations
      */
     public List<SymbolInfo> getGoodSymbols ()
     {
-        return SymbolInfo.getGoodSymbols(symbols);
+        return SymbolInfo.getGoodSymbols(symbols, Main.context);
     }
 
     /**

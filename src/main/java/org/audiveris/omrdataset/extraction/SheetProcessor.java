@@ -21,6 +21,8 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
+import java.awt.Graphics2D;
+import org.audiveris.omr.util.FileUtil;
 import org.audiveris.omr.util.StopWatch;
 import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
@@ -28,23 +30,28 @@ import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
 import org.audiveris.omrdataset.api.TablatureAreas;
 import org.audiveris.omrdataset.api.ZhawAnnotations;
-import org.audiveris.omrdataset.training.App;
+import org.audiveris.omrdataset.extraction.SourceInfo.Collection;
+import org.audiveris.omrdataset.extraction.SourceInfo.XmlFormat;
+import org.audiveris.omrdataset.extraction.SourceInfo.USheetId;
 import static org.audiveris.omrdataset.training.App.CONTROL_EXT;
 import static org.audiveris.omrdataset.training.App.CONTROL_FOLDER_NAME;
+import static org.audiveris.omrdataset.training.App.CSV_EXT;
 import static org.audiveris.omrdataset.training.App.FEATURES_FOLDER_NAME;
 import static org.audiveris.omrdataset.training.App.FILTERED_EXT;
 import static org.audiveris.omrdataset.training.App.FILTERED_FOLDER_NAME;
+import static org.audiveris.omrdataset.training.App.IMAGES_FOLDER_NAME;
+import static org.audiveris.omrdataset.training.App.INFO_EXT;
 import static org.audiveris.omrdataset.training.App.MAX_SYMBOL_SCALE;
 import static org.audiveris.omrdataset.training.App.NONE_RATIO;
+import static org.audiveris.omrdataset.training.App.NONES_EXT;
+import static org.audiveris.omrdataset.training.App.NONES_FOLDER_NAME;
 import static org.audiveris.omrdataset.training.App.PATCHES_FOLDER_NAME;
 import static org.audiveris.omrdataset.training.App.TABLATURES_EXT;
-import org.audiveris.omrdataset.training.Context.SourceType;
+import static org.audiveris.omrdataset.training.App.TABLATURES_FOLDER_NAME;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,41 +87,45 @@ public class SheetProcessor
     }
 
     //~ Instance fields ----------------------------------------------------------------------------
-    /** Unique sheet id. */
-    private final int sheetId;
+    /** Universal sheet id. */
+    private final USheetId uSheetId;
 
-    /** Path to sheet (SHEET.xml) annotations file. */
+    /**
+     * Path to raw sheet (SHEET.xml) annotations file.
+     * Read from archive-N/<b>xml_annotations</b> folder.
+     */
     private final Path infoPath;
 
-    /** Path to sheet (SHEET.tablatures.xml) tablatures file, if any. */
+    /**
+     * Path to sheet (SHEET.tablatures.xml) tablatures file, if any.
+     * Found in archive-N/<b>tablatures</b> folder.
+     */
     private final Path tablaturesPath;
 
-    /** Path to sheet filtered (SHEET.filtered.xml) annotations file. */
+    /**
+     * Path to sheet filtered (SHEET.filtered.xml) annotations file.
+     * Written in archive-N/<b>filtered</b> folder
+     */
     private final Path filteredPath;
 
     /** Sheet name radix (sans extension). */
     private final String radix;
 
-    /** Sheet folder. */
-    private final Path sheetFolder;
-
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Creates a new {@code SheetProcessor} object.
      *
-     * @param sheetId  sheet id (strictly positive)
-     * @param infoPath path to sheet info file (.xml)
+     * @param uSheetId universal sheet id
      */
-    public SheetProcessor (int sheetId,
-                           Path infoPath)
+    public SheetProcessor (USheetId uSheetId)
     {
-        this.sheetId = sheetId;
-        this.infoPath = infoPath;
+        this.uSheetId = uSheetId;
+        this.infoPath = SourceInfo.getPath(uSheetId);
 
-        radix = Utils.sansExtension(infoPath.getFileName().toString());
-        sheetFolder = infoPath.getParent();
-        tablaturesPath = sheetFolder.resolve(radix + TABLATURES_EXT);
-        filteredPath = sheetFolder.resolveSibling(FILTERED_FOLDER_NAME)
+        radix = FileUtil.avoidExtensions(infoPath.getFileName().toString(), INFO_EXT);
+        tablaturesPath = Main.archiveFolder.resolve(TABLATURES_FOLDER_NAME)
+                .resolve(radix + TABLATURES_EXT);
+        filteredPath = Main.archiveFolder.resolve(FILTERED_FOLDER_NAME)
                 .resolve(radix + FILTERED_EXT);
     }
 
@@ -137,11 +148,14 @@ public class SheetProcessor
             SheetAnnotations annotations = null;
             BufferedImage initialImg = null;
 
-            // Run step #1 (source filtering)?
-            //--------------------------------
-            if (Main.cli.source != null) {
+            if (Main.cli.filter) {
+                // Run step #1 (source filtering)?
+                //--------------------------------
+                // This step is mandatory for the very first use of the (raw) sheet annotations
+                // which are converted/checked and then saved as filtered sheet annotations.
                 watch.start("source");
-                annotations = (Main.cli.source == SourceType.ZHAW)
+                Collection collection = uSheetId.getCollectionId().getCollection();
+                annotations = (collection.getXmlFormat() == XmlFormat.ZHAW)
                         ? ZhawAnnotations.unmarshal(infoPath).toSheetAnnotations()
                         : SheetAnnotations.unmarshal(infoPath);
                 logger.info("{} {}", id(), annotations);
@@ -167,7 +181,7 @@ public class SheetProcessor
                 }
 
                 // More serious checks on symbols, which may discard some of them
-                new Filter(sheetId, annotations, tablatures).process();
+                new Filter(uSheetId, annotations, tablatures).process();
 
                 // Save filtered annotations
                 watch.start("save filtered");
@@ -178,9 +192,10 @@ public class SheetProcessor
 
             // From now on, we require the *filtered* annotations
             //
-            // Run step #2 (nones)?
-            //------------------------
             if (Main.cli.nones) {
+                // Run step #2 (nones)?
+                //---------------------
+                // This step augments the filtered annotations with artificial "none" annotations
                 watch.start("nones");
                 if (annotations == null) {
                     annotations = SheetAnnotations.unmarshal(filteredPath);
@@ -192,20 +207,22 @@ public class SheetProcessor
                 // Augment annotations with none symbols
                 int nb = (int) Math.rint(NONE_RATIO * annotations.getGoodSymbols().size());
                 logger.info("{} Creating {} none symbols", id(), nb);
+                Path nonesPath = Main.contextFolder.resolve(NONES_FOLDER_NAME)
+                        .resolve(radix + NONES_EXT);
                 annotations.getOuterSymbolsLiveList().addAll(
-                        new NonesBuilder(sheetId, annotations).insertNones(nb));
+                        new NonesBuilder(uSheetId, annotations, nonesPath).insertNones(nb));
                 annotations.marshall(filteredPath);
             }
 
-            // Histogram? (optional)
             if (Main.cli.histo) {
+                // Histogram? (optional)
                 watch.start("histo");
                 if (annotations == null) {
                     annotations = SheetAnnotations.unmarshal(filteredPath);
                 }
 
                 // Print out shape histogram for each sheet
-                new Histogram(sheetId, annotations).print();
+                new Histogram(uSheetId, annotations).print();
             }
 
             // Control? (optional)
@@ -216,15 +233,17 @@ public class SheetProcessor
                 }
 
                 // Generate control images for visual checking
+                // All symbols in sheet displayed with their bounds in blue
+                // Plus the none locations if any, displayed as small red crosses
                 initialImg = getImage(getImagePath(infoPath, annotations.getSheetInfo()));
-                Path controlPath = sheetFolder.resolveSibling(CONTROL_FOLDER_NAME)
+                Path controlPath = Main.contextFolder.resolve(CONTROL_FOLDER_NAME)
                         .resolve(radix + CONTROL_EXT);
-                new Control(sheetId, annotations).build(controlPath, initialImg);
+                new Control(uSheetId, annotations).build(controlPath, initialImg);
             }
 
-            // Run step #3 (features)?
-            //------------------------
             if (Main.cli.features) {
+                // Run step #3 (features)?
+                //------------------------
                 if (annotations == null) {
                     annotations = SheetAnnotations.unmarshal(filteredPath);
                 }
@@ -233,22 +252,24 @@ public class SheetProcessor
                     initialImg = getImage(getImagePath(infoPath, annotations.getSheetInfo()));
                 }
 
-                // Extract features for each symbol definition in the sheet
+                // Extract features in the sheet for each symbol definition
+                // relevant for the current context (for example: just heads and nones).
+                // Features are patch pixel values written in compressed CSV format
                 watch.start("features");
-                final Path featuresPath = sheetFolder.resolveSibling(FEATURES_FOLDER_NAME)
-                        .resolve(radix + App.FEATURES_EXT);
-                new Features(sheetId, annotations).extract(initialImg, featuresPath);
+                final Path featuresPath = Main.contextFolder.resolve(FEATURES_FOLDER_NAME)
+                        .resolve(radix + CSV_EXT);
+                new Features(uSheetId, annotations).extract(initialImg, featuresPath);
             }
 
-            // Patches? (optional)
             if (Main.cli.patches) {
+                // Patches? (optional)
+                // Generate patch images meant for visual checking
                 watch.start("patches");
-                // Generate patch images for visual checking
-                final Path featuresPath = sheetFolder.resolveSibling(FEATURES_FOLDER_NAME)
-                        .resolve(radix + App.FEATURES_EXT);
-                new Patches(sheetId,
+                final Path featuresPath = Main.contextFolder.resolve(FEATURES_FOLDER_NAME)
+                        .resolve(radix + CSV_EXT);
+                new Patches(uSheetId,
                             featuresPath,
-                            sheetFolder.resolveSibling(PATCHES_FOLDER_NAME).resolve(radix))
+                            Main.contextFolder.resolve(PATCHES_FOLDER_NAME).resolve(radix))
                         .process();
             }
 
@@ -263,30 +284,7 @@ public class SheetProcessor
     //----//
     private String id ()
     {
-        return "sheetId:" + sheetId;
-    }
-
-    //-------//
-    // scale //
-    //-------//
-    /**
-     * Build a scaled version of an image.
-     *
-     * @param img   image to scale
-     * @param ratio scaling ratio
-     * @return the scaled image
-     */
-    public static BufferedImage scale (BufferedImage img,
-                                       double ratio)
-    {
-        AffineTransform at = AffineTransform.getScaleInstance(ratio, ratio);
-        AffineTransformOp atop = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        BufferedImage scaledImg = new BufferedImage(
-                (int) Math.ceil(img.getWidth() * ratio),
-                (int) Math.ceil(img.getHeight() * ratio),
-                img.getType());
-
-        return atop.filter(img, scaledImg);
+        return uSheetId.toString();
     }
 
     //---------------------//
@@ -323,12 +321,21 @@ public class SheetProcessor
         BufferedImage img = ImageIO.read(imgPath.toFile());
         logger.info("{} Loaded image {}", id(), imgPath);
 
-        if (img.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-            throw new RuntimeException("Wrong image type=" + img.getType() + " " + imgPath);
-            // ZHAW png files use type TYPE_3BYTE_BGR instead of a gray image.
+        if (img.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+            return img;
         }
 
-        return img;
+        long start = System.currentTimeMillis();
+        BufferedImage converted = new BufferedImage(img.getWidth(),
+                                                    img.getHeight(),
+                                                    BufferedImage.TYPE_BYTE_GRAY);
+        Graphics2D g = converted.createGraphics();
+        g.drawImage(img, null, null);
+        g.dispose();
+        long dur = System.currentTimeMillis() - start;
+        logger.info("Converting wrong image type {} {} in {} ms", img.getType(), imgPath, dur);
+
+        return converted;
     }
 
     //--------------//
@@ -346,13 +353,8 @@ public class SheetProcessor
             return null;
         }
 
-        final Path imgPath;
-        if (Main.cli.source == SourceType.ZHAW) {
-            Path imgDir = infoPath.getParent().resolveSibling("gray_images_png");
-            imgPath = imgDir.resolve(fileName);
-        } else {
-            imgPath = infoPath.resolveSibling(fileName);
-        }
+        final Path imgDir = infoPath.getParent().resolveSibling(IMAGES_FOLDER_NAME);
+        final Path imgPath = imgDir.resolve(fileName);
 
         return imgPath;
     }

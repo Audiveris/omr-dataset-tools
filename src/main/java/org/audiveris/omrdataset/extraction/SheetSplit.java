@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------//
 //                                                                                                //
-//                                            S p l i t                                           //
+//                                       S h e e t S p l i t                                      //
 //                                                                                                //
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
@@ -21,15 +21,10 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
-import org.audiveris.omr.util.FileUtil;
 import org.audiveris.omr.util.ZipWrapper;
 import org.audiveris.omrdataset.Main;
-import static org.audiveris.omrdataset.Main.executors;
-import static org.audiveris.omrdataset.Main.processors;
-import static org.audiveris.omrdataset.training.App.BINS_PATH;
 import static org.audiveris.omrdataset.training.App.BIN_COUNT;
-import static org.audiveris.omrdataset.training.App.FEATURES_ZIP;
-import static org.audiveris.omrdataset.training.App.SHEETS_MAP_PATH;
+import static org.audiveris.omrdataset.training.App.CSV_EXT;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +40,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -53,8 +47,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class {@code Split} collects all sheet features and split them into a small number of
- * bin-xx.zip csv files, so that each file can be separately fully loaded in memory.
+ * Class {@code SheetSplit} collects all sheet features and split them into a small number
+ * of bin-xx.csv.zip files, so that each file can be separately fully loaded in memory.
  * <p>
  * Randomization is implemented at two levels:
  * <ol>
@@ -64,11 +58,12 @@ import java.util.regex.Pattern;
  *
  * @author Hervé Bitteur
  */
-public class Split
+@Deprecated // Replaced by split from the shape tally (see TallySplit)
+public class SheetSplit
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(Split.class);
+    private static final Logger logger = LoggerFactory.getLogger(SheetSplit.class);
 
     private static final Pattern BIN_PATTERN = Pattern.compile("bin-[0-9]+\\.zip");
 
@@ -83,7 +78,7 @@ public class Split
     private int nextSheetIndex;
 
     //~ Constructors -------------------------------------------------------------------------------
-    public Split ()
+    public SheetSplit ()
     {
 
     }
@@ -113,8 +108,7 @@ public class Split
 
         allSheetFeatures = getAllSheetFeatures();
 
-        saveSheetIndex();
-
+        ///saveSheetIndex();
         processSheets(); // Perhaps in parallel
 
         // Close all bins
@@ -144,7 +138,7 @@ public class Split
     {
         final Random random = new Random();
         final Path virtualPath = allSheetFeatures.get(sheetId - 1);
-        logger.info("Split sheetId: {} (zipped) {}", sheetId, virtualPath);
+        logger.info("Split {} {}", sheetId, virtualPath);
 
         try {
             final ZipWrapper zin = ZipWrapper.open(virtualPath);
@@ -179,8 +173,7 @@ public class Split
     private void processSheets ()
             throws Exception
     {
-
-        final Callable task = new Callable()
+        Main.processAll(new Callable<Void>()
         {
             @Override
             public Void call ()
@@ -199,23 +192,7 @@ public class Split
 
                 return null;
             }
-        };
-
-        if (Main.cli.parallel) {
-            final Collection<Callable<Void>> tasks = new ArrayList<>();
-
-            for (int i = 0; i < processors; i++) {
-                tasks.add(task);
-            }
-
-            logger.info("Start of parallel processing of sheets");
-            executors.invokeAll(tasks);
-            logger.info("End of parallel processing of sheets");
-        } else {
-            logger.info("Start of sequential processing of sheets");
-            task.call();
-            logger.info("End of sequential processing of sheets");
-        }
+        });
     }
 
     //--------------//
@@ -235,8 +212,7 @@ public class Split
         List<ZipPrintWriter> list = new ArrayList<>();
 
         for (int b = 1; b <= BIN_COUNT; b++) {
-            String radix = String.format("bin-%02d", b);
-            ZipWrapper wrapper = ZipWrapper.create(BINS_PATH.resolve(radix + ".csv"));
+            ZipWrapper wrapper = ZipWrapper.create(Main.binPath(b));
             ZipPrintWriter zpw = new ZipPrintWriter(wrapper, wrapper.newPrintWriter());
             list.add(zpw);
         }
@@ -259,25 +235,23 @@ public class Split
             if (!Files.exists(input)) {
                 logger.warn("Could not find {}", input);
             } else {
-                Files.walkFileTree(
-                        input,
-                        new SimpleFileVisitor<Path>()
-                {
-                    @Override
-                    public FileVisitResult visitFile (Path path,
-                                                      BasicFileAttributes attrs)
-                            throws IOException
-                    {
-                        // We look for "SHEET.features.zip", and store "SHEET.features.csv"
-                        String fn = path.getFileName().toString();
-                        if (fn.endsWith(FEATURES_ZIP)) {
-                            String newName = FileUtil.getNameSansExtension(path) + ".csv";
-                            list.add(path.resolveSibling(newName));
-                        }
+                Files.walkFileTree(input,
+                                   new SimpleFileVisitor<Path>()
+                           {
+                               @Override
+                               public FileVisitResult visitFile (Path path,
+                                                                 BasicFileAttributes attrs)
+                                       throws IOException
+                               {
+                                   // We look for "SHEET.csv.zip"
+                                   String fn = path.getFileName().toString();
+                                   if (fn.endsWith(CSV_EXT)) {
+                                       list.add(path);
+                                   }
 
-                        return FileVisitResult.CONTINUE;
-                    }
-                });
+                                   return FileVisitResult.CONTINUE;
+                               }
+                           });
             }
         }
 
@@ -294,9 +268,9 @@ public class Split
     {
         final List<Path> allBins = new ArrayList<>();
 
-        if (Files.exists(BINS_PATH)) {
+        if (Files.exists(Main.binsFolder)) {
             Files.walkFileTree(
-                    BINS_PATH,
+                    Main.binsFolder,
                     new SimpleFileVisitor<Path>()
             {
                 @Override
@@ -317,30 +291,6 @@ public class Split
             });
         }
         return allBins;
-    }
-
-    //----------------//
-    // saveSheetIndex //
-    //----------------//
-    /**
-     * From the list of feature files, build the index of sheets.
-     *
-     * @return the sheet index
-     * @throws Exception if anything goes wrong
-     */
-    private SheetIndex saveSheetIndex ()
-            throws Exception
-    {
-        SheetIndex index = new SheetIndex();
-
-        for (Path path : allSheetFeatures) {
-            index.getId(path);
-        }
-
-        index.marshal(SHEETS_MAP_PATH);
-
-        logger.info("Global sheet map saved at {}", SHEETS_MAP_PATH);
-        return index;
     }
 
     //----------------//

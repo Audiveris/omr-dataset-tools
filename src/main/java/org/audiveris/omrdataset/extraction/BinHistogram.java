@@ -21,27 +21,25 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
+import org.audiveris.omr.util.ZipWrapper;
+import org.audiveris.omrdataset.Main;
+import org.audiveris.omrdataset.api.OmrShape;
+import static org.audiveris.omrdataset.api.OmrShapes.OMR_SHAPES;
+import static org.audiveris.omrdataset.api.Patch.parseLabel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import org.audiveris.omrdataset.api.OmrShape;
-import static org.audiveris.omrdataset.training.App.BINS_PATH;
-import static org.audiveris.omrdataset.training.Context.CSV_LABEL;
-import org.datavec.api.records.reader.RecordReader;
-import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
-import org.datavec.api.split.FileSplit;
-import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class {@code BinHistogram} computes a histogram of all shapes present in a collection
- * of .csv files.
+ * of .csv.zip files.
  *
  * @author Hervé Bitteur
  */
@@ -51,10 +49,10 @@ public class BinHistogram
     //~ Static fields/initializers -----------------------------------------------------------------
     private static final Logger logger = LoggerFactory.getLogger(BinHistogram.class);
 
-    private static final int numClasses = OmrShape.unknown.ordinal();
-
     //~ Instance fields ----------------------------------------------------------------------------
-    private final Map<OmrShape, Integer> histo = new EnumMap<>(OmrShape.class);
+    private final Class labelClass = Main.context.getLabelClass();
+
+    private final Map<Object, Integer> histo = new EnumMap<>(labelClass);
 
     //~ Constructors -------------------------------------------------------------------------------
     public BinHistogram ()
@@ -66,44 +64,38 @@ public class BinHistogram
             throws Exception
     {
         for (int bin : bins) {
-            String name = String.format("bin-%02d.csv", bin);
-            Path featuresPath = BINS_PATH.resolve(name);
-            logger.info("Populating histogram with {}", featuresPath);
+            ///String name = String.format("limited-bin-%02d.csv.zip", bin);
+            Path inPath = Main.binPath(bin);
+            logger.info("Populating histogram with {}", inPath);
 
-            if (!Files.exists(featuresPath)) {
-                logger.warn("Could not find {}", featuresPath);
+            if (!Files.exists(inPath)) {
+                logger.warn("Could not find {}", inPath);
             } else {
-                int it = 0;
-                RecordReader recordReader = new CSVRecordReader(0, ',');
-                recordReader.initialize(new FileSplit(featuresPath.toFile()));
-                int batchSize = 500;
-                DataSetIterator iterator = new RecordReaderDataSetIterator(
-                        recordReader, batchSize, CSV_LABEL, numClasses, -1);
+                final ZipWrapper zin = ZipWrapper.open(inPath);
+                final BufferedReader br = zin.newBufferedReader();
 
-                while (iterator.hasNext()) {
-                    final DataSet dataSet = iterator.next();
-                    final INDArray labels = dataSet.getLabels();
-                    final int rows = labels.rows();
-                    it++;
-                    logger.info("   it:{} processing {} rows", it, rows);
+                String line;
 
-                    for (int r = 0; r < rows; r++) {
-                        final OmrShape shape = getShape(labels.getRow(r));
-                        final Integer count = histo.get(shape);
+                while ((line = br.readLine()) != null) {
+                    final String[] cols = line.split(",");
+                    final Enum shape = parseLabel(cols, Main.context);
+                    final Integer count = histo.get(shape);
 
-                        if (count == null) {
-                            histo.put(shape, 1);
-                        } else {
-                            histo.put(shape, count + 1);
-                        }
+                    if (count == null) {
+                        histo.put(shape, 1);
+                    } else {
+                        histo.put(shape, count + 1);
                     }
                 }
+
+                br.close();
+                zin.close();
             }
         }
     }
 
     /**
-     * Print the proportion for each shape present in current sheet.
+     * Print the proportion for each shape present in histogram.
      */
     public void print ()
     {
@@ -114,39 +106,27 @@ public class BinHistogram
         }
 
         StringBuilder sb = new StringBuilder();
-        // Non-empty buckets
-        for (Map.Entry<OmrShape, Integer> entry : histo.entrySet()) {
-            int count = entry.getValue();
-            double ratio = count / (double) total;
-            sb.append(String.format("%n%7d %.3f ", count, ratio)).append(entry.getKey());
+//        // Non-empty buckets
+//        for (Map.Entry<OmrShape, Integer> entry : histo.entrySet()) {
+//            int count = entry.getValue();
+//            double ratio = count / (double) total;
+//            sb.append(String.format("%n%7d %.3f ", count, ratio)).append(entry.getKey());
+//        }
+        // All buckets
+        for (OmrShape shape : OMR_SHAPES) {
+            Integer count = histo.get(shape);
+            if (count == null) {
+                sb.append("\n              ").append(shape);
+                count = 0;
+            } else {
+                double ratio = count / (double) total;
+                sb.append(String.format("%n%7d %.3f ", count, ratio)).append(shape);
+            }
         }
 
         sb.append(String.format("%n%7d 100.0", total));
 
-        logger.info(" histogram:\n{}", sb);
+        logger.info("histogram:\n{}", sb);
     }
-
-    //----------//
-    // getShape //
-    //----------//
-    /**
-     * Report the shape name indicated in the labels vector.
-     *
-     * @param labels the labels vector (1.0 for a shape, 0.0 for the others)
-     * @return the shape name
-     */
-    private OmrShape getShape (INDArray labels)
-    {
-        for (int c = 0; c < numClasses; c++) {
-            double val = labels.getDouble(c);
-
-            if (val != 0) {
-                return OmrShape.values()[c];
-            }
-        }
-
-        return null;
-    }
-
 //~ Inner Classes ------------------------------------------------------------------------------
 }

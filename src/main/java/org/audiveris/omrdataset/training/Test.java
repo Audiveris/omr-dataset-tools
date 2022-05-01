@@ -21,25 +21,35 @@
 // </editor-fold>
 package org.audiveris.omrdataset.training;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.audiveris.omr.util.StopWatch;
+import org.audiveris.omrdataset.Main;
+import org.audiveris.omrdataset.api.Context;
+import org.audiveris.omrdataset.api.OmrEvaluation;
 import org.audiveris.omrdataset.api.OmrShape;
-import org.audiveris.omrdataset.api.OmrShapes;
-import static org.audiveris.omrdataset.training.App.BATCH_SIZE;
-import static org.audiveris.omrdataset.training.App.BINS_PATH;
+import static org.audiveris.omrdataset.api.OmrShapes.OMR_SHAPES;
+import org.audiveris.omrdataset.api.Patch;
+import static org.audiveris.omrdataset.api.Patch.UPatch.parseUPatch;
+import org.audiveris.omrdataset.extraction.SourceInfo;
+import org.audiveris.omrdataset.extraction.SourceInfo.UArchiveId;
+import static org.audiveris.omrdataset.training.App.MISTAKES_FOLDER_NAME;
 import static org.audiveris.omrdataset.training.App.MODEL_PATH;
-import static org.audiveris.omrdataset.training.Context.CSV_LABEL;
-import org.datavec.api.records.reader.RecordReader;
-import org.datavec.api.split.FileSplit;
-import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.util.ModelSerializer;
-import org.nd4j.evaluation.classification.Evaluation;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.api.DataSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.util.ModelSerializer;
+import org.nd4j.linalg.api.ndarray.INDArray;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.zip.ZipInputStream;
 
 /**
  * Class {@code Test}
@@ -52,12 +62,12 @@ public class Test
     //~ Static fields/initializers -----------------------------------------------------------------
     private static final Logger logger = LoggerFactory.getLogger(Test.class);
 
-    private static final int numClasses = OmrShape.unknown.ordinal();
+    public static final double MIN_GRADE = 0.01;
     //~ Instance fields ----------------------------------------------------------------------------
 
     //~ Constructors -------------------------------------------------------------------------------
     //~ Methods ------------------------------------------------------------------------------------
-    public void process ()
+    public void process (Path testPath)
             throws Exception
     {
         StopWatch watch = new StopWatch("Test");
@@ -68,105 +78,178 @@ public class Test
         }
 
         watch.start("Restoring model");
-        ComputationGraph model = ModelSerializer.restoreComputationGraph(MODEL_PATH.toFile(), false);
+        ///ComputationGraph model = ModelSerializer.restoreComputationGraph(MODEL_PATH.toFile(), false);
+        MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(MODEL_PATH.toFile(),
+                                                                           false);
         logger.info("Model restored from {}", MODEL_PATH.toAbsolutePath());
 
-        watch.start("Creating iterator");
-        Path testPath = BINS_PATH.resolve("bin-10.csv");
-        RecordReader testRecordReader = new Training.MyCSVRecordReader(0, ',');
-        testRecordReader.initialize(new FileSplit(testPath.toFile()));
-        int maxNumBatches = 1;
-        RecordReaderDataSetIterator testIter = new RecordReaderDataSetIterator(
-                testRecordReader, BATCH_SIZE, CSV_LABEL, numClasses, maxNumBatches);
-        testIter.setPreProcessor(new PixelPreProcessor());
-        //Instruct the iterator to collect metadata, and store it in the DataSet objects
-        testIter.setCollectMetaData(true);
+        watch.start("Testing");
         logger.info("Getting test dataset from {} ...", testPath);
+        final ZipInputStream zis = new ZipInputStream(Files.newInputStream(testPath));
+        zis.getNextEntry();
 
-        OmrShape[] shapes = OmrShape.values();
+        UArchiveId uArchiveId = SourceInfo.lookupArchiveId(testPath);
+        Path fileName = testPath.getFileName();
+        Path mistakesFolder = SourceInfo.getPath(uArchiveId).resolve(MISTAKES_FOLDER_NAME);
+        Files.createDirectories(mistakesFolder);
+//
+//        Path mistakesPath = mistakesFolder.resolve(fileName);
+//        final ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(mistakesPath));
+//        zos.putNextEntry(new ZipEntry(FileUtil.getNameSansExtension(mistakesPath)));
 
-        // Test sample per sample
-        while (testIter.hasNext()) {
-            DataSet testData = testIter.next();
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(zis, UTF_8)); //             final PrintWriter pw = new PrintWriter(
+                //                     new BufferedWriter(new OutputStreamWriter(zos, UTF_8)))
+                ) {
+            final Context context = Main.context;
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                final Patch.UPatch uPatch = parseUPatch(line, context);
+                final INDArray pixels = uPatch.pixelsArray();
+
+                long start = System.currentTimeMillis();
+                ///final INDArray preds = model.outputSingle(pixels);
+                final INDArray preds = model.output(pixels);
+                long stop = System.currentTimeMillis();
+                System.out.println("model.outputSingle in " + (stop - start) + " ms");
+
+                // Extract and sort evaluations
+                final List<OmrEvaluation> evalList = new ArrayList<>();
+
+                for (int iShape = 0; iShape < preds.length(); iShape++) {
+                    OmrShape omrShape = OMR_SHAPES[iShape];
+                    double grade = preds.getDouble(iShape);
+                    evalList.add(new OmrEvaluation(omrShape, grade));
+                }
+
+                Collections.sort(evalList);
+
+                final String topPreds = topPredictions(evalList);
+                System.out.println(
+                        String.format("%-15s %s ->%s", uPatch.uSymbolId, uPatch.label, topPreds));
 //
-//            Evaluation multEval = new Evaluation(numClasses);
-//            INDArray[] output = model.output(testData.getFeatures());
-//            multEval.eval(testData.getLabels(), output);
-//            logger.info(multEval.stats());
+//                final OmrShape inferred = evalList.get(0).omrShape;
+//                if (inferred != uPatch.shape) {
+//                    WrongPatch wPatch = new WrongPatch(inferred, uPatch);
+//                    pw.println(wPatch.toCsv());
+//                }
+            }
+        }
+
+        watch.print();
+    }
+
+    //----------------//
+    // topPredictions //
+    //----------------//
+    private String topPredictions (List<OmrEvaluation> evalList)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for (OmrEvaluation ev : evalList) {
+            if (ev.grade < 0.01) {
+                break;
+            }
+
+            sb.append(String.format(" %.2f:", ev.grade)).append(ev.omrShape);
+        }
+
+        return sb.toString();
+    }
+    //~ Inner Classes ------------------------------------------------------------------------------
 //
-//            final INDArray features = dataSet.getFeatures();
-//            logger.info("features rank:{} shape:{}", features.rank(), features.shape());
-//            logger.info("features rows:{} cols:{}", features.rows(), features.columns());
+//    //----------//
+//    // getShape //
+//    //----------//
+//    /**
+//     * Report the shape name indicated in the labels vector.
+//     *
+//     * @param labels the labels vector (1.0 for a shape, 0.0 for the others)
+//     * @return the shape name
+//     */
+//    private OmrShape getShape (INDArray labels)
+//    {
+//        for (int c = 0; c < NUM_CLASSES; c++) {
+//            double val = labels.getDouble(c);
 //
-//            final INDArray labels = dataSet.getLabels();
-//            logger.info("labels rows:{} cols:{}", labels.rows(), labels.columns());
+//            if (val != 0) {
+//                return OMR_SHAPES[c];
+//            }
+//        }
 //
+//        return null;
+//    }
+
+//    public void process (Path testPath)
+//            throws Exception
+//    {
+//        StopWatch watch = new StopWatch("Test");
+//
+//        if (!Files.exists(MODEL_PATH)) {
+//            logger.warn("Could not find model at {}", MODEL_PATH);
+//            return;
+//        }
+//
+//        watch.start("Restoring model");
+//        ComputationGraph model = ModelSerializer.restoreComputationGraph(MODEL_PATH.toFile(), false);
+//        logger.info("Model restored from {}", MODEL_PATH.toAbsolutePath());
+//
+//        watch.start("Creating iterator");
+//        int maxNumBatches = -1;
+//        logger.info("maxNumBatches: {}", maxNumBatches);
+//
+//        RecordReader testRecordReader = new CSVRecordReader(0, ',');
+//        RecordReaderDataSetIterator testIter = new RecordReaderDataSetIterator(
+//                testRecordReader, BATCH_SIZE, CSV_LABEL, NUM_CLASSES, maxNumBatches);
+//
+//        final ZipWrapper zinTest = ZipWrapper.open(testPath);
+//        final InputStream testIs = zinTest.newInputStream();
+//        testRecordReader.initialize(new InputStreamInputSplit(testIs));
+//
+//        //Instruct the iterator to collect metadata, and store it in the DataSet objects
+//        testIter.setCollectMetaData(true);
+//        logger.info("Getting test dataset from {} ...", testPath);
+//
+//        // Test sample per sample
+//        while (testIter.hasNext()) {
+//            DataSet testData = testIter.next();
+//            final INDArray features = testData.getFeatures();
+//            final INDArray labels = testData.getLabels();
 //            final int rows = features.rows();
 //
 //            for (int r = 0; r < rows; r++) {
-//                INDArray row = features.getRow(r);
 //                INDArray label = labels.getRow(r);
 //                OmrShape expected = getShape(label);
 //
-//                INDArray reshapedRow = row.reshape(1, 1, CONTEXT_HEIGHT, CONTEXT_WIDTH);
+//                INDArray row = features.getRow(r);
+//                INDArray pixels = row.get(interval(0, NUM_PIXELS));
+//                pixels.divi(255.0); // Normalize pixels
+//                INDArray reshapedPixels = pixels.reshape(1, 1, CONTEXT_HEIGHT, CONTEXT_WIDTH);
 //
-//                INDArray preds = model.outputSingle(reshapedRow);
+//                INDArray preds = model.outputSingle(reshapedPixels);
 //
 //                // Extract and sort evaluations
 //                List<OmrEvaluation> evalList = new ArrayList<>();
 //
 //                for (int iShape = 0; iShape < preds.length(); iShape++) {
-//                    OmrShape omrShape = shapes[iShape];
+//                    OmrShape omrShape = OMR_SHAPES[iShape];
 //                    double grade = preds.getDouble(iShape);
 //                    evalList.add(new OmrEvaluation(omrShape, grade));
 //                }
 //
 //                Collections.sort(evalList);
 //
-//                logger.info("Expected: {}", expected);
-//                for (int guess = 1; guess <= 5; guess++) {
-//                    logger.info("   {}: {}", guess, evalList.get(guess - 1));
-//                }
+//                // BEWARE: label column has been "removed" by testData.getFeatures()
+//                INDArray meta = row.get(interval(CSV_LABEL, CSV_INTERLINE));
+//                USymbolId uSymbolId = SourceInfo.parseSymbolId(meta);
+//                String topPreds = topPredictions(evalList);
+//                System.out.println(String.format("%-15s %s ->%s", uSymbolId, expected, topPreds));
 //            }
-        }
+//        }
 //
-//        Evaluation multEval = new Evaluation(numClasses);
-//        INDArray output = model.output(testData.getFeatures());
-//        multEval.eval(testData.getLabels(), output);
-//        logger.info(multEval.stats());
-
-        // Global evaluation
-        logger.info("Evaluation on {} batches max...", maxNumBatches);
-        watch.start("Evaluation " + maxNumBatches);
-        testIter.reset();
-        Evaluation eval = model.evaluate(testIter);
-        eval.setLabelsList(OmrShapes.NAMES);
-        logger.info("eval: {}", eval.stats(false, true));
-
-        watch.print();
-    }
-
-    //----------//
-    // getShape //
-    //----------//
-    /**
-     * Report the shape name indicated in the labels vector.
-     *
-     * @param labels the labels vector (1.0 for a shape, 0.0 for the others)
-     * @return the shape name
-     */
-    private OmrShape getShape (INDArray labels)
-    {
-        for (int c = 0; c < numClasses; c++) {
-            double val = labels.getDouble(c);
-
-            if (val != 0) {
-                return OmrShape.values()[c];
-            }
-        }
-
-        return null;
-    }
-
-    //~ Inner Classes ------------------------------------------------------------------------------
+//        testIs.close();
+//        zinTest.close();
+//
+//        watch.print();
+//    }
 }

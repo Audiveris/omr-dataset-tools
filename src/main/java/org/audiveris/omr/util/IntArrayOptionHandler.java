@@ -23,11 +23,15 @@ package org.audiveris.omr.util;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Localizable;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Setter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
 
 /**
  * Class {@code IntArrayOptionHandler} is a CLI option handler for an array of positive
@@ -105,11 +109,34 @@ public class IntArrayOptionHandler
         }
 
         if (counter == 0) {
-            String msg = "Missing int value after argument '" + params.getParameter(counter) + "'";
-            throw new CmdLineException(this.owner, msg);
+            throw new CmdLineException(owner, Messages.MISSING_OPERAND, params.getParameter(counter));
         }
 
         return counter;
     }
+
     //~ Inner Classes ------------------------------------------------------------------------------
+    //----------//
+    // Messages //
+    //----------//
+    private static enum Messages
+            implements Localizable
+    {
+        MISSING_OPERAND;
+
+        @Override
+        public String formatWithLocale (Locale locale,
+                                        Object... args)
+        {
+//        ResourceBundle localized = ResourceBundle.getBundle(Messages.class.getName(), locale);
+//        return MessageFormat.format(localized.getString(name()),args);
+            return "Missing int value after argument '" + args[0] + "'";
+        }
+
+        @Override
+        public String format (Object... args)
+        {
+            return formatWithLocale(Locale.getDefault(), args);
+        }
+    }
 }

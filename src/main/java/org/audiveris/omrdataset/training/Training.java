@@ -21,43 +21,42 @@
 // </editor-fold>
 package org.audiveris.omrdataset.training;
 
+import org.audiveris.omr.util.StopWatch;
 import org.audiveris.omr.util.ZipWrapper;
+import org.audiveris.omrdataset.Main;
 import static org.audiveris.omrdataset.training.App.BATCH_SIZE;
-import static org.audiveris.omrdataset.training.Context.CSV_LABEL;
-import static org.audiveris.omrdataset.training.Context.NUM_CLASSES;
+import static org.audiveris.omrdataset.training.App.BIN_COUNT;
+import static org.audiveris.omrdataset.training.App.MODEL_PATH;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.InputStreamInputSplit;
 import org.datavec.api.writable.Writable;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.audiveris.omr.util.FileUtil;
-import org.audiveris.omr.util.StopWatch;
-import org.audiveris.omrdataset.api.OmrShapes;
-import static org.audiveris.omrdataset.training.App.BINS_PATH;
-import static org.audiveris.omrdataset.training.App.BIN_COUNT;
-import static org.audiveris.omrdataset.training.App.MODEL_PATH;
-import static org.audiveris.omrdataset.training.Context.CONTEXT_HEIGHT;
-import static org.audiveris.omrdataset.training.Context.CONTEXT_WIDTH;
 import org.deeplearning4j.api.storage.StatsStorage;
-import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.evaluation.classification.Evaluation;
+import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.api.NeuralNetwork;
+import org.deeplearning4j.nn.graph.ComputationGraph;
+
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class {@code Training} performs the training of the classifier neural network based
@@ -74,12 +73,6 @@ public class Training
     //~ Instance fields ----------------------------------------------------------------------------
     /** Normalization. */
     private final DataSetPreProcessor preProcessor = new PixelPreProcessor();
-
-    /** Zip wrapper for test bin. */
-    private ZipWrapper zinTest;
-
-    /** Input stream from test bin. */
-    private InputStream testIs;
 
     //~ Methods ------------------------------------------------------------------------------------
     /**
@@ -115,136 +108,206 @@ public class Training
                 bins.add(i);
             }
         }
-        logger.info("About to train on bins: {}", bins);
+
+        logger.info("Archive:{} About to train on bins: {}", Main.uArchiveId, bins);
 
         final StopWatch watch = new StopWatch("Training");
         watch.start("Set iterators");
 
-        // For test, the limited bin is sufficient
-        Path zipTestPath = BINS_PATH.resolve(String.format("limited-bin-%02d.zip", 10));
-        String newName = FileUtil.getNameSansExtension(zipTestPath) + ".csv";
-        Path testPath = zipTestPath.resolveSibling(newName);
-        zinTest = ZipWrapper.open(testPath);
-
         // Model
-        final ComputationGraph model;
+        ///final ComputationGraph model;
+        ///final MultiLayerNetwork model;
+        final NeuralNetwork model;
 
         if (Files.exists(MODEL_PATH)) {
             watch.start("Restoring model");
-            model = ModelSerializer.restoreComputationGraph(MODEL_PATH.toFile(), false);
+            model = ModelSerializer.restoreComputationGraph(MODEL_PATH.toFile(), true);
+            ///model = ModelSerializer.restoreMultiLayerNetwork(MODEL_PATH.toFile(), true);
             logger.info("Model restored from {}", MODEL_PATH.toAbsolutePath());
+
+            // Backup model with time stamp before training
+            final LocalDateTime now = LocalDateTime.now();
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
+            Path backup = MODEL_PATH.resolveSibling(now.format(formatter) + "-model.zip");
+            watch.start("Model backup");
+            Files.copy(MODEL_PATH, backup);
+            logger.info("Model backup as {}", backup.toAbsolutePath());
         } else {
             watch.start("Building model");
             logger.info("Building model from scratch");
-            model = new ResNet18V2(1, CONTEXT_WIDTH, CONTEXT_HEIGHT, NUM_CLASSES).create();
+            model = new ResNet18V2(1,
+                                   Main.context.getContextWidth(), // 27
+                                   Main.context.getContextHeight(), // 21
+                                   Main.context.getNumClasses()).create();
+//            model = new HeadModel(1,
+//                                  Main.context.getContextWidth(),
+//                                  Main.context.getContextHeight(),
+//                                  Main.context.getNumClasses()).create();
         }
-
-        UIServer uiServer = null;
 
         try {
             if (true) {
-                // Prepare monitoring
-                //Initialize the user interface backend
-                uiServer = UIServer.getInstance();
+                UIServer uiServer = UIServer.getInstance();
 
                 //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
                 StatsStorage statsStorage = new InMemoryStatsStorage(); //Alternative: new FileStatsStorage(File), for saving and loading later
-
-                //Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
                 uiServer.attach(statsStorage);
 
-                //Then add the StatsListener to collect this information from the network, as it trains
-                model.setListeners(new StatsListener(statsStorage), new ScoreIterationListener(1));
+                if (model instanceof MultiLayerNetwork multiLayerNetwork) {
+                    multiLayerNetwork.setListeners(new StatsListener(statsStorage),
+                                                   new ScoreIterationListener(1));
+                } else if (model instanceof ComputationGraph computationGraph) {
+                    computationGraph.setListeners(new StatsListener(statsStorage),
+                                                  new ScoreIterationListener(1));
+                }
             } else {
-                model.setListeners(new ScoreIterationListener(1));
+                if (model instanceof MultiLayerNetwork multiLayerNetwork) {
+                    multiLayerNetwork.setListeners(new ScoreIterationListener(1));
+                } else if (model instanceof ComputationGraph computationGraph) {
+                    computationGraph.setListeners(new ScoreIterationListener(1));
+                }
             }
 
             logger.info("Training model...");
             int nEpochs = 1;
 
             for (int epoch = 1; epoch <= nEpochs; epoch++) {
-                logger.info("Starting epoch {} on {}", epoch, LocalDateTime.now());
-                watch.start("epoch " + epoch);
+                logger.info("*** Starting epoch {} on {} ***", epoch, LocalDateTime.now());
+                watch.start("epoch " + epoch + " training");
+                long start = System.currentTimeMillis();
 
                 for (int bin : bins) {
-                    final String name = String.format("bin-%02d.csv", bin);
-                    final Path trainPath = BINS_PATH.resolve(name);
+                    final Path trainPath = Main.binPath(bin);
                     final ZipWrapper zinTrain = ZipWrapper.open(trainPath);
                     final InputStream is = zinTrain.newInputStream();
 
-                    final RecordReader trainRecordReader = new MyCSVRecordReader(0, ',');
+                    final RecordReader trainRecordReader = new MyCSVRecordReader();
                     trainRecordReader.initialize(new InputStreamInputSplit(is));
                     RecordReaderDataSetIterator trainIter = new RecordReaderDataSetIterator(
-                            trainRecordReader, BATCH_SIZE, CSV_LABEL, NUM_CLASSES, -1);
-                    trainIter.setCollectMetaData(true); //Instruct the iterator to collect metadata, and store it in the DataSet objects (USEFUL???????)
+                            trainRecordReader,
+                            BATCH_SIZE,
+                            Main.context.getCsvLabel(),
+                            Main.context.getNumClasses(),
+                            -1);
+                    trainIter.setCollectMetaData(true);
                     trainIter.setPreProcessor(preProcessor);
                     logger.info("{}", LocalDateTime.now());
-                    logger.info("Training from (zipped) {} ...", trainPath);
+                    logger.info("Training from {} ...", trainPath);
 
-                    long start = System.currentTimeMillis();
-                    model.fit(trainIter);
-
-                    logger.info("{}", LocalDateTime.now());
-                    double duration = System.currentTimeMillis() - start;
-                    logger.info(String.format("*** End bin #%d, duration: %.0f mn",
-                                              bin, duration / 60000));
-
-                    // Save model
-                    ModelSerializer.writeModel(model, MODEL_PATH.toFile(), true);
-                    logger.info("Model stored as {}", MODEL_PATH.toAbsolutePath());
-
-                    // Test model on test set
-                    logger.info("Evaluation for bin {}", bin);
-                    watch.start("Evaluation " + bin);
-                    RecordReaderDataSetIterator testIter = getNewTestIter();
-                    Evaluation eval = model.evaluate(testIter);
-                    eval.setLabelsList(OmrShapes.NAMES);
-                    testIs.close();
-                    logger.info("{}", eval.stats(false, true));
+                    model.fit(trainIter); // Hours or days on this line ...
 
                     is.close();
                     zinTrain.close();
                 }
+
+                double duration = System.currentTimeMillis() - start;
+                logger.info("{}", LocalDateTime.now());
+                logger.info(String.format("*** End epoch #%d, duration: %.0f mn",
+                                          epoch, duration / 60000));
+
+                // Save model
+                ModelSerializer.writeModel((Model) model, MODEL_PATH.toFile(), true);
+                logger.info("Model stored as {}", MODEL_PATH.toAbsolutePath());
+
+                // Evaluate model on test set
+                watch.start("epoch " + epoch + " evaluation");
+                logger.info("Evaluation for epoch {}", epoch);
+                evaluate(model, 10);
             }
 
             logger.info("{}", LocalDateTime.now());
         } finally {
-            // Stop UI monitoring
-            if (uiServer != null) {
-                uiServer.stop();
-            }
             watch.print();
+            UIServer.stopInstance(); // Stop UI monitoring if needed
+            logger.info("The end.");
         }
-
-        zinTest.close();
-        logger.info("The end.");
     }
+//
+//    //----------//
+//    // evaluate //
+//    //----------//
+//    /**
+//     * Evaluate the model using a test data set among the bins.
+//     * <p>
+//     * NOTA: Because data set is hosted in a zip system, reset() can't be used for the iterator.
+//     *
+//     * @param model model to evaluate
+//     * @param bin   bin to use for test (usually the last one: 10)
+//     * @throws Exception if anything goes wrong
+//     */
+//    private void evaluate (ComputationGraph model,
+//                           int bin)
+//            throws Exception
+//    {
+//        final RecordReader testRecordReader = new MyCSVRecordReader();
+//        final RecordReaderDataSetIterator testIter = new RecordReaderDataSetIterator(
+//                testRecordReader,
+//                BATCH_SIZE,
+//                Main.context.getCsvLabel(),
+//                Main.context.getNumClasses(),
+//                -1);
+//
+//        final Path testPath = Main.binPath(bin);
+//        final ZipWrapper zinTest = ZipWrapper.open(testPath);
+//        final InputStream testIs = zinTest.newInputStream();
+//        testRecordReader.initialize(new InputStreamInputSplit(testIs));
+//        testIter.setCollectMetaData(true); //Instruct the iterator to collect metadata
+//        testIter.setPreProcessor(preProcessor);
+//        logger.info("Using test dataset {} ...", zinTest);
+//
+//        final Evaluation eval = model.evaluate(testIter);
+//        eval.setLabelsList(Main.context.getLabelList());
+//
+//        testIs.close();
+//        zinTest.close();
+//        logger.info("{}", eval.stats(true));
+//    }
+//
+    //----------//
+    // evaluate //
+    //----------//
 
-    //----------------//
-    // getNewTestIter //
-    //----------------//
     /**
-     * Get a new fresh iterator of test bin.
+     * Evaluate the model using a test data set among the bins.
      * <p>
-     * Because it is hosted in a zip system, the reset() can't be used.
+     * NOTA: Because data set is hosted in a zip system, reset() can't be used for the iterator.
      *
-     * @return test iterator
-     * @throws Exception
+     * @param model model to evaluate
+     * @param bin   bin to use for test (usually the last one: 10)
+     * @throws Exception if anything goes wrong
      */
-    private RecordReaderDataSetIterator getNewTestIter ()
+    ///private void evaluate (MultiLayerNetwork model,
+    private void evaluate (NeuralNetwork model,
+                           int bin)
             throws Exception
     {
-        testIs = zinTest.newInputStream();
+        final RecordReader testRecordReader = new MyCSVRecordReader();
+        final RecordReaderDataSetIterator testIter = new RecordReaderDataSetIterator(
+                testRecordReader,
+                BATCH_SIZE,
+                Main.context.getCsvLabel(),
+                Main.context.getNumClasses(),
+                -1);
 
-        RecordReader testRecordReader = new MyCSVRecordReader(0, ',');
+        final Path testPath = Main.binPath(bin);
+        final ZipWrapper zinTest = ZipWrapper.open(testPath);
+        final InputStream testIs = zinTest.newInputStream();
         testRecordReader.initialize(new InputStreamInputSplit(testIs));
-        RecordReaderDataSetIterator testIter = new RecordReaderDataSetIterator(
-                testRecordReader, BATCH_SIZE, CSV_LABEL, NUM_CLASSES, -1);
         testIter.setCollectMetaData(true); //Instruct the iterator to collect metadata
         testIter.setPreProcessor(preProcessor);
-        logger.info("Getting test dataset from (zipped) {} ...", zinTest);
+        logger.info("Using test dataset {} ...", zinTest);
 
-        return testIter;
+        Evaluation eval = null;
+        if (model instanceof MultiLayerNetwork multiLayerNetwork) {
+            eval = multiLayerNetwork.evaluate(testIter);
+        } else if (model instanceof ComputationGraph computationGraph) {
+            eval = computationGraph.evaluate(testIter);
+        }
+        eval.setLabelsList(Main.context.getLabelList());
+
+        testIs.close();
+        zinTest.close();
+        logger.info("{}", eval.stats(true));
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
@@ -252,24 +315,24 @@ public class Training
     // MyCSVRecordReader //
     //-------------------//
     /**
-     * Remove all the CSV columns that lie beyond the class ID, to please DL4J.
+     * Remove all the CSV columns that lie beyond the label ID, to please DL4J.
      */
     public static class MyCSVRecordReader
             extends CSVRecordReader
     {
 
-        public MyCSVRecordReader (int numLinesToSkip,
-                                  char delimiter)
+        private static final int labelIndex = Main.context.getCsvLabel();
+
+        public MyCSVRecordReader ()
         {
-            super(numLinesToSkip, delimiter);
+            super(0, ",");
         }
 
         @Override
         protected List<Writable> parseLine (String line)
         {
             List<Writable> vals = super.parseLine(line);
-            return vals.subList(0, CSV_LABEL + 1);
+            return vals.subList(0, labelIndex + 1);
         }
     }
-
 }

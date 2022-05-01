@@ -21,13 +21,22 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.text.NumberFormat;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +48,19 @@ import org.slf4j.LoggerFactory;
 public abstract class Utils
 {
 
+    //~ Static fields/initializers -----------------------------------------------------------------
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
+    private static final NumberFormat NF1 = NumberFormat.getNumberInstance(Locale.US);
+
+    private static final NumberFormat NF3 = NumberFormat.getNumberInstance(Locale.US);
+
+    static {
+        NF1.setGroupingUsed(false);
+        NF1.setMaximumFractionDigits(1); // For a maximum of 1 decimal
+        NF3.setGroupingUsed(false);
+        NF3.setMaximumFractionDigits(3); // For a maximum of 3 decimals
+    }
 
     //~ Constructors -------------------------------------------------------------------------------
     private Utils ()
@@ -50,34 +71,52 @@ public abstract class Utils
     //----------------//
     // getPrintWriter //
     //----------------//
-    public static PrintWriter getPrintWriter (Path path)
+    public static PrintWriter getPrintWriter (Path path,
+                                              OpenOption... options)
             throws IOException
     {
         Files.createDirectories(path.getParent());
 
-        final OutputStream os = Files.newOutputStream(path);
+        final OutputStream os = Files.newOutputStream(path, options);
         final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 
         return new PrintWriter(bw);
     }
 
-    //---------------//
-    // sansExtension //
-    //---------------//
+    //-------------------//
+    // setAbsoluteStroke //
+    //-------------------//
     /**
-     * Remove the ending extension of the provided file name
+     * Whatever the current scaling of a graphic context, set the stroke to the desired
+     * absolute width, and return the saved stroke for later restore.
      *
-     * @param name file name such as "foo.ext"
-     * @return radix such as "foo"
+     * @param g     the current graphics context
+     * @param width the absolute stroke width desired
+     * @return the previous stroke
      */
-    public static String sansExtension (String name)
+    public static Stroke setAbsoluteStroke (Graphics g,
+                                            float width)
     {
-        int i = name.lastIndexOf('.');
+        Graphics2D g2 = (Graphics2D) g;
+        AffineTransform AT = g2.getTransform();
+        double ratio = AT.getScaleX();
+        Stroke oldStroke = g2.getStroke();
+        Stroke stroke = new BasicStroke(width / (float) ratio);
+        g2.setStroke(stroke);
 
-        if (i >= 0) {
-            return name.substring(0, i);
-        } else {
-            return name;
-        }
+        return oldStroke;
+    }
+
+    public static String stringOf (Rectangle2D box)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("(x").append(NF1.format(box.getX()))
+                .append(",y").append(NF1.format(box.getY()))
+                .append(",w").append(NF1.format(box.getWidth()))
+                .append(",h").append(NF1.format(box.getHeight()))
+                .append(")");
+
+        return sb.toString();
     }
 }

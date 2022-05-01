@@ -22,12 +22,15 @@
 package org.audiveris.omrdataset;
 
 import org.audiveris.omr.util.IntArrayOptionHandler;
-import org.audiveris.omrdataset.training.Context.SourceType;
+import org.audiveris.omr.util.PathListOptionHandler;
+import org.audiveris.omrdataset.api.Context.ContextType;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.ParserProperties;
+import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.StopOptionHandler;
 
 import org.slf4j.Logger;
@@ -37,6 +40,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -52,85 +56,126 @@ public class CLI
 
     //~ Instance fields ----------------------------------------------------------------------------
     /** Help mode. */
-    @Option(name = "-help", help = true, usage = "Display general help then stop")
+    @Option(name = "-help",
+            help = true,
+            usage = "Display general help then stop")
     public boolean help;
 
+    /** ContextType. */
+    @Option(name = "-context",
+            required = true,
+            usage = "(mandatory) Specify which context kind to use")
+    public ContextType contextType;
+
     /** 1/ Source. */
-    @Option(name = "-filter", usage = "Step 1: Load and filter symbols according to source type")
-    public SourceType source;
+    @Option(name = "-filter",
+            usage = "Step 1: Load and filter symbols")
+    public boolean filter;
 
     /** 2/ Nones. */
-    @Option(name = "-nones", usage
-            = "Step 2: Generate none symbols (effective for control & features)")
+    @Option(name = "-nones",
+            usage = "Step 2: Generate none symbols"
+                            + "\n   (effective for control & features)")
     public boolean nones;
 
     /** 3/ Features. */
-    @Option(name = "-features", usage = "Step 3: Generate sheet .csv (zipped) files")
+    @Option(name = "-features",
+            usage = "Step 3: Generate sheet .csv.zip files")
     public boolean features;
 
-    /** 4/ Split. */
-    @Option(name = "-split", usage = "Step 4: Split all sheet .csv files into few csv bins")
-    public boolean split;
+    /** 4/ Tally. */
+    @Option(name = "-tally",
+            usage = "Step 4: Dispatch features by shape")
+    public boolean tally;
 
-    /** 5/ Shuffle. */
-    @Option(name = "-shuffle", usage = "Step 5: Shuffle each csv bin in memory")
+    /** 4b/ shape Grids. */
+    @Option(name = "-shapeGrids",
+            usage = "Step 4.b: Build patch grids by shape")
+    public boolean shapeGrids;
+
+    /** 4c/ specific Grids. */
+    @Option(name = "-grids",
+            usage = "Step 4.c: Build patch grids on selected inputs",
+            handler = PathListOptionHandler.class)
+    public ArrayList<Path> grids;
+
+    /** 5/ Bins. */
+    @Option(name = "-bins",
+            usage = "Step 5: Split shape tally files into bins")
+    public boolean bins;
+
+    /** 6/ Shuffle. */
+    @Option(name = "-shuffle",
+            usage = "Step 6: Shuffle each bin in memory")
     public boolean shuffle;
 
-    /** 6/ Train. */
-    @Option(name = "-train", usage = "Step 6: Train model on selected bins",
+    /** 7/ Train. */
+    @Option(name = "-train",
+            usage = "Step 7: Train model on selected bins",
             handler = IntArrayOptionHandler.class)
     public ArrayList<Integer> train;
 
-    /** 7/ Test. */
-    @Option(name = "-test", usage = "Step 7: Evaluate model from test csv bins")
-    public boolean test;
+    /** Test. */
+    @Option(name = "-testPath",
+            usage = "Evaluate model on the provided features file",
+            metaVar = "XXX.csv.zip")
+    public Path testPath;
+
+    /** Parallel processing. */
+    @Option(name = "-parallel",
+            usage = "(recommended) Use parallel processing"
+                            + "\n   (effective on steps 1 to 5)")
+    public boolean parallel;
+
+    /** Shape names. */
+    @Option(name = "-names",
+            usage = "(optional) Print context shapes names with their index")
+    public boolean names;
 
     /** Sheet histogram of shapes. */
-    @Option(name = "-histo", usage = "(optional) Print shape histogram per sheet")
+    @Option(name = "-histo",
+            usage = "(optional) Print shape histogram per sheet")
     public boolean histo;
 
     /** Bin histogram of shapes. */
-    @Option(name = "-binhisto", usage = "(optional) Print shape histogram for provided bins",
+    @Option(name = "-binhisto",
+            usage = "(optional) Print shape histogram of selected bins",
             handler = IntArrayOptionHandler.class)
     public ArrayList<Integer> binHisto;
 
     /** Control images. */
-    @Option(name = "-control", usage = "(optional) Generate control images")
+    @Option(name = "-control",
+            usage = "(optional) Generate control image of each sheet")
     public boolean control;
 
     /** Patch images. */
     @Option(name = "-patches", usage = "(optional) Generate patch images")
     public boolean patches;
 
-    /** Shape names. */
-    @Option(name = "-names", usage = "(optional) Print all possible shape names with their index")
-    public boolean names;
-
-    /** Parallel processing. */
-    @Option(name = "-parallel", usage
-            = "(recommanded) Use parallel processing (effective on steps 1 to 4)")
-    public boolean parallel;
-
-    /** Limit. */
-    @Option(name = "-limit", usage = "(Deprecated) Limit samples per shape")
-    public boolean limit;
-
-    /** Target directory for output data. */
-    @Option(name = "-output", usage = "(optional) Define output directory", metaVar = "<folder>")
-    public Path outputFolder;
-
-    /** Alternate target file for network model. */
-    @Option(name = "-model", usage = "(optional) Define path to model", metaVar = "<.zip file>")
-    public Path modelPath;
-
     /** The range of iterations to inspect. */
-    @Option(name = "-inspect", usage = "(optional) Inspect a bin for a range of iterations",
+    @Option(name = "-inspect",
+            usage = "(optional) Inspect a bin for a range of iterations",
             handler = IntArrayOptionHandler.class)
     public ArrayList<Integer> inspect;
 
+    /** Target directory for output data. */
+    @Option(name = "-output",
+            usage = "(optional) Define output directory"
+                            + "\n   (defaults to \"data/output\")",
+            metaVar = "<folder>")
+    public Path outputFolder;
+
+    /** Alternate target file for network model. */
+    @Option(name = "-model",
+            usage = "(optional) Define path to model"
+                            + "\n   (defaults to \"<output>/training/patch-classifier.zip\")",
+            metaVar = "<.zip file>")
+    public Path modelPath;
+
     /** Final arguments, with optional "--" separator. */
     @Argument
-    @Option(name = "--", handler = StopOptionHandler.class)
+    @Option(name = "--",
+            handler = StopOptionHandler.class)
     public List<Path> arguments = new ArrayList<Path>();
 
     //~ Methods ------------------------------------------------------------------------------------
@@ -146,9 +191,25 @@ public class CLI
     {
         logger.info("CLI args: {}", Arrays.toString(args));
 
-        CLI cli = new CLI();
+        final CLI cli = new CLI();
 
-        final CmdLineParser parser = new CmdLineParser(cli);
+        final Comparator<OptionHandler> noSsorter = new Comparator<>()
+        {
+            @Override
+            public int compare (OptionHandler o1,
+                                OptionHandler o2)
+            {
+                return 0;
+            }
+        };
+
+        final ParserProperties props = ParserProperties.defaults()
+                .withAtSyntax(true)
+                .withUsageWidth(100)
+                .withShowDefaults(false)
+                .withOptionSorter(noSsorter);
+
+        final CmdLineParser parser = new CmdLineParser(cli, props);
 
         parser.parseArgument(args);
 
@@ -172,10 +233,10 @@ public class CLI
 
         buf.append("\n");
         buf.append("\nSyntax:");
-        buf.append("\n   [OPTIONS] -- [INPUT_FILES]\n");
+        buf.append("\n   [OPTIONS] -- [INPUT_ANNOTATION_FILES and/or INPUT_FOLDERS]\n");
 
         buf.append("\n@file:");
-        buf.append("\n Content to be extended in line");
+        buf.append("\n Content to be expanded in line");
         buf.append("\n");
 
         buf.append("\nOptions:\n");

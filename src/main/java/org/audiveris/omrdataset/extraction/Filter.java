@@ -26,6 +26,7 @@ import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
 import org.audiveris.omrdataset.api.SymbolInfo.Cause;
 import org.audiveris.omrdataset.api.TablatureAreas;
+import org.audiveris.omrdataset.extraction.SourceInfo.USheetId;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +49,8 @@ import java.util.Map;
  */
 public class Filter
 {
-
     //~ Static fields/initializers -----------------------------------------------------------------
+
     private static final Logger logger = LoggerFactory.getLogger(Filter.class);
 
     private static final double MAX_OVERLAP = 0.6;
@@ -72,7 +73,7 @@ public class Filter
     }
 
     //~ Instance fields ----------------------------------------------------------------------------
-    private final int sheetId;
+    private final USheetId uSheetId;
 
     private final SheetAnnotations annotations;
 
@@ -82,15 +83,15 @@ public class Filter
     /**
      * Creates a {@code Filter} object working on a sheet annotations.
      *
-     * @param sheetId     sheet ID
+     * @param uSheetId    universal sheet ID
      * @param annotations related annotations
      * @param tablatures  related tablature areas, or null
      */
-    public Filter (int sheetId,
+    public Filter (USheetId uSheetId,
                    SheetAnnotations annotations,
                    TablatureAreas tablatures)
     {
-        this.sheetId = sheetId;
+        this.uSheetId = uSheetId;
         this.annotations = annotations;
 
         // Exclusions found in annotations file
@@ -127,7 +128,7 @@ public class Filter
             // Now that all symbols are correct, address the cClefs samples
             convertCClefs();
         } catch (Throwable ex) {
-            logger.warn("sheetId:{} Error processing annotations {}", sheetId, annotations, ex);
+            logger.warn("{} Error processing annotations {}", uSheetId, annotations, ex);
         }
     }
 
@@ -261,18 +262,11 @@ public class Filter
      */
     private void checkOverlaps ()
     {
-        List<SymbolInfo> sortedSymbols = new ArrayList<>(annotations.getGoodSymbols());
-        Collections.sort(sortedSymbols, new Comparator<SymbolInfo>()
-                 {
-                     @Override
-                     public int compare (SymbolInfo s1,
-                                         SymbolInfo s2)
-                     {
-                         // Sort by starting abscissa
-                         return Double.compare(s1.getBounds().getX(), s2.getBounds().getX());
-                     }
+        final List<SymbolInfo> sortedSymbols = new ArrayList<>(annotations.getGoodSymbols());
 
-                 });
+        // Sort by starting abscissa
+        Collections.sort(sortedSymbols, (SymbolInfo s1, SymbolInfo s2)
+                         -> Double.compare(s1.getBounds().getX(), s2.getBounds().getX()));
 
         SymbolLoop:
         for (int i = 0; i < sortedSymbols.size(); i++) {
@@ -297,7 +291,7 @@ public class Filter
                 }
 
                 if (box.intersects(b)) {
-                    // Accept the case "outer symbol vs one of its inner symbol"
+                    // Accept the case "outer symbol vs one of its inner symbol(s)"
                     if (areParents(symbol, s)) {
                         logger.debug("Parents {} {}", symbol, s);
                         continue;
@@ -310,8 +304,8 @@ public class Filter
                     final double ioB = interArea / bArea;
 
                     if (ioBox > MAX_OVERLAP || ioB > MAX_OVERLAP) {
-                        logger.info("sheetId:{} {}/{} {} {}",
-                                    sheetId,
+                        logger.info("{} {}/{} {} {}",
+                                    uSheetId,
                                     String.format("%.2f", ioBox),
                                     String.format("%.2f", ioB), symbol, s);
 
@@ -422,7 +416,7 @@ public class Filter
                     // We have a vertical overlap between clef and staff/barline
                     OmrShape oldShape = clef.getOmrShape();
                     OmrShape newShape = cClefVariantOf(oldShape, cMiddle, box);
-                    logger.debug("sheetId:{} {} set to {}", sheetId, clef, newShape);
+                    logger.debug("{} {} set to {}", uSheetId, clef, newShape);
                     clef.setOmrShape(newShape);
 
                     continue SymbolLoop;

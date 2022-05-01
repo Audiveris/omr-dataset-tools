@@ -22,6 +22,7 @@
 package org.audiveris.omrdataset.api;
 
 import org.audiveris.omr.util.Jaxb;
+import static org.audiveris.omrdataset.extraction.Utils.stringOf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,7 +257,7 @@ public class SymbolInfo
     /**
      * Assign a new shape.
      *
-     * @param the new omrShape
+     * @param omrShape the new omrShape
      */
     public void setOmrShape (OmrShape omrShape)
     {
@@ -296,7 +297,7 @@ public class SymbolInfo
             sb.append(" scale:").append(scale);
         }
 
-        sb.append(" ").append(bounds);
+        sb.append(" ").append(stringOf(bounds));
 
         sb.append("}");
 
@@ -396,16 +397,18 @@ public class SymbolInfo
      * Report the outer/inner symbols that so far are neither invalid nor ignored.
      *
      * @param symbols the list of symbols to browse
+     * @param context the context in which symbols are considered
      * @return the interesting symbols
      */
-    public static List<SymbolInfo> getGoodSymbols (List<SymbolInfo> symbols)
+    public static List<SymbolInfo> getGoodSymbols (List<SymbolInfo> symbols,
+                                                   Context context)
     {
         final List<SymbolInfo> goods = new ArrayList<>();
 
         for (SymbolInfo symbol : symbols) {
             final OmrShape shape = symbol.getOmrShape();
 
-            if (!symbol.isInvalid() && (shape != null) && !shape.isIgnored()) {
+            if (!symbol.isInvalid() && !context.ignores(shape)) {
                 goods.add(symbol);
             }
             // Check the inner symbols as well, because an ignored outer can have good inners
@@ -413,7 +416,7 @@ public class SymbolInfo
             for (SymbolInfo inner : symbol.getInnerSymbols()) {
                 final OmrShape s = inner.getOmrShape();
 
-                if (!inner.isInvalid() && (s != null) && !s.isIgnored()) {
+                if (!inner.isInvalid() && !context.ignores(s)) {
                     goods.add(inner);
                 }
             }

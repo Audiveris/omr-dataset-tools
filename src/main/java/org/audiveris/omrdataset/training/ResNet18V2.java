@@ -45,6 +45,9 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.deeplearning4j.nn.conf.graph.GraphVertex;
+import org.deeplearning4j.nn.conf.layers.Layer;
+
 /**
  * Class {@code ResNet18V2} implements ResNet18 network, using V2 architecture.
  * <p>
@@ -60,13 +63,13 @@ public class ResNet18V2
     private static final Logger logger = LoggerFactory.getLogger(ResNet18V2.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
-    private final int inputDepth;
+    protected final int inputDepth;
 
-    private final int inputWidth;
+    protected final int inputWidth;
 
-    private final int inputHeight;
+    protected final int inputHeight;
 
-    private final int numClasses;
+    protected final int numClasses;
 
     //~ Constructors -------------------------------------------------------------------------------
     /**
@@ -131,15 +134,15 @@ public class ResNet18V2
         last = identityBlock(graph, 64, "3", last);
 
         // Stage 3
-        last = reductionBlock(graph, 2, 128, "4", last);
+        last = convBlock(graph, 2, 128, "4", last);
         last = identityBlock(graph, 128, "5", last);
 
         // Stage 4
-        last = reductionBlock(graph, 2, 256, "6", last);
+        last = convBlock(graph, 2, 256, "6", last);
         last = identityBlock(graph, 256, "7", last);
 
         // Stage 5
-        last = reductionBlock(graph, 2, 512, "8", last);
+        last = convBlock(graph, 2, 512, "8", last);
         last = identityBlock(graph, 512, "9", last);
 
         // Tail
@@ -152,6 +155,39 @@ public class ResNet18V2
         network.init();
 
         return network;
+    }
+
+    //----------//
+    // addLayer //
+    //----------//
+    /**
+     * Convenient method to ease the linking of created layers.
+     *
+     * @param graph       the graph being built
+     * @param layerName   name for the layer to create
+     * @param layer       layer implementation
+     * @param layerInputs name(s) of layer input(s)
+     * @return layerName, to ease further linking
+     */
+    protected static String addLayer (GraphBuilder graph,
+                                      String layerName,
+                                      Layer layer,
+                                      String... layerInputs)
+    {
+        graph.addLayer(layerName, layer, layerInputs);
+        return layerName;
+    }
+
+    //-----------//
+    // addVertex //
+    //-----------//
+    protected static String addVertex (GraphBuilder graph,
+                                       String vertexName,
+                                       GraphVertex vertex,
+                                       String... vertexInputs)
+    {
+        graph.addVertex(vertexName, vertex, vertexInputs);
+        return vertexName;
     }
 
     //-----------//
@@ -167,33 +203,25 @@ public class ResNet18V2
      * @param input  component input
      * @return the name of last layer
      */
-    private String component (GraphBuilder graph,
-                              int stride,
-                              int filter,
-                              String sbc,
-                              String input)
+    protected String component (GraphBuilder graph,
+                                int stride,
+                                int filter,
+                                String sbc,
+                                String input)
     {
-        final String normName = "bn_" + sbc;
-        final String reluName = "relu_" + sbc;
-        final String convName = "conv2d_" + sbc;
+        String last;
 
-        graph
-                .addLayer(normName,
-                          new BatchNormalization(),
-                          input)
-                .addLayer(reluName,
-                          new ActivationLayer.Builder().activation(Activation.RELU).build(),
-                          normName)
-                .addLayer(convName,
-                          new ConvolutionLayer.Builder()
-                                  .kernelSize(3, 3)
-                                  .padding(1, 1)
-                                  .stride(stride, stride)
-                                  .nOut(filter)
-                                  .build(),
-                          reluName);
+        last = addLayer(graph, "conv_" + sbc,
+                        new ConvolutionLayer.Builder()
+                                .kernelSize(3, 3)
+                                .padding(1, 1)
+                                .stride(stride, stride)
+                                .nOut(filter)
+                                .build(), input);
 
-        return convName;
+        last = addLayer(graph, "bn_" + sbc,
+                        new BatchNormalization(), last);
+        return last;
     }
 
     //--------------------//
@@ -212,33 +240,36 @@ public class ResNet18V2
      * @param input  block input
      * @return the name of last layer
      */
-    private String firstIdentityBlock (GraphBuilder graph,
-                                       int filter,
-                                       String sb,
-                                       String input)
+    protected String firstIdentityBlock (GraphBuilder graph,
+                                         int filter, // = 64
+                                         String sb,
+                                         String input)
     {
-        final String convName = "conv2d_" + sb + "a";
+        String left;
+        left = addLayer(graph, "conv_" + sb + "a",
+                        new ConvolutionLayer.Builder()
+                                .kernelSize(3, 3)
+                                .stride(1, 1)
+                                .nOut(filter)
+                                .convolutionMode(ConvolutionMode.Same)
+                                .build(),
+                        input);
+        left = addLayer(graph, "bn_" + sb + "a", new BatchNormalization(), left);
 
-        graph.addLayer(convName,
-                       new ConvolutionLayer.Builder()
-                               .kernelSize(3, 3)
-                               .stride(1, 1)
-                               .nOut(filter)
-                               .convolutionMode(ConvolutionMode.Same)
-                               .build(),
-                       input);
+        left = addLayer(graph, "relu_" + sb + "a",
+                        new ActivationLayer.Builder().activation(Activation.RELU).build(), left);
 
-        String last = convName;
-
-        last = component(graph, 1, filter, sb + "b", last);
+        left = component(graph, 1, filter, sb + "b", left);
 
         // shortcut
-        final String shortcutName = "add_" + sb;
-        graph.addVertex(shortcutName,
-                        new ElementWiseVertex(ElementWiseVertex.Op.Add),
-                        last, input);
+        String both = addVertex(graph, "add_" + sb,
+                                new ElementWiseVertex(ElementWiseVertex.Op.Add),
+                                left, input);
 
-        return shortcutName;
+        both = addLayer(graph, "relu_" + sb,
+                        new ActivationLayer.Builder().activation(Activation.RELU).build(), both);
+
+        return both;
     }
 
     //---------------//
@@ -257,27 +288,33 @@ public class ResNet18V2
      * @param input  block input
      * @return the name of last layer
      */
-    private String identityBlock (GraphBuilder graph,
-                                  int filter,
-                                  String sb,
-                                  String input)
+    protected String identityBlock (GraphBuilder graph,
+                                    int filter,
+                                    String sb,
+                                    String input)
     {
-        String last;
-        last = component(graph, 1, filter, sb + "a", input);
-        last = component(graph, 1, filter, sb + "b", last);
+        String left;
+        left = component(graph, 1, filter, sb + "a", input);
+        left = addLayer(graph, "relu_" + sb + "a",
+                        new ActivationLayer.Builder().activation(Activation.RELU).build(), left);
+
+        left = component(graph, 1, filter, sb + "b", left);
 
         // shortcut
-        final String shortcutName = "add_" + sb;
-        graph.addVertex(shortcutName,
-                        new ElementWiseVertex(ElementWiseVertex.Op.Add),
-                        last, input);
+        String both;
+        both = addVertex(graph, "add_" + sb,
+                         new ElementWiseVertex(ElementWiseVertex.Op.Add),
+                         left, input);
 
-        return shortcutName;
+        both = addLayer(graph, "relu_" + sb,
+                        new ActivationLayer.Builder().activation(Activation.RELU).build(), both);
+
+        return both;
     }
 
-    //----------------//
-    // reductionBlock //
-    //----------------//
+    //-----------//
+    // convBlock //
+    //-----------//
     /**
      * Append a reduction block made of 2 parallel reduction branches merged at the end:
      * <ul>
@@ -292,33 +329,37 @@ public class ResNet18V2
      * @param input       block input
      * @return the name of last layer
      */
-    private String reductionBlock (GraphBuilder graph,
-                                   int firstStride,
-                                   int filter,
-                                   String sb,
-                                   String input)
+    protected String convBlock (GraphBuilder graph,
+                                int firstStride,
+                                int filter,
+                                String sb,
+                                String input)
     {
-        String last;
-        last = component(graph, firstStride, filter, sb + "a", input);
-        last = component(graph, 1, filter, sb + "b", last);
+        String left;
+        left = component(graph, firstStride, filter, sb + "a", input);
+        left = addLayer(graph, "relu_" + sb + "a",
+                        new ActivationLayer.Builder().activation(Activation.RELU).build(), left);
+
+        left = component(graph, 1, filter, sb + "b", left);
 
         // Projection shortcut
-        final String convName = "conv2d_" + sb + "s";
-        graph.addLayer(convName,
-                       new ConvolutionLayer.Builder()
-                               .kernelSize(1, 1)
-                               .stride(firstStride, firstStride)
-                               .nOut(filter)
-                               .build(),
-                       input);
+        String right = addLayer(graph, "conv_" + sb + "_skip",
+                                new ConvolutionLayer.Builder()
+                                        .kernelSize(1, 1)
+                                        .stride(firstStride, firstStride)
+                                        .nOut(filter)
+                                        .build(),
+                                input);
+        right = addLayer(graph, "bn_" + sb + "_skip", new BatchNormalization(), right);
 
-        // Addition of the 2 branches
-        final String shortcutName = "add_" + sb;
-        graph.addVertex(shortcutName,
-                        new ElementWiseVertex(ElementWiseVertex.Op.Add),
-                        last, convName);
+        // Both
+        String both = addVertex(graph, "add_" + sb,
+                                new ElementWiseVertex(ElementWiseVertex.Op.Add),
+                                left, right);
+        both = addLayer(graph, "relu_" + sb,
+                        new ActivationLayer.Builder().activation(Activation.RELU).build(), both);
 
-        return shortcutName;
+        return both;
     }
 
     //-----------//
@@ -331,36 +372,36 @@ public class ResNet18V2
      * @param input block input
      * @return the name of last layer
      */
-    private String stemBlock (GraphBuilder graph,
-                              String input)
+    protected String stemBlock (GraphBuilder graph,
+                                String input)
     {
         // Stem (Stage 1)
-        graph
-                .addLayer("conv2d_1",
-                          new ConvolutionLayer.Builder()
-                                  .kernelSize(7, 7)
-                                  .padding(3, 3)
-                                  .stride(2, 2)
-                                  .nOut(64)
-                                  .build(),
-                          input)
-                .addLayer("bn_1",
-                          new BatchNormalization(),
-                          "conv2d_1")
-                .addLayer("relu_1",
-                          new ActivationLayer.Builder()
-                                  .activation(Activation.RELU)
-                                  .build(),
-                          "bn_1")
-                .addLayer("maxpool2d_1",
-                          new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
-                                  .convolutionMode(ConvolutionMode.Same)
-                                  .kernelSize(3, 3)
-                                  .stride(2, 2)
-                                  .build(),
-                          "relu_1");
+        String last;
+        last = addLayer(graph, "conv_1",
+                        new ConvolutionLayer.Builder()
+                                .kernelSize(7, 7)
+                                .padding(3, 3)
+                                .stride(2, 2)
+                                .nOut(64)
+                                .build(),
+                        input);
+        last = addLayer(graph, "bn_1",
+                        new BatchNormalization(),
+                        last);
+        last = addLayer(graph, "relu_1",
+                        new ActivationLayer.Builder()
+                                .activation(Activation.RELU)
+                                .build(),
+                        last);
+        last = addLayer(graph, "maxpool_1",
+                        new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+                                .convolutionMode(ConvolutionMode.Same)
+                                .kernelSize(3, 3)
+                                .stride(2, 2)
+                                .build(),
+                        last);
 
-        return "maxpool2d_1";
+        return last;
     }
 
     //-----------//
@@ -368,58 +409,64 @@ public class ResNet18V2
     //-----------//
     /**
      * Append the block of network last layers.
+     * <p>
+     * NOTA: The SubsamplingLayer has been (temporarily) removed to cope with small input patches.
      *
      * @param graph the graph configuration being defined
      * @param input block input
      * @return the name of last layer
      */
-    private String tailBlock (GraphBuilder graph,
-                              String input)
+    protected String tailBlock (GraphBuilder graph,
+                                String input)
     {
-        graph
-                .addLayer("bn_10",
-                          new BatchNormalization(),
-                          input)
-                .addLayer("relu_10",
-                          new ActivationLayer.Builder()
-                                  .activation(Activation.RELU)
-                                  .build(),
-                          "bn_10")
-                .addLayer("avgpool2d_1",
-                          new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.AVG)
-                                  .kernelSize(4, 2)
-                                  .stride(2, 2)
-                                  .build(),
-                          "relu_10")
-                .addLayer("fc_out",
-                          new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                                  .nOut(numClasses)
-                                  .activation(Activation.SOFTMAX)
-                                  .build(),
-                          "avgpool2d_1");
+        String last = input;
 
-        return "fc_out";
+        last = addLayer(graph, "avgpool_1",
+                        new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.AVG)
+                                ///.kernelSize(4, 2) ????
+                                .kernelSize(2, 2)
+                                .stride(2, 2)
+                                .build(),
+                        last);
+
+        last = addLayer(graph, "fc_out",
+                        new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                                .nOut(numClasses)
+                                .activation(Activation.SOFTMAX)
+                                .build(),
+                        last);
+
+        return last;
     }
 
     //------//
     // main //
     //------//
     /**
-     * Pseudo main method to easily print out summary end memory report.
+     * Pseudo main method to easily print out summary and memory report.
      *
      * @param args unused
      */
     public static void main (String[] args)
     {
-        ///network = new ResNet18V2(1, CONTEXT_WIDTH, CONTEXT_HEIGHT, NUM_CLASSES).create();
-        ComputationGraph network = new ResNet18V2(1, 56, 112, 204).create(); // 197 vs 204
+        final int CONTEXT_DEPTH = 1;
+        final int CONTEXT_WIDTH = 54; //60; //33; //224; //54;
+        final int CONTEXT_HEIGHT = 42; //100; //97; //224; //42;
+        final int NUM_CLASSES = 12;
+        ComputationGraph network = new ResNet18V2(CONTEXT_DEPTH,
+                                                  CONTEXT_WIDTH,
+                                                  CONTEXT_HEIGHT,
+                                                  NUM_CLASSES).create();
 
         System.out.println();
         System.out.println("*** ResNet18V2 ***");
-        ///InputType inputType = InputType.convolutionalFlat(inputHeight, inputWidth, inputDepth);
-        System.out.printf("inputHeight:%d, inputWidth:%d, inputDepth:%d, numClasses:%d",
-                          56, 112, 1, 204); // 197 vs 204
-        InputType inputType = InputType.convolutionalFlat(112, 56, 1);
+        System.out.printf("CONTEXT_DEPTH:%d, CONTEXT_WIDTH:%d, CONTEXT_HEIGHT:%d, NUM_CLASSES:%d",
+                          CONTEXT_DEPTH, CONTEXT_WIDTH, CONTEXT_HEIGHT, NUM_CLASSES);
+        System.out.println();
+        ///System.out.println(network.getConfiguration());
+        InputType inputType = InputType.convolutionalFlat(CONTEXT_HEIGHT,
+                                                          CONTEXT_WIDTH,
+                                                          CONTEXT_DEPTH);
         System.out.println(network.summary(inputType));
         System.out.println(network.getConfiguration().getMemoryReport(inputType));
     }

@@ -21,13 +21,13 @@
 // </editor-fold>
 package org.audiveris.omr.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import org.audiveris.omrdataset.extraction.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,8 +35,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Class {@code ZipWrapper} allows to wrap a file in a zip system rather transparently.
@@ -47,14 +49,46 @@ import java.nio.file.Paths;
  * Zip compression for a typical CSV file, is about 95%, meaning the same information is now kept
  * in 5% (1/20th) of the uncompressed version.
  * <p>
- * Java offers the notion of
+ * Java offers the notion of zip file system, which is used here.
+ * <p>
+ * The ZipWrapper simply puts a Zip envelope around a standard file, in a manner as transparent as
+ * possible.
+ * The methods {@link #create(Path)}, {@link #open(Path)}, {@link #delete(Path)},
+ * {@link #deleteIfExists(Path)} and {@link #exists(Path)} expect a "virtual path" as parameter.
+ * They accept a virtual path both with and without a ".zip" extension:
+ * <table>
+ * <tr>
+ * <th>Path provided</th>
+ * <th>Zip external file</th>
+ * <th>Zip internal entry</th>
+ * </tr>
+ * <tr>
+ * <td>path/to/foo</td>
+ * <td>path/to/foo.zip</td>
+ * <td>foo</td>
+ * <tr>
+ * <td>path/to/foo.ext</td>
+ * <td>path/to/foo.ext.zip</td>
+ * <td>foo.ext</td>
+ * <tr>
+ * <td>path/to/foo.zip</td>
+ * <td>path/to/foo.zip</td>
+ * <td>foo</td>
+ * <tr>
+ * <td>path/to/foo.ext.zip</td>
+ * <td>path/to/foo.ext.zip</td>
+ * <td>foo.ext</td>
+ * </tr>
+ * </table>
+ * It is recommended to use the last 2 cases because the physical path is the same as the
+ * virtual path.
  *
  * @author Hervé Bitteur
  */
 public class ZipWrapper
 {
-
     //~ Static fields/initializers -----------------------------------------------------------------
+
     private static final Logger logger = LoggerFactory.getLogger(ZipWrapper.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
@@ -71,39 +105,21 @@ public class ZipWrapper
     }
 
     //~ Methods ------------------------------------------------------------------------------------
+    //-------//
+    // close //
+    //-------//
+    public void close ()
+            throws IOException
+    {
+        root.getFileSystem().close();
+    }
+
     //----------//
     // getInner //
     //----------//
     public Path getInner ()
     {
         return innerPath;
-    }
-
-    //----------------//
-    // newPrintWriter //
-    //----------------//
-    public PrintWriter newPrintWriter ()
-            throws IOException
-    {
-        return Utils.getPrintWriter(innerPath);
-    }
-
-    //-------------------//
-    // newBufferedReader //
-    //-------------------//
-    public BufferedReader newBufferedReader ()
-            throws IOException
-    {
-        return new BufferedReader(new InputStreamReader(newInputStream(), "UTF-8"));
-    }
-
-    //-------------------//
-    // newBufferedWriter //
-    //-------------------//
-    public BufferedWriter newBufferedWriter ()
-            throws IOException
-    {
-        return new BufferedWriter(new OutputStreamWriter(newOutputStream(), "UTF-8"));
     }
 
     //---------//
@@ -114,53 +130,78 @@ public class ZipWrapper
         return root;
     }
 
+    //-------------------//
+    // newBufferedReader //
+    //-------------------//
+    public BufferedReader newBufferedReader (OpenOption... options)
+            throws IOException
+    {
+        return new BufferedReader(new InputStreamReader(newInputStream(options), "UTF-8"));
+    }
+
+    //-------------------//
+    // newBufferedWriter //
+    //-------------------//
+    public BufferedWriter newBufferedWriter (OpenOption... options)
+            throws IOException
+    {
+        return new BufferedWriter(new OutputStreamWriter(newOutputStream(options), "UTF-8"));
+    }
+
     //----------------//
     // newInputStream //
     //----------------//
-    public InputStream newInputStream ()
+    public InputStream newInputStream (OpenOption... options)
             throws IOException
     {
-        return Files.newInputStream(innerPath);
+        return Files.newInputStream(innerPath, options);
     }
 
     //-----------------//
     // newOutputStream //
     //-----------------//
-    public OutputStream newOutputStream ()
+    public OutputStream newOutputStream (OpenOption... options)
             throws IOException
     {
-        return Files.newOutputStream(innerPath);
+        return Files.newOutputStream(innerPath, options);
     }
 
-    //-------//
-    // close //
-    //-------//
-    public void close ()
+    //----------------//
+    // newPrintWriter //
+    //----------------//
+    public PrintWriter newPrintWriter (OpenOption... options)
             throws IOException
     {
-        root.getFileSystem().close();
+        return Utils.getPrintWriter(innerPath, options);
+    }
+
+    @Override
+    public String toString ()
+    {
+        return new StringBuilder()
+                .append(getClass().getSimpleName()).append('{')
+                .append(root.getFileSystem())
+                .append(" inner:")
+                .append(innerPath)
+                .append('}').toString();
     }
 
     //--------//
     // create //
     //--------//
+    /**
+     * Create a new ZipWrapper at virtualPath location.
+     *
+     * @param virtualPath
+     * @return the created wrapper
+     * @throws IOException if IO error
+     */
     public static ZipWrapper create (Path virtualPath)
             throws IOException
     {
         final Path root = ZipFileSystem.create(toZip(virtualPath));
 
-        return new ZipWrapper(root, root.resolve(virtualPath.getFileName().toString()));
-    }
-
-    //------//
-    // open //
-    //------//
-    public static ZipWrapper open (Path virtualPath)
-            throws IOException
-    {
-        final Path root = ZipFileSystem.open(toZip(virtualPath));
-
-        return new ZipWrapper(root, root.resolve(virtualPath.getFileName().toString()));
+        return new ZipWrapper(root, root.resolve(toInner(virtualPath)));
     }
 
     //--------//
@@ -190,54 +231,135 @@ public class ZipWrapper
         return Files.exists(toZip(virtualPath));
     }
 
+    //------//
+    // open //
+    //------//
+    public static ZipWrapper open (Path virtualPath)
+            throws IOException
+    {
+        final Path root = ZipFileSystem.open(toZip(virtualPath));
+
+        return new ZipWrapper(root, root.resolve(toInner(virtualPath)));
+    }
+
+    //--------//
+    // toInner//
+    //--------//
+    public static String toInner (Path virtualPath)
+    {
+        final Path fileName = virtualPath.getFileName();
+        final String extension = FileUtil.getExtension(fileName);
+
+        if (extension.equals(".zip")) {
+            return FileUtil.getNameSansExtension(virtualPath);
+        } else {
+            return fileName.toString();
+        }
+    }
+
     //-------//
     // toZip //
     //-------//
     public static Path toZip (Path virtualPath)
     {
-        return virtualPath.resolveSibling(FileUtil.getNameSansExtension(virtualPath) + ".zip");
+        final String extension = FileUtil.getExtension(virtualPath);
+
+        if (extension.equals(".zip")) {
+            return virtualPath;
+        } else {
+            return virtualPath.resolveSibling(FileUtil.getNameSansExtension(virtualPath) + ".zip");
+        }
     }
 
     public static void main (String[] args)
             throws Exception
     {
-        final Path where = Paths.get("data/tests/essai.csv");
+        final Path where = Paths.get("data/tests/essai.csv.zip");
+        ///final Path where = Paths.get("data/tests/essai.csv");
 
         {
-            logger.info("1");
+            logger.info("touch");
             final ZipWrapper zw = ZipWrapper.create(where);
-            final OutputStream os = zw.newOutputStream();
-            final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-
-            bw.write("Une ligne");
-            bw.newLine();
-            bw.write("Une deuxième ligne");
-            bw.newLine();
-            bw.write("Une troisième ligne");
-            bw.newLine();
-
-            bw.flush();
-            os.close();
+            logger.info("zw:{}", zw);
+            zw.close();
         }
+//
+//        {
+//            logger.info("creation");
+//            final ZipWrapper zw = ZipWrapper.create(where);
+//            final BufferedWriter bw = zw.newBufferedWriter();
+//
+//            bw.write("Une ligne");
+//            bw.newLine();
+//            bw.write("Une deuxième ligne");
+//            bw.newLine();
+//            bw.write("Une troisième ligne");
+//            bw.newLine();
+//
+//            bw.flush();
+//            bw.close();
+//            zw.close();
+//        }
 
         {
-            logger.info("2");
-            final ZipWrapper zw = ZipWrapper.create(where);
-            final InputStream is = zw.newInputStream();
-            final BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                logger.info("line: {}", line);
+            logger.info("read");
+            final ZipWrapper zw = ZipWrapper.open(where);
+            logger.info("zw:{}", zw);
+            if (Files.exists(zw.getInner())) {
+                try (BufferedReader br = zw.newBufferedReader()) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        logger.info("line: {}", line);
+                    }
+                }
+            } else {
+                logger.info("{} does not exist", zw.getInner());
             }
-
-            is.close();
             zw.close();
         }
 
         {
-            logger.info("3");
-            final ZipWrapper zw = ZipWrapper.create(where);
+            logger.info("append");
+            final ZipWrapper zw = ZipWrapper.open(where);
+            logger.info("zw:{}", zw);
+            final OutputStream os = zw.newOutputStream(StandardOpenOption.CREATE,
+                                                       StandardOpenOption.APPEND);
+            final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+
+            bw.write("Une quatrième ligne");
+            bw.newLine();
+            bw.write("Une cinquième ligne");
+            bw.newLine();
+            bw.write("Une sixième ligne");
+            bw.newLine();
+
+            bw.flush();
+            bw.close();
+            zw.close();
+        }
+
+        {
+            logger.info("append-bis");
+            final ZipWrapper zw = ZipWrapper.open(where);
+            final BufferedWriter bw = zw.newBufferedWriter(StandardOpenOption.CREATE,
+                                                           StandardOpenOption.APPEND);
+
+            bw.write("Une septième ligne");
+            bw.newLine();
+            bw.write("Une huitième ligne");
+            bw.newLine();
+            bw.write("Une neuvième ligne");
+            bw.newLine();
+
+            bw.flush();
+            bw.close();
+            zw.close();
+        }
+
+        {
+            logger.info("read2");
+            final ZipWrapper zw = ZipWrapper.open(where);
+            logger.info("zw:{}", zw);
             final BufferedReader br = zw.newBufferedReader();
 
             String line;
@@ -249,22 +371,11 @@ public class ZipWrapper
             zw.close();
         }
 
-        {
-            logger.info("4");
-            final ZipWrapper zw2 = ZipWrapper.open(where);
-            final InputStream is2 = zw2.newInputStream();
-            final BufferedReader br2 = new BufferedReader(new InputStreamReader(is2, "UTF-8"));
+        logger.info("exists");
+        boolean exists = ZipWrapper.exists(where);
+        logger.info("exists:{}", exists);
 
-            String line2;
-            while ((line2 = br2.readLine()) != null) {
-                logger.info("line: {}", line2);
-            }
-
-            is2.close();
-            zw2.close();
-        }
-
-        logger.info("5");
+        logger.info("deletion");
         boolean deleted = ZipWrapper.deleteIfExists(where);
         logger.info("deleted: {}", deleted);
     }

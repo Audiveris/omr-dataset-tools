@@ -22,7 +22,7 @@
 package org.audiveris.omrdataset.api;
 
 /**
- * Class {@code OmrEvaluation}
+ * Class {@code OmrEvaluation} is an evaluation using OmrShape (rather than Shape).
  *
  * @author Hervé Bitteur
  */

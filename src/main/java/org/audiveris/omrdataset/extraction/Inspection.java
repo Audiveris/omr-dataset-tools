@@ -21,13 +21,14 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
-import static org.audiveris.omrdataset.training.App.BINS_PATH;
+import org.audiveris.omr.util.StopWatch;
+import org.audiveris.omrdataset.Main;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.List;
-import org.audiveris.omr.util.StopWatch;
 
 /**
  * Class {@code Inspection} inspects a range of iterations, by selecting the related
@@ -52,8 +53,7 @@ public class Inspection
      */
     public Inspection (int bin)
     {
-        final String name = String.format("bin-%02d.csv", bin);
-        binPath = BINS_PATH.resolve(name);
+        binPath = Main.binPath(bin);
     }
 
     //~ Methods ------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ public class Inspection
         StopWatch watch = new StopWatch("Inspection " + iterations);
         // Extract the related samples
         watch.start("slice");
-        logger.info("Slice extraction for {}", iterations);
+        logger.info("Slice extraction for {} in {}", iterations, binPath);
         final int iterMin = iterations.get(0);
         final int iterMax = iterations.get(iterations.size() - 1);
         Path slicePath = new CsvSlicer().extract(binPath, iterMin, iterMax);

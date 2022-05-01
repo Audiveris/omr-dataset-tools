@@ -1,65 +1,98 @@
-
+Sources:
 
 [defined by -- SOURCE1 SOURCE2 arguments]
-SOURCE                              // Perhaps several source folders
-└── BOOK                            // Perhaps several levels of intermediate folders
-    ├── SHEET.xml                   // Original annotations file
-    ├── SHEET.png                   // Original image file
-    ├── SHEET.omr                   // OMR data on original image
-    ├── SHEET.tablatures.xml        // Detected tablature areas if any
-    ├── SHEET.filtered.xml          // Filtered annotations file
-    ├── SHEET.features.csv          // Symbols + nones features in CSV format (without sheet id)
-    ├── SHEET.controls.png          // Optional control image (original + symbols + nones)
-    └── SHEET.patches               // Optional patch subimages
-        ├── 1-SYMB-SHAPE.png        // First symbol patch in sheet
-        ├── ...
-        └── NN-SYMB-SHAPE.png       // Last symbol patch in sheet
+
+.
+├── DeepScores
+│   ├── archive-0
+│   │   ├── archive-sheet-index.csv
+│   │   ├── bins
+│   │   │   ├── bin-01.csv.zip
+│   │   │   └── bin-NN.csv.zip
+│   │   ├── classifications
+│   │   │   └── SHAPE
+│   │   │       └── N.png
+│   │   ├── control
+│   │   │   └── SHEET.controls.png
+│   │   ├── features
+│   │   │   └── SHEET.csv.zip
+│   │   ├── filtered
+│   │   │   └── SHEET.filtered.xml
+│   │   ├── gray_images_png
+│   │   │   └── SHEET.png
+│   │   ├── mistakes
+│   │   │   └── SHAPE.csv.zip
+│   │   ├── omr
+│   │   │   └── SHEET.omr
+│   │   ├── patches
+│   │   │   └── SHEET
+│   │   │       └── SYMBOLID(x99y99w99z99)-SHAPE.png
+│   │   ├── shapes
+│   │   │   └── SHAPE.csv.zip
+│   │   ├── tablatures
+│   │   │   └── SHEET.tablatures.xml
+│   │   └── xml_annotations
+│   │       └── SHEET.xml
+│   └── archive-20
+└── MuseScore
+    └── archive-0
 
 
 
-[defined by option -output XXXXXX]
-XXXXXX
-│
+Target:
+
+// Target folder where training material is kept
+//----------------------------------------------
+//
+[optionally superseded by option -output XXXXXX]
+
+data/output/
 ├── training
-│   ├── global-sheets-map.xml       // Mapping sheet id <-> SHEET.xml
 │   ├── bins
-│   │   ├── bin-01.csv              // Bin #1 of CSV features (with sheet id appended)
-│   │   ├── ...
-│   │   └── bin-NN.csv              // Bin #N of CSV features (with sheet id appended)
-│   └── patch-classifier.zip        // Trained model
-│
-└── analyses                        // Data for local analyses
-    └── iter-M-N                    // Small range of iterations (1 or 2?)
-        ├── iter-M-N.features.csv   // Slice of features used for iterations range
-        ├── 1-SH-SYMB-SHAPE.png     // First patch in features slice
-        ├── ...
-        └── 64-SH-SYMB-SHAPE.png    // Last patch in features slice
+│   │   ├── bin-01.csv.zip
+│   │   └── bin-NN.csv.zip
+│   └── patch-classifier.zip
+└── verification
+    └── BIN-iter-M-N
+        ├── 1-COL-ARC-SH-SYMB-SHAPE.png
+        ├── 2-COL-ARC-SH-SYMB-SHAPE.png
+        ├── 64-COL-ARC-SH-SYMB-SHAPE.png
+        └── iter-M-N.csv.zip
 
 
+Command line:
 
-Command line
+
 Syntax:
-   [OPTIONS] -- [INPUT_FILES]
+   [OPTIONS] -- [INPUT_ANNOTATION_FILES and/or INPUT_FOLDERS]
 
 @file:
- Content to be extended in line
+ Content to be expanded in line
 
 Options:
- -1filter           : Step 1: Filter symbols from raw source files
- -2features         : Step 2: Generate sheet .csv files
- -3split            : Step 3: Split all sheet .csv files into few csv bins
- -4train            : Step 4: Train model from csv bins
-
- -nones             : Generate none symbols (effective on steps 1 & 2)
- -model <.zip file> : Defines path to model
- -output <folder>   : Defines output directory
- -parallel          : Use parallel processing (effective on steps 1 & 2)
-
- -help              : Displays general help then stops
- -names             : Print all possible shape names
- -controls          : Generate control images
- -histo             : Shape histogram per sheet
- -patches           : Generate patch images                     
+ -help                 : Display general help then stop
+ -filter               : Step 1: Load and filter symbols
+ -nones                : Step 2: Generate none symbols
+                            (effective for control & features)
+ -features             : Step 3: Generate sheet .csv.zip files
+ -tally                : Step 4: Dispatch features by shape
+ -grids                : Step 4.b: Build patch grids by shape
+ -split                : Step 5: Split shape tally files into bins
+ -shuffle              : Step 6: Shuffle each bin in memory
+ -train int[]          : Step 7: Train model on selected bins
+ -testPath XXX.csv.zip : Evaluate model on the provided features file
+ -parallel             : (recommended) Use parallel processing
+                            (effective on steps 1 to 4)
+ -names                : (optional) Print all possible shape names with their index
+ -histo                : (optional) Print shape histogram per sheet
+ -binhisto int[]       : (optional) Print shape histogram of selected bins
+ -control              : (optional) Generate control images
+ -patches              : (optional) Generate patch images
+ -inspect int[]        : (optional) Inspect a bin for a range of iterations
+ -output <folder>      : (optional) Define output directory
+                            (defaults to "data/output")
+ -model <.zip file>    : (optional) Define path to model
+                            (defaults to "<output>/training/patch-classifier.zip")
 
 Input file extensions:
  .xml: annotations file

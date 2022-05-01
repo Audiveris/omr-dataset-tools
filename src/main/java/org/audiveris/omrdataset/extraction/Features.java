@@ -21,20 +21,25 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
+import org.audiveris.omr.util.Table;
 import org.audiveris.omr.util.ZipWrapper;
+import org.audiveris.omrdataset.Main;
+import org.audiveris.omrdataset.api.Context;
 import org.audiveris.omrdataset.api.OmrShape;
+import org.audiveris.omrdataset.api.Patch.UPatch;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
-import static org.audiveris.omrdataset.training.Context.BACKGROUND;
-import static org.audiveris.omrdataset.training.Context.CONTEXT_HEIGHT;
-import static org.audiveris.omrdataset.training.Context.CONTEXT_WIDTH;
-import static org.audiveris.omrdataset.training.Context.INTERLINE;
-import static org.audiveris.omrdataset.extraction.SheetProcessor.scale;
+import org.audiveris.omrdataset.extraction.SourceInfo.USheetId;
+import org.audiveris.omrdataset.extraction.SourceInfo.USymbolId;
+import static org.audiveris.omrdataset.api.Context.BACKGROUND;
+import static org.audiveris.omrdataset.api.Context.INTERLINE;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -47,31 +52,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Class {@code Features} reads input images data (collection of pairs: sheet image and
- * symbol descriptors) and produces the features CSV file meant for NN training.
+ * Class {@code Features} reads input data (image and annotations) and produces
+ * a features CSV file meant for NN training.
  * <p>
- * Each page annotations are augmented with artificial None symbols.
- * For visual checking, a page image can be produced with initial image, true symbols boxes and
- * None symbols locations.
- * <p>
- * In the features CSV file, there must be one record per symbol, containing:
- * <ol>
- * <li>the (112*56=6272) pixels of the patch image centered on the symbol center
- * <li>(index of) shape name
- * <li>symbol id within sheet
- * <li>x
- * <li>y
- * <li>w
- * <li>h
- * <li>interline value (10) // Useful?
- * <li>sheet id (APPENDED WHEN BEING STORED IN bin-xx.csv)
- * </ol>
- * <p>
- * Beside CSV training file, we retrieve Norm (mean + stdDev) for: <ul>
- * <li>all pixel values whatever the shape
- * <li>symbol width per valid shape
- * <li>symbol height per valid shape
- * </ul>
+ * In a features CSV file, there must be one record per sample.
  *
  * @author Hervé Bitteur
  */
@@ -81,27 +65,30 @@ public class Features
 
     private static final Logger logger = LoggerFactory.getLogger(Features.class);
 
+    /** Should we process inner symbols?. */
     private static final boolean leaves = true;
 
     //~ Instance fields ----------------------------------------------------------------------------
-    private final int sheetId;
+    /** The sheet being processed. */
+    private final USheetId uSheetId;
 
+    /** Symbols (and nones) in this sheet. */
     private final SheetAnnotations annotations;
 
-    /** Sheet image(s) gathered by interline value. */
+    /** Sheet image(s) indexed by interline value. */
     private final Map<Integer, BufferedImage> imgMap = new TreeMap<>();
 
     //~ Constructors -------------------------------------------------------------------------------
     /**
      * Create a {@code Features} object.
      *
-     * @param sheetId     ID of related sheet
+     * @param uSheetId    ID of related sheet
      * @param annotations sheet annotations
      */
-    public Features (int sheetId,
+    public Features (USheetId uSheetId,
                      SheetAnnotations annotations)
     {
-        this.sheetId = sheetId;
+        this.uSheetId = uSheetId;
         this.annotations = annotations;
     }
 
@@ -110,19 +97,19 @@ public class Features
     // extract //
     //---------//
     /**
-     * Extract the features for sheet good symbols.
+     * Extract the features for sheet good symbols with respect to current context.
      *
      * @param initialImg   whole sheet image
-     * @param featuresPath path to sheet features compressed file (.zip)
+     * @param featuresPath path to sheet features compressed output file (.zip)
      * @throws IOException if anything goes wrong
      */
     public void extract (BufferedImage initialImg,
                          Path featuresPath)
             throws IOException
     {
-        List<SymbolInfo> symbols = annotations.getGoodSymbols();
-        ZipWrapper zout = ZipWrapper.create(featuresPath);
-        logger.info("sheetId:{} Extracting features to (zipped) {}", sheetId, featuresPath);
+        final List<SymbolInfo> symbols = annotations.getGoodSymbols();
+        final ZipWrapper zout = ZipWrapper.create(featuresPath);
+        logger.info("{} Extracting features to {}", uSheetId, featuresPath);
 
         try (PrintWriter features = zout.newPrintWriter()) {
             extractFeatures(initialImg, symbols, features);
@@ -138,112 +125,137 @@ public class Features
     /**
      * Generate the features related to the collection of provided symbols.
      *
-     * @param initialImg the initial image
-     * @param symbols    the symbols to process
-     * @param features   features output file
+     * @param originalImg the original image
+     * @param symbols     the symbols to process
+     * @param features    features output file
      */
-    private void extractFeatures (BufferedImage initialImg,
+    private void extractFeatures (BufferedImage originalImg,
                                   List<SymbolInfo> symbols,
                                   PrintWriter features)
+            throws IOException
     {
         for (SymbolInfo symbol : symbols) {
             final OmrShape symbolShape = symbol.getOmrShape();
-            logger.debug("{}", symbol);
 
             // Inner symbols?
             if (leaves) {
                 List<SymbolInfo> innerSymbols = symbol.getInnerSymbols();
 
                 if (!innerSymbols.isEmpty()) {
-                    extractFeatures(initialImg, SymbolInfo.getGoodSymbols(innerSymbols), features);
-//
-//                    if (!OmrShapes.TIME_COMBOS.contains(symbolShape)) {
-//                        continue;
-//                    }
+                    extractFeatures(originalImg,
+                                    SymbolInfo.getGoodSymbols(innerSymbols, Main.context),
+                                    features);
                 }
             }
 
-            final StringBuilder sb = new StringBuilder(6500); // Largely presized
-            final Rectangle2D box = symbol.getBounds();
+            final Context context = Main.context;
+            final UPatch uPatch = new UPatch(
+                    symbolShape,
+                    new USymbolId(uSheetId, symbol.getId()),
+                    symbol.getBounds(),
+                    symbol.getInterline(),
+                    context.ignores(symbolShape) ? context.getNone() : context.getLabel(symbolShape),
+                    getPixels(symbol, originalImg),
+                    Main.context);
 
-            // Pick up image properly scaled
-            final double interline = symbol.getInterline();
-            final int roundedInterline = (int) Math.rint(interline);
-            final boolean rescale = roundedInterline != INTERLINE;
-            final double ratio = INTERLINE / interline;
-            BufferedImage img = imgMap.get(roundedInterline);
-
-            if (img == null) {
-                imgMap.put(roundedInterline, img = rescale ? scale(initialImg, ratio) : initialImg);
-            }
-
-            final int imgWidth = img.getWidth();
-            final int imgHeight = img.getHeight();
-
-            // Symbol center
-            final double sCenterX = ratio * (box.getX() + (box.getWidth() / 2.0));
-            final double sCenterY = ratio * (box.getY() + (box.getHeight() / 2.0));
-
-            // Top-left corner of context
-            final int axMin = (int) Math.rint(sCenterX - (CONTEXT_WIDTH / 2));
-            final int ayMin = (int) Math.rint(sCenterY - (CONTEXT_HEIGHT / 2));
-            logger.trace("left:{} top:{}", axMin, ayMin);
-
-            final WritableRaster raster = img.getRaster();
-            final DataBuffer buffer = raster.getDataBuffer();
-            final DataBufferByte byteBuffer = (DataBufferByte) buffer;
-            final byte[] bytes = byteBuffer.getData();
-
-            // Extract bytes from sub-image, paying attention to image limits
-            // Target format is flattened format, row by row.
-            for (int y = 0; y < CONTEXT_HEIGHT; y++) {
-                int ay = ayMin + y; // Absolute y
-
-                if ((ay < 0) || (ay >= imgHeight)) {
-                    // Fill row with background value
-                    for (int x = 0; x < CONTEXT_WIDTH; x++) {
-                        sb.append(BACKGROUND).append(',');
-                    }
-                } else {
-                    for (int x = 0; x < CONTEXT_WIDTH; x++) {
-                        int ax = axMin + x; // Absolute x
-                        int val = ((ax < 0) || (ax >= imgWidth)) ? BACKGROUND
-                                : (255 - (bytes[(ay * imgWidth) + ax] & 0xff)); // Inversion!
-                        sb.append(val).append(',');
-                    }
-                }
-            }
-
-            // Add OmrShape index
-            try {
-                sb.append(symbolShape.ordinal());
-            } catch (Exception ex) {
-                logger.error("sheetId:{} Missing shape {}", sheetId, symbol);
-                throw new RuntimeException("Missing shape for " + symbol);
-            }
-
-            // Collection source. A bit tricky, to be improved! :-)
-            final String src = annotations.getSource().toLowerCase();
-            sb.append(',').append(src.contains("zhaw") ? 1 : (src.contains("musescore") ? 2 : 0));
-
-            // Symbol id
-            sb.append(',').append(symbol.getId());
-
-            // Original symbol bounds (non scaled)
-            sb.append(',').append(box.getX());
-            sb.append(',').append(box.getY());
-            sb.append(',').append(box.getWidth());
-            sb.append(',').append(box.getHeight());
-
-            // Original interline value for this symbol
-            sb.append(',').append(symbol.getInterline());
-
-// We do not include sheet ID at this point!
-//            // Sheet id
-//            sb.append(',').append(sheetId);
-//
-            // This is the end for this symbol...
-            features.println(sb.toString());
+            ///System.out.println(uPatch.toString());
+            features.println(uPatch.toCsv());
         }
+    }
+
+    //-----------//
+    // getPixels //
+    //-----------//
+    /**
+     * Build the pixel table for a symbol within its original image.
+     *
+     * @param symbol        the symbol to process
+     * @param originalImage the original score image
+     * @return the populated pixel table
+     */
+    private Table.UnsignedByte getPixels (SymbolInfo symbol,
+                                          BufferedImage originalImage)
+            throws IOException
+    {
+        // Pick up image properly scaled
+        final double interline = symbol.getInterline();
+        final int roundedInterline = (int) Math.rint(interline);
+        final boolean rescale = roundedInterline != INTERLINE;
+        final double ratio = INTERLINE / interline;
+        BufferedImage img = imgMap.get(roundedInterline);
+
+        if (img == null) {
+            imgMap.put(roundedInterline, img = rescale
+                       ? scale(originalImage, ratio) : originalImage);
+        }
+
+        final int imgWidth = img.getWidth();
+        final int imgHeight = img.getHeight();
+
+        // Symbol center
+        final Rectangle2D box = symbol.getBounds();
+        final double sCenterX = ratio * (box.getX() + (box.getWidth() / 2.0));
+        final double sCenterY = ratio * (box.getY() + (box.getHeight() / 2.0));
+
+        // Top-left corner of context
+        final int contextWidth = Main.context.getContextWidth();
+        final int contextHeight = Main.context.getContextHeight();
+        final int axMin = (int) Math.rint(sCenterX - (contextWidth / 2));
+        final int ayMin = (int) Math.rint(sCenterY - (contextHeight / 2));
+        logger.trace("left:{} top:{}", axMin, ayMin);
+
+        final WritableRaster raster = img.getRaster();
+        final DataBuffer buffer = raster.getDataBuffer();
+        final DataBufferByte byteBuffer = (DataBufferByte) buffer;
+        final byte[] bytes = byteBuffer.getData();
+        final Table.UnsignedByte pixels = new Table.UnsignedByte(contextWidth, contextHeight);
+
+        // Extract bytes from sub-image, paying attention to image limits
+        // Target format is flattened format, row by row.
+        int idx = 0;
+        for (int y = 0; y < contextHeight; y++) {
+            int ay = ayMin + y; // Absolute y
+
+            if ((ay < 0) || (ay >= imgHeight)) {
+                // Fill row with background value
+                for (int x = 0; x < contextWidth; x++) {
+                    pixels.setValue(idx++, BACKGROUND);
+                }
+            } else {
+                for (int x = 0; x < contextWidth; x++) {
+                    int ax = axMin + x; // Absolute x
+                    int val = ((ax < 0) || (ax >= imgWidth)) ? BACKGROUND
+                            : (255 - (bytes[(ay * imgWidth) + ax] & 0xff)); // Inversion!
+                    pixels.setValue(idx++, val);
+                }
+            }
+        }
+
+        return pixels;
+    }
+
+    //-------//
+    // scale //
+    //-------//
+    /**
+     * Build a scaled version of an image.
+     *
+     * @param img   image to scale
+     * @param ratio scaling ratio
+     * @return the scaled image
+     */
+    private BufferedImage scale (BufferedImage img,
+                                 double ratio)
+    {
+        AffineTransform at = AffineTransform.getScaleInstance(ratio, ratio);
+        AffineTransformOp atop = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        BufferedImage scaledImg = new BufferedImage(
+                (int) Math.ceil(img.getWidth() * ratio),
+                (int) Math.ceil(img.getHeight() * ratio),
+                img.getType());
+
+        BufferedImage scaled = atop.filter(img, scaledImg);
+
+        return scaled;
     }
 }

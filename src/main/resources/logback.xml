@@ -4,7 +4,7 @@
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-5level [%X{BOOK}%X{SHEET}] %25replace(%file){'\.java$',''} %-4line | %msg%n%ex</pattern>
+            <pattern>%-5level %22replace(%file){'\.java$',''} %-4line | %msg%n%ex</pattern>
         </encoder>
     </appender>
 

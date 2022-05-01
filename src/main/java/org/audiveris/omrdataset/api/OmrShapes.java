@@ -38,7 +38,10 @@ public abstract class OmrShapes
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    /** OmrShapes as a list a strings. */
+    /** OmrShapes as an array. */
+    public static final OmrShape[] OMR_SHAPES = OmrShape.values();
+
+    /** OmrShapes names as a list a strings. */
     public static final List<String> NAMES = getNames();
 
     /** Predefined combos for time signatures. */
@@ -70,7 +73,7 @@ public abstract class OmrShapes
     {
         List<String> list = new ArrayList<String>();
 
-        for (OmrShape shape : OmrShape.values()) {
+        for (OmrShape shape : OMR_SHAPES) {
             list.add(shape.toString());
         }
 
@@ -131,7 +134,7 @@ public abstract class OmrShapes
      */
     public static void printOmrShapes ()
     {
-        for (OmrShape shape : OmrShape.values()) {
+        for (OmrShape shape : OMR_SHAPES) {
             System.out.printf("%3d %s%n", shape.ordinal(), shape.toString());
         }
     }

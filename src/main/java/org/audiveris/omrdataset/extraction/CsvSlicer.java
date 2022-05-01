@@ -21,17 +21,17 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import org.audiveris.omr.util.FileUtil;
+import org.audiveris.omr.util.ZipWrapper;
 import static org.audiveris.omrdataset.training.App.ANALYSES_PATH;
 import static org.audiveris.omrdataset.training.App.BATCH_SIZE;
 
 import org.slf4j.Logger;
-
-import java.nio.file.Path;
-import org.audiveris.omr.util.FileUtil;
-import org.audiveris.omr.util.ZipWrapper;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.nio.file.Path;
 
 /**
  * Class {@code CsvSlicer} gets a slice of a (zipped) CSV feature file, based on desired
@@ -65,7 +65,7 @@ public class CsvSlicer
         final String radix = "iter-" + iterMin + ((iterMax != iterMin) ? "-" + iterMax : "");
         final int idxMin = iterMin * BATCH_SIZE;
         final int idxMax = (iterMax + 1) * BATCH_SIZE - 1;
-        final String name = FileUtil.getNameSansExtension(csvPath);
+        final String name = FileUtil.avoidExtensions(csvPath, ".csv.zip").getFileName().toString();
         final Path dir = ANALYSES_PATH.resolve(name + "-" + radix);
         final Path slicePath = dir.resolve(radix + ".csv");
 

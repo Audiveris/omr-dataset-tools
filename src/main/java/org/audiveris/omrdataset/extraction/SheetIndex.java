@@ -21,45 +21,42 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
-import java.io.IOException;
+import org.audiveris.omr.util.StopWatch;
+import static org.audiveris.omrdataset.training.App.ANNOTATIONS_FOLDER_NAME;
+import static org.audiveris.omrdataset.training.App.INFO_EXT;
+import static org.audiveris.omrdataset.training.App.SHEET_INDEX_NAME;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.stream.XMLStreamException;
-import org.audiveris.omr.util.Jaxb;
 
 /**
- * Class {@code SheetIndex} keeps an index of sheets processed, to allow any sheet to
- * be referenced via its ID in a feature line.
+ * Class {@code SheetIndex} keeps an index of all sheets in a given archive, to allow
+ * any sheet to be referenced via its ID in a feature line.
  *
  * @author Hervé Bitteur
  */
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "SheetIndex")
 public class SheetIndex
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
     private static final Logger logger = LoggerFactory.getLogger(SheetIndex.class);
 
-    /** Un/marshalling context for use with JAXB. */
-    private static volatile JAXBContext jaxbContext;
-
     //~ Instance fields ----------------------------------------------------------------------------
-    @XmlElementWrapper(name = "map")
     private final TreeMap<Integer, String> int2Str = new TreeMap<>();
 
     private final Map<String, Integer> str2Int = new HashMap<>();
@@ -73,24 +70,6 @@ public class SheetIndex
     }
 
     //~ Methods ------------------------------------------------------------------------------------
-//    public static void main (String[] args)
-//            throws Exception
-//    {
-//        SheetIndex si = new SheetIndex();
-//
-//        for (int i = 1; i <= 5; i++) {
-//            si.getId(Paths.get("path_" + i));
-//        }
-//
-//        si.marshal(Paths.get("MySheetIndex.xml"));
-//
-//        SheetIndex newSi = SheetIndex.unmarshal(Paths.get("MySheetIndex.xml"));
-//        logger.info("newSi.int2Str: {}", newSi.int2Str);
-//        logger.info("newSi.str2Int: {}", newSi.str2Int);
-//        logger.info("newSi.lastId: {}", newSi.lastId);
-//
-//    }
-//
     public synchronized Integer getId (Path path)
     {
         final String str = path.toAbsolutePath().toString();
@@ -116,38 +95,121 @@ public class SheetIndex
     }
 
     public void marshal (Path outPath)
-            throws JAXBException,
-                   IOException,
-                   XMLStreamException
+            throws IOException
     {
-        Jaxb.marshal(this, outPath, getJaxbContext());
+        try (PrintWriter pw = Utils.getPrintWriter(outPath)) {
+            for (Entry<Integer, String> entry : int2Str.entrySet()) {
+                pw.println(entry.getKey() + "," + entry.getValue());
+            }
+
+            pw.flush();
+        }
+    }
+
+    @Override
+    public String toString ()
+    {
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append("{size:").append(int2Str.size()).append('}');
+
+        return sb.toString();
     }
 
     public static SheetIndex unmarshal (Path inPath)
-            throws IOException,
-                   JAXBException
+            throws IOException
     {
-        return (SheetIndex) Jaxb.unmarshal(inPath, getJaxbContext());
-    }
+        final SheetIndex si = new SheetIndex();
 
-    @SuppressWarnings("unused")
-    private void afterUnmarshal (Unmarshaller m,
-                                 Object parent)
-    {
-        // Populate reverse map str2Int and lastId
-        for (Entry<Integer, String> entry : int2Str.entrySet()) {
-            str2Int.put(entry.getValue(), lastId = entry.getKey());
-        }
-    }
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(Files.newInputStream(inPath), "UTF-8"))) {
+            String line;
 
-    private static JAXBContext getJaxbContext ()
-            throws JAXBException
-    {
-        // Lazy creation
-        if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(SheetIndex.class);
+            while ((line = br.readLine()) != null) {
+                final String[] tokens = line.split(",");
+                final int id = Integer.parseInt(tokens[0]);
+                final String str = tokens[1];
+                si.str2Int.put(str, id);
+                si.int2Str.put(id, str);
+            }
         }
 
-        return jaxbContext;
+        return si;
     }
+
+    /**
+     * Report the sheet index for the provided archive.
+     *
+     * @param archiveFolder provided archive folder
+     * @return the archive index
+     */
+    public static SheetIndex getSheetIndex (Path archiveFolder)
+    {
+        StopWatch watch = new StopWatch("getSheetIndex");
+        // If index exists on disk, simply load it
+        final Path indexPath = archiveFolder.resolve(SHEET_INDEX_NAME);
+
+        try {
+            watch.start("Existence");
+            if (Files.exists(indexPath)) {
+                watch.start("Unmarshalling");
+                SheetIndex index = unmarshal(indexPath);
+                ///watch.print();
+                return index;
+            }
+        } catch (IOException ex) {
+            logger.warn("Error loading sheet index {}", indexPath, ex);
+        }
+
+        // Build the index from scratch
+        final Path annotationsFolder = archiveFolder.resolve(ANNOTATIONS_FOLDER_NAME);
+
+        try {
+            final SheetIndex index = new SheetIndex();
+            logger.info("Browsing annotations");
+            watch.start("Browsing annotations");
+            Files.walkFileTree(
+                    annotationsFolder,
+                    new SimpleFileVisitor<Path>()
+            {
+                @Override
+                public FileVisitResult visitFile (Path path,
+                                                  BasicFileAttributes attrs)
+                        throws IOException
+                {
+                    String fn = path.getFileName().toString();
+                    if (fn.endsWith(INFO_EXT)) {
+                        index.getId(path); // This populates the index
+                    }
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+
+            try {
+                // Save index on disk
+                logger.info("Marshalling index");
+                watch.start("Marshalling index");
+                index.marshal(indexPath);
+            } catch (IOException ex) {
+                logger.warn("Error saving sheet index {}", indexPath, ex);
+                return null;
+            }
+
+            ///watch.print();
+            return index;
+        } catch (IOException ex) {
+            logger.warn("Error browsing annotations folder {}", annotationsFolder, ex);
+        }
+
+        return null;
+    }
+//
+//    public static void main (String[] args)
+//            throws Exception
+//    {
+//        // Just for testing
+//        Path archivePath = Paths.get("D:\\soft\\mscore-dataset\\MuseScore\\archive-0");
+//        SheetIndex si = getSheetIndex(archivePath);
+//        logger.info("si: {}", si);
+//    }
 }

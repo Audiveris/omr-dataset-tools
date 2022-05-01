@@ -21,10 +21,12 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
+import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
-import static org.audiveris.omrdataset.training.Context.INTERLINE;
+import org.audiveris.omrdataset.extraction.SourceInfo.USheetId;
+import static org.audiveris.omrdataset.api.Context.INTERLINE;
 import static org.audiveris.omrdataset.training.App.NONE_X_MARGIN;
 import static org.audiveris.omrdataset.training.App.NONE_Y_MARGIN;
 import static org.audiveris.omrdataset.training.App.IMAGES_FORMAT;
@@ -59,14 +61,14 @@ public class Control
 
     private static final Color AREA_COLOR = new Color(255, 255, 0, 25);
 
-    private final int sheetId;
+    private final USheetId uSheetId;
 
     private final SheetAnnotations annotations;
 
-    public Control (int sheetId,
+    public Control (USheetId uSheetId,
                     SheetAnnotations annotations)
     {
-        this.sheetId = sheetId;
+        this.uSheetId = uSheetId;
         this.annotations = annotations;
     }
 
@@ -80,7 +82,7 @@ public class Control
                        BufferedImage initialImg)
     {
         try {
-            logger.info("sheetId:{} Generating control image {}", sheetId, controlsPath);
+            logger.info("{} Generating control image {}", uSheetId, controlsPath);
             BufferedImage ctrl = new BufferedImage(
                     initialImg.getWidth(),
                     initialImg.getHeight(),
@@ -95,7 +97,7 @@ public class Control
             Files.createDirectories(controlsPath.getParent());
             ImageIO.write(ctrl, IMAGES_FORMAT, controlsPath.toFile());
         } catch (IOException ex) {
-            logger.warn("sheetId:{} Error drawing boxes to {}", sheetId, controlsPath, ex);
+            logger.warn("{} Error drawing boxes to {}", uSheetId, controlsPath, ex);
         }
     }
 
@@ -154,7 +156,7 @@ public class Control
                         box.getWidth() + 1,
                         box.getHeight() + 1);
 
-                if (symbol.getOmrShape().isIgnored()) {
+                if (Main.context.ignores(symbol.getOmrShape())) {
                     g.setColor(Color.BLUE);
                 } else if (symbol.isInvalid()) {
                     g.setColor(Color.ORANGE);

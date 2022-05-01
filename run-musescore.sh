@@ -1,0 +1,5 @@
+#!/bin/bash
+
+#./gradlew run --args="-parallel -context HEAD -nones -control -features -tally -bins -shuffle -- D:\soft\mscore-dataset\MuseScore\archive-0\xml_annotations" 2>&1 | tee data/material/M-shuffle.txt
+#./gradlew run --args="-parallel -context HEAD -shapeGrids -- D:\soft\mscore-dataset\MuseScore\archive-0\xml_annotations" 2>&1 | tee data/material/M-shapeGrids.txt
+#./gradlew run --args="-parallel -context HEAD -grids D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-01.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-02.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-03.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-04.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-05.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-06.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-07.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-08.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-09.csv.zip D:\soft\mscore-dataset\MuseScore\archive-0\HEAD\bins\bin-10.csv.zip -- D:\soft\mscore-dataset\MuseScore\archive-0\xml_annotations"

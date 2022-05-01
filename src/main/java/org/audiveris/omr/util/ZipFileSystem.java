@@ -21,14 +21,17 @@
 // </editor-fold>
 package org.audiveris.omr.util;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import static java.lang.Boolean.TRUE;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.ProviderNotFoundException;
+import java.nio.file.spi.FileSystemProvider;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Class {@code ZipFileSystem} gathers utility methods to read from and write to a zip
@@ -40,23 +43,29 @@ import java.util.zip.ZipOutputStream;
  * transparently under this root umbrella.
  * <p>
  * When IO operations are finished, the file system must be closed via a {@link FileSystem#close()}
- * on the root path like {@code root.getFileSystem().close();}
+ * on the root path like <b>root.getFileSystem().close();</b>
  *
  * @author Hervé Bitteur
  */
 public abstract class ZipFileSystem
 {
+    //~ Static fields/initializers -----------------------------------------------------------------
 
+    public static final int MAX_ENTRY_SIZE = 1 * 1024 * 1024 * 1024;
+
+    //~ Instance fields ----------------------------------------------------------------------------
+    //~ Constructors -------------------------------------------------------------------------------
     /** Not meant to be instantiated. */
     private ZipFileSystem ()
     {
     }
+    //~ Methods ------------------------------------------------------------------------------------
 
     //--------//
     // create //
     //--------//
     /**
-     * Create a new zip file system at the location provided by '{@code path}' parameter.
+     * Create a new zip file system at the location provided by '<b>path</b>' parameter.
      * If such file already exists, it is deleted beforehand.
      * <p>
      * When IO operations are finished, the file system must be closed via {@link FileSystem#close}
@@ -74,13 +83,20 @@ public abstract class ZipFileSystem
 
         // Make sure the containing folder exists
         Files.createDirectories(path.getParent());
+//
+//        // Make it a zip file
+//        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path.toFile()));
+//        zos.close();
+//
+//        // Finally open the file system just created
+//        return open(path);
 
-        // Make it a zip file
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path.toFile()));
-        zos.close();
+        Map<String, Object> env = new HashMap<>();
+        env.put("create", "true");
 
-        // Finally open the file system just created
-        return open(path);
+        FileSystem zipfs = newFileSystem(path, env);
+
+        return zipfs.getPath(zipfs.getSeparator());
     }
 
     //------//
@@ -88,7 +104,7 @@ public abstract class ZipFileSystem
     //------//
     /**
      * Open a zip file system (supposed to already exist at location provided by
-     * '{@code path}' parameter) for reading or writing.
+     * '<b>path</b>' parameter) for reading or writing.
      * <p>
      * When IO operations are finished, the file system must be closed via {@link FileSystem#close}
      *
@@ -99,10 +115,61 @@ public abstract class ZipFileSystem
     public static Path open (Path path)
             throws IOException
     {
+        return open(path, false);
+    }
+
+    //------//
+    // open //
+    //------//
+    /**
+     * Open a zip file system (supposed to already exist at location provided by
+     * '<b>path</b>' parameter) for reading or writing.
+     * <p>
+     * When IO operations are finished, the file system must be closed via {@link FileSystem#close}
+     *
+     * @param path        (zip) file path
+     * @param useTempFile mandatory for huge files
+     * @return the root path of the (zipped) file system
+     * @throws IOException if anything goes wrong
+     */
+    public static Path open (Path path,
+                             boolean useTempFile)
+            throws IOException
+    {
         Objects.requireNonNull(path, "ZipFileSystem.open: path is null");
 
-        FileSystem fileSystem = FileSystems.newFileSystem(path, (ClassLoader) null);
+        final FileSystem zipfs;
 
-        return fileSystem.getPath(fileSystem.getSeparator());
+        if (useTempFile) {
+            Map<String, Object> env = new HashMap<>();
+            env.put("useTempFile", TRUE);
+            zipfs = newFileSystem(path, env);
+        } else {
+            // NOTA: don't remove the cast to ClassLoader (meant for Java 13 compatibility)
+            zipfs = FileSystems.newFileSystem(path, (ClassLoader) null);
+        }
+
+        return zipfs.getPath(zipfs.getSeparator());
+    }
+
+    //---------------//
+    // newFileSystem //
+    //---------------//
+    public static FileSystem newFileSystem (Path path,
+                                            Map<String, Object> env)
+            throws IOException
+    {
+        if (path == null) {
+            throw new NullPointerException();
+        }
+
+        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+            try {
+                return provider.newFileSystem(path, env);
+            } catch (UnsupportedOperationException uoe) {
+            }
+        }
+
+        throw new ProviderNotFoundException("Provider not found");
     }
 }

@@ -21,15 +21,19 @@
 // </editor-fold>
 package org.audiveris.omrdataset.extraction;
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import org.audiveris.omrdataset.Main;
 import org.audiveris.omrdataset.api.OmrShape;
 import org.audiveris.omrdataset.api.OmrShapes;
 import org.audiveris.omrdataset.api.SheetAnnotations;
 import org.audiveris.omrdataset.api.SymbolInfo;
+import org.audiveris.omrdataset.extraction.SourceInfo.USheetId;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class {@code Histogram} handles the histogram of shapes for a given sheet.
@@ -43,7 +47,7 @@ public class Histogram
     private static final Logger logger = LoggerFactory.getLogger(Histogram.class);
     //~ Instance fields ----------------------------------------------------------------------------
 
-    private final int sheetId;
+    private final USheetId uSheetId;
 
     private final SheetAnnotations annotations;
 
@@ -51,10 +55,10 @@ public class Histogram
     private final Map<OmrShape, Integer> histo = new EnumMap<>(OmrShape.class);
 
     //~ Constructors -------------------------------------------------------------------------------
-    public Histogram (int sheetId,
+    public Histogram (USheetId uSheetId,
                       SheetAnnotations annotations)
     {
-        this.sheetId = sheetId;
+        this.uSheetId = uSheetId;
         this.annotations = annotations;
 
         populate(annotations.getGoodSymbols());
@@ -82,7 +86,7 @@ public class Histogram
 
         sb.append(String.format("%n%4d 100.0", total));
 
-        logger.info("sheetId:{} histogram:{}", sheetId, sb);
+        logger.info("{} histogram:{}", uSheetId, sb);
     }
 
     /**
@@ -98,11 +102,11 @@ public class Histogram
             final OmrShape symbolShape = symbol.getOmrShape();
 
             if (symbolShape == null) {
-                logger.info("sheetId:{} Skipping null shape {}", sheetId, symbol);
+                logger.info("{} Skipping null shape {}", uSheetId, symbol);
                 continue;
             }
 
-            if (symbolShape.isIgnored()) {
+            if (Main.context.ignores(symbolShape)) {
                 continue;
             }
 
