@@ -81,7 +81,8 @@ To filter input and generate proper features for HEAD classifier, using input fr
 
 To launch training on those generated features, use:
 ```
-./gradlew run --args="-context HEAD -train 1-9 -- D:\soft\DeepScores\archive-6\xml_annotations" ```
+./gradlew run --args="-context HEAD -train 1-9 -- D:\soft\DeepScores\archive-6\xml_annotations"
+```
 
 The training results in the creation or update of file `data/output/training/head-classifier.zip`.
 
