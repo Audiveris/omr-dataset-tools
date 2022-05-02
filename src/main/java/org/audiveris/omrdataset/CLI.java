@@ -90,12 +90,12 @@ public class CLI
 
     /** 4b/ shape Grids. */
     @Option(name = "-shapeGrids",
-            usage = "Step 4.b: Build patch grids by shape")
+            usage = "Step 4.b (optional): Build patch grids by shape")
     public boolean shapeGrids;
 
     /** 4c/ specific Grids. */
     @Option(name = "-grids",
-            usage = "Step 4.c: Build patch grids on selected inputs",
+            usage = "Step 4.c (optional): Build patch grids on selected inputs",
             handler = PathListOptionHandler.class)
     public ArrayList<Path> grids;
 
@@ -168,7 +168,7 @@ public class CLI
     /** Alternate target file for network model. */
     @Option(name = "-model",
             usage = "(optional) Define path to model"
-                            + "\n   (defaults to \"<output>/training/patch-classifier.zip\")",
+                            + "\n   (defaults to \"<output>/training/head-classifier.zip\")",
             metaVar = "<.zip file>")
     public Path modelPath;
 
