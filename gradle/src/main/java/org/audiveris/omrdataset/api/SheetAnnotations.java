@@ -63,6 +63,12 @@ public class SheetAnnotations
     private static volatile JAXBContext jaxbContext;
 
     //~ Instance fields ----------------------------------------------------------------------------
+    @XmlAttribute(name = "version")
+    private String version;
+
+    @XmlAttribute(name = "complete")
+    private Boolean complete;
+
     @XmlElement(name = "Source")
     private String source;
 
@@ -141,6 +147,24 @@ public class SheetAnnotations
         return SymbolInfo.getGoodSymbols(symbols, Main.context);
     }
 
+    /**
+     * @return the version
+     */
+    public String getVersion ()
+    {
+        return version;
+    }
+
+    /**
+     * Report whether these annotations are complete.
+     *
+     * @return the complete
+     */
+    public boolean isComplete ()
+    {
+        return (complete != null) && complete;
+    }
+
     //----------//
     // marshall //
     //----------//
@@ -170,6 +194,16 @@ public class SheetAnnotations
     }
 
     /**
+     * Set completeness information.
+     *
+     * @param complete the complete to set
+     */
+    public void setComplete (boolean complete)
+    {
+        this.complete = complete ? true : null;
+    }
+
+    /**
      * @param sheetInfo the sheetInfo to set
      */
     public void setSheetInfo (SheetInfo sheetInfo)
@@ -177,10 +211,22 @@ public class SheetAnnotations
         this.sheetInfo = sheetInfo;
     }
 
+    /**
+     * @param version the version to set
+     */
+    public void setVersion (String version)
+    {
+        this.version = version;
+    }
+
     @Override
     public String toString ()
     {
         StringBuilder sb = new StringBuilder("Annotations{");
+
+        if (version != null) {
+            sb.append("version:").append(version);
+        }
 
         if (source != null) {
             sb.append(" source:").append(source);

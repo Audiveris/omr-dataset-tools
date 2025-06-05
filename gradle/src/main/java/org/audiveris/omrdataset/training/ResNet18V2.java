@@ -21,11 +21,6 @@
 // </editor-fold>
 package org.audiveris.omrdataset.training;
 
-import org.audiveris.omrdataset.DSMain;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
@@ -34,20 +29,24 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.distribution.TruncatedNormalDistribution;
 import org.deeplearning4j.nn.conf.graph.ElementWiseVertex;
-import org.deeplearning4j.nn.conf.graph.GraphVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BatchNormalization;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.weights.WeightInitDistribution;
+
 import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.learning.config.RmsProp;
-import org.nd4j.linalg.lossfunctions.impl.LossMCXENT;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.deeplearning4j.nn.conf.graph.GraphVertex;
+import org.deeplearning4j.nn.conf.layers.Layer;
 
 /**
  * Class {@code ResNet18V2} implements ResNet18 network, using V2 architecture.
@@ -64,11 +63,11 @@ public class ResNet18V2
     private static final Logger logger = LoggerFactory.getLogger(ResNet18V2.class);
 
     //~ Instance fields ----------------------------------------------------------------------------
-    protected final int inputHeight;
+    protected final int inputDepth;
 
     protected final int inputWidth;
 
-    protected final int inputDepth;
+    protected final int inputHeight;
 
     protected final int numClasses;
 
@@ -76,19 +75,19 @@ public class ResNet18V2
     /**
      * Factory for ResNet18V2 network instances.
      *
-     * @param inputHeight input height
-     * @param inputWidth  input width
      * @param inputDepth  input number of channels (1 for gray, 3 for RGB)
+     * @param inputWidth  input width
+     * @param inputHeight input height
      * @param numClasses  number of classes to recognize
      */
-    public ResNet18V2 (int inputHeight,
+    public ResNet18V2 (int inputDepth,
                        int inputWidth,
-                       int inputDepth,
+                       int inputHeight,
                        int numClasses)
     {
-        this.inputHeight = inputHeight;
-        this.inputWidth = inputWidth;
         this.inputDepth = inputDepth;
+        this.inputWidth = inputWidth;
+        this.inputHeight = inputHeight;
         this.numClasses = numClasses;
     }
 
@@ -99,10 +98,9 @@ public class ResNet18V2
     /**
      * Create and initialize an instance of ResNet18V2 network.
      *
-     * @param lossWeights vector of loss weights to be used
      * @return the initialized network
      */
-    public OmrComputationGraph create (INDArray lossWeights)
+    public ComputationGraph create ()
     {
         // Define the graph configuration
         final WorkspaceMode workspaceMode = WorkspaceMode.ENABLED;
@@ -112,8 +110,8 @@ public class ResNet18V2
                         .activation(Activation.IDENTITY)
                         .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                         .updater(new RmsProp(0.1, 0.96, 0.001))
-                        .weightInit(new WeightInitDistribution(
-                                new TruncatedNormalDistribution(0.0, 0.5)))
+                        .weightInit(
+                                new WeightInitDistribution(new TruncatedNormalDistribution(0.0, 0.5)))
                         .l1(1e-7)
                         .l2(5e-5)
                         .miniBatch(true)
@@ -148,13 +146,12 @@ public class ResNet18V2
         last = identityBlock(graph, 512, "9", last);
 
         // Tail
-        last = tailBlock(graph, lossWeights, last);
+        last = tailBlock(graph, last);
 
         graph.setOutputs(last);
 
         // Build the network with defined configuration
-        final OmrComputationGraph network = new OmrComputationGraph(getClass().getSimpleName(),
-                                                                    graph.build());
+        final ComputationGraph network = new ComputationGraph(graph.build());
         network.init();
 
         return network;
@@ -415,13 +412,11 @@ public class ResNet18V2
      * <p>
      * NOTA: The SubsamplingLayer has been (temporarily) removed to cope with small input patches.
      *
-     * @param graph       the graph configuration being defined
-     * @param lossWeights vector of loss weights to be used
-     * @param input       block input
+     * @param graph the graph configuration being defined
+     * @param input block input
      * @return the name of last layer
      */
     protected String tailBlock (GraphBuilder graph,
-                                INDArray lossWeights,
                                 String input)
     {
         String last = input;
@@ -434,16 +429,12 @@ public class ResNet18V2
                                 .build(),
                         last);
 
-        last
-                = addLayer(graph, "fc_out",
-                           //new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                           new OutputLayer.Builder()
-                                   .lossFunction(new LossMCXENT(lossWeights))
-                                   .nOut(numClasses)
-                                   .activation(Activation.SOFTMAX)
-                                   .build(),
-                           last
-                );
+        last = addLayer(graph, "fc_out",
+                        new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                                .nOut(numClasses)
+                                .activation(Activation.SOFTMAX)
+                                .build(),
+                        last);
 
         return last;
     }
@@ -458,19 +449,19 @@ public class ResNet18V2
      */
     public static void main (String[] args)
     {
-        final int CONTEXT_HEIGHT = 96; //100; //97; //224; //42;
-        final int CONTEXT_WIDTH = 48; //60; //33; //224; //54;
         final int CONTEXT_DEPTH = 1;
-        final int NUM_CLASSES = 112;
-        ComputationGraph network = new ResNet18V2(CONTEXT_HEIGHT,
+        final int CONTEXT_WIDTH = 54; //60; //33; //224; //54;
+        final int CONTEXT_HEIGHT = 42; //100; //97; //224; //42;
+        final int NUM_CLASSES = 12;
+        ComputationGraph network = new ResNet18V2(CONTEXT_DEPTH,
                                                   CONTEXT_WIDTH,
-                                                  CONTEXT_DEPTH,
-                                                  NUM_CLASSES).create(DSMain.getLossWeights());
+                                                  CONTEXT_HEIGHT,
+                                                  NUM_CLASSES).create();
 
         System.out.println();
         System.out.println("*** ResNet18V2 ***");
-        System.out.printf("CONTEXT_HEIGHT:%d, CONTEXT_WIDTH:%d, CONTEXT_DEPTH:%d, NUM_CLASSES:%d",
-                          CONTEXT_HEIGHT, CONTEXT_WIDTH, CONTEXT_DEPTH, NUM_CLASSES);
+        System.out.printf("CONTEXT_DEPTH:%d, CONTEXT_WIDTH:%d, CONTEXT_HEIGHT:%d, NUM_CLASSES:%d",
+                          CONTEXT_DEPTH, CONTEXT_WIDTH, CONTEXT_HEIGHT, NUM_CLASSES);
         System.out.println();
         ///System.out.println(network.getConfiguration());
         InputType inputType = InputType.convolutionalFlat(CONTEXT_HEIGHT,

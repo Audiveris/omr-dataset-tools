@@ -22,7 +22,10 @@
 package org.audiveris.omrdataset.api;
 
 /**
- * Class {@code GeneralShape} is a subset of DeepScoresShape, meant for general patch classifier.
+ * Class {@code GeneralShape} is a subset of OmrShape, meant for general processing
+ * outside of head processing.
+ * <p>
+ * This is meant to be a small first list, just to validate its integration and efficiency in OMR.
  *
  * @author Hervé Bitteur
  */
@@ -31,17 +34,11 @@ public enum GeneralShape
     none,
 
     brace,
-//    ledgerLine,
     repeatDot,
-    segno,
-    coda,
-    clefG,
-    clefCAlto,
-    clefCTenor,
-    clefF,
-    clefUnpitchedPercussion, // No samples found in DeepScoresV2 dense (but found in complete)
-    clef8,
-    clef15,
+    gClef,
+    cClefAlto,
+    cClefTenor,
+    fClef,
     timeSig0,
     timeSig1,
     timeSig2,
@@ -54,119 +51,30 @@ public enum GeneralShape
     timeSig9,
     timeSigCommon,
     timeSigCutCommon,
-    noteheadBlackOnLine,
-//    noteheadBlackOnLineSmall,
-    noteheadBlackInSpace,
-//    noteheadBlackInSpaceSmall,
-    noteheadHalfOnLine,
-//    noteheadHalfOnLineSmall,
-    noteheadHalfInSpace,
-//    noteheadHalfInSpaceSmall,
-    noteheadWholeOnLine,
-//    noteheadWholeOnLineSmall,
-    noteheadWholeInSpace,
-//    noteheadWholeInSpaceSmall,
-    noteheadDoubleWholeOnLine,
-//    noteheadDoubleWholeOnLineSmall,
-    noteheadDoubleWholeInSpace,
-//    noteheadDoubleWholeInSpaceSmall,
-    augmentationDot,
-//    stem,
-    tremolo1,
-    tremolo2,
-    tremolo3,
-    tremolo4,
-    tremolo5,
+    noteheadBlack,
+    noteheadBlackSmall,
+    noteheadHalf,
+    noteheadWhole,
     flag8thUp,
-//    flag8thUpSmall,
     flag16thUp,
     flag32ndUp,
-    flag64thUp,
-    flag128thUp,
     flag8thDown,
-//    flag8thDownSmall,
     flag16thDown,
     flag32ndDown,
-    flag64thDown,
-    flag128thDown,
     accidentalFlat,
-//    accidentalFlatSmall,
     accidentalNatural,
-//    accidentalNaturalSmall,
     accidentalSharp,
-//    accidentalSharpSmall,
-    accidentalDoubleSharp,
-    accidentalDoubleFlat,
     keyFlat,
     keyNatural,
     keySharp,
-    articAccentAbove,
-    articAccentBelow,
-    articStaccatoAbove,
-    articStaccatoBelow,
-    articTenutoAbove,
-    articTenutoBelow,
-    articStaccatissimoAbove,
-    articStaccatissimoBelow,
-    articMarcatoAbove,
-    articMarcatoBelow,
-    fermataAbove,
-    fermataBelow,
-    caesura,
-    restDoubleWhole,
     restWhole,
     restHalf,
     restQuarter,
     rest8th,
     rest16th,
     rest32nd,
-    rest64th,
-    rest128th,
-    restHNr, // No sample found
-    dynamicP,
-    dynamicM,
-    dynamicF,
-    dynamicS,
-    dynamicZ,
-    dynamicR,
-//    graceNoteAcciaccaturaStemUp,
-//    graceNoteAppoggiaturaStemUp,
-//    graceNoteAcciaccaturaStemDown,
-//    graceNoteAppoggiaturaStemDown,
-    ornamentTrill,
-    ornamentTurn,
-    ornamentTurnInverted,
-    ornamentMordent,
-    ornamentMordentInverted, // Forgotten in DeepScoresV2 shape list!
-    stringsDownBow,
-    stringsUpBow,
-    arpeggiato,
-    keyboardPedalPed,
-    keyboardPedalUp,
     tuplet3,
-    tuplet6,
-    fingering0,
-    fingering1,
-    fingering2,
-    fingering3,
-    fingering4,
-    fingering5,
-//    slur,
-//    beam,
-//    tie,
-    restHBar,
-//    dynamicCrescendoHairpin,
-//    dynamicDiminuendoHairpin,
-    tuplet1,
-    tuplet2,
-    tuplet4,
-    tuplet5,
-    tuplet7,
-    tuplet8,
-    tuplet9,
-    tupletBracket;
-//    staff,
-//    ottavaBracket;
+    tuplet6;
 
     //~ Methods ------------------------------------------------------------------------------------
     //------------//
@@ -182,13 +90,13 @@ public enum GeneralShape
             return OmrShape.brace;
         case repeatDot:
             return OmrShape.repeatDot;
-        case clefG:
+        case gClef:
             return OmrShape.gClef;
-        case clefCAlto:
+        case cClefAlto:
             return OmrShape.cClefAlto;
-        case clefCTenor:
+        case cClefTenor:
             return OmrShape.cClefTenor;
-        case clefF:
+        case fClef:
             return OmrShape.fClef;
         case timeSig0:
             return OmrShape.timeSig0;
@@ -214,14 +122,13 @@ public enum GeneralShape
             return OmrShape.timeSigCommon;
         case timeSigCutCommon:
             return OmrShape.timeSigCutCommon;
-        case noteheadBlackOnLine:
-        case noteheadBlackInSpace:
+        case noteheadBlack:
             return OmrShape.noteheadBlack;
-        case noteheadHalfOnLine:
-        case noteheadHalfInSpace:
+        case noteheadBlackSmall:
+            return OmrShape.noteheadBlackSmall;
+        case noteheadHalf:
             return OmrShape.noteheadHalf;
-        case noteheadWholeOnLine:
-        case noteheadWholeInSpace:
+        case noteheadWhole:
             return OmrShape.noteheadWhole;
         case flag8thUp:
             return OmrShape.flag8thUp;
@@ -269,7 +176,6 @@ public enum GeneralShape
     //----------------//
     // toGeneralShape //
     //----------------//
-    // Not sure this method is relevant....
     public static GeneralShape toGeneralShape (OmrShape omrShape)
     {
         if (omrShape == null) {
@@ -284,13 +190,13 @@ public enum GeneralShape
         case repeatDot:
             return repeatDot;
         case gClef:
-            return clefG;
+            return gClef;
         case cClefAlto:
-            return clefCAlto;
+            return cClefAlto;
         case cClefTenor:
-            return clefCTenor;
+            return cClefTenor;
         case fClef:
-            return clefF;
+            return fClef;
         case timeSig0:
             return timeSig0;
         case timeSig1:
@@ -315,12 +221,14 @@ public enum GeneralShape
             return timeSigCommon;
         case timeSigCutCommon:
             return timeSigCutCommon;
-//        case noteheadBlack:
-//            return noteheadBlack;
-//        case noteheadHalf:
-//            return noteheadHalf;
-//        case noteheadWhole:
-//            return noteheadWhole;
+        case noteheadBlack:
+            return noteheadBlack;
+        case noteheadBlackSmall:
+            return noteheadBlackSmall;
+        case noteheadHalf:
+            return noteheadHalf;
+        case noteheadWhole:
+            return noteheadWhole;
         case flag8thUp:
             return flag8thUp;
         case flag16thUp:
@@ -363,19 +271,6 @@ public enum GeneralShape
             return tuplet6;
         default:
             return null;
-        }
-    }
-
-    //------//
-    // main //
-    //------//
-    public static void main (String... args)
-    {
-        System.out.println("GeneralShape values:");
-        final GeneralShape[] values = GeneralShape.values();
-
-        for (int i = 0; i < values.length; i++) {
-            System.out.println(String.format("%3d %s", i, values[i]));
         }
     }
 }

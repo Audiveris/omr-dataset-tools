@@ -21,8 +21,6 @@
 // </editor-fold>
 package org.audiveris.omrdataset.training;
 
-import org.audiveris.omrdataset.DSMain;
-
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
@@ -36,11 +34,8 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.weights.WeightInitDistribution;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.RmsProp;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Class {@code ResNet34V2}
@@ -59,17 +54,17 @@ public class ResNet34V2
     /**
      * Factory for ResNet34V2 network instances.
      *
-     * @param inputHeight input height
-     * @param inputWidth  input width
      * @param inputDepth  input number of channels (1 for gray, 3 for RGB)
+     * @param inputWidth  input width
+     * @param inputHeight input height
      * @param numClasses  number of classes to recognize
      */
-    public ResNet34V2 (int inputHeight,
+    public ResNet34V2 (int inputDepth,
                        int inputWidth,
-                       int inputDepth,
+                       int inputHeight,
                        int numClasses)
     {
-        super(inputHeight, inputWidth, inputDepth, numClasses);
+        super(inputDepth, inputWidth, inputHeight, numClasses);
     }
 
     //~ Methods ------------------------------------------------------------------------------------
@@ -82,7 +77,7 @@ public class ResNet34V2
      * @return the initialized network
      */
     @Override
-    public OmrComputationGraph create (INDArray lossWeights)
+    public ComputationGraph create ()
     {
         // Define the graph configuration
         final WorkspaceMode workspaceMode = WorkspaceMode.ENABLED;
@@ -136,13 +131,12 @@ public class ResNet34V2
         last = identityBlock(graph, 512, "17", last);
 
         // Tail
-        last = tailBlock(graph, lossWeights, last);
+        last = tailBlock(graph, last);
 
         graph.setOutputs(last);
 
         // Build the network with defined configuration
-        final OmrComputationGraph network = new OmrComputationGraph(getClass().getSimpleName(),
-                                                                    graph.build());
+        final ComputationGraph network = new ComputationGraph(graph.build());
         network.init();
 
         return network;
@@ -150,19 +144,19 @@ public class ResNet34V2
 
     public static void main (String[] args)
     {
-        final int CONTEXT_HEIGHT = 112;
-        final int CONTEXT_WIDTH = 56;
         final int CONTEXT_DEPTH = 1;
+        final int CONTEXT_WIDTH = 56;
+        final int CONTEXT_HEIGHT = 112;
         final int NUM_CLASSES = 204;
-        ComputationGraph network = new ResNet34V2(CONTEXT_HEIGHT,
+        ComputationGraph network = new ResNet34V2(CONTEXT_DEPTH,
                                                   CONTEXT_WIDTH,
-                                                  CONTEXT_DEPTH,
-                                                  NUM_CLASSES).create(DSMain.getLossWeights());
+                                                  CONTEXT_HEIGHT,
+                                                  NUM_CLASSES).create();
 
         System.out.println();
         System.out.println("*** ResNet34V2 ***");
-        System.out.printf("CONTEXT_HEIGHT:%d, CONTEXT_WIDTH:%d, CONTEXT_DEPTH:%d, NUM_CLASSES:%d",
-                          CONTEXT_HEIGHT, CONTEXT_WIDTH, CONTEXT_DEPTH, NUM_CLASSES);
+        System.out.printf("CONTEXT_DEPTH:%d, CONTEXT_WIDTH:%d, CONTEXT_HEIGHT:%d, NUM_CLASSES:%d",
+                          CONTEXT_DEPTH, CONTEXT_WIDTH, CONTEXT_HEIGHT, NUM_CLASSES);
         System.out.println();
         ///System.out.println(network.getConfiguration());
         InputType inputType = InputType.convolutionalFlat(CONTEXT_HEIGHT,

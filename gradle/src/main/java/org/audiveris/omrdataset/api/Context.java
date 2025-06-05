@@ -78,7 +78,7 @@ public abstract class Context<S extends Enum>
     private static final Logger logger = LoggerFactory.getLogger(Context.class);
 
     /** Predefined interline value: {@value}. */
-    public static final int INTERLINE = 17; // Was 20 for MuseScore
+    public static final int INTERLINE = 20;
 
     /** Value used for background pixel feature: {@value}. */
     public static final int BACKGROUND = 0;

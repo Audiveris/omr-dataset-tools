@@ -50,7 +50,7 @@ public class HeadContext
     private static final Logger logger = LoggerFactory.getLogger(HeadContext.class);
 
     /** Height for symbol context, in pixels: {@value}. */
-    private static final int CONTEXT_HEIGHT = 54; // Was 42
+    private static final int CONTEXT_HEIGHT = 42;
 
     /** Width for symbol context, in pixels: {@value}. */
     private static final int CONTEXT_WIDTH = 54;

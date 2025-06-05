@@ -40,10 +40,10 @@ public class GeneralContext
     private static final Logger logger = LoggerFactory.getLogger(GeneralContext.class);
 
     /** Height for symbol context, in pixels: {@value}. */
-    private static final int CONTEXT_HEIGHT = 96;
+    private static final int CONTEXT_HEIGHT = 55;
 
     /** Width for symbol context, in pixels: {@value}. */
-    private static final int CONTEXT_WIDTH = 48;
+    private static final int CONTEXT_WIDTH = 55;
 
     /** Number of pixels in a patch: {@value}. */
     private static final int NUM_PIXELS = CONTEXT_HEIGHT * CONTEXT_WIDTH;

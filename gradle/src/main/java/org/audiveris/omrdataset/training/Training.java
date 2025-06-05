@@ -33,20 +33,22 @@ import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.InputStreamInputSplit;
 import org.datavec.api.writable.Writable;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
+import org.deeplearning4j.api.storage.StatsStorage;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.deeplearning4j.core.storage.StatsStorage;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.api.NeuralNetwork;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.ui.model.stats.StatsListener;
-import org.deeplearning4j.ui.model.storage.InMemoryStatsStorage;
-import org.deeplearning4j.util.ModelSerializer;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -85,13 +87,10 @@ public class Training
         new Training().process(null);
     }
 
-    //---------//
-    // process //
-    //---------//
     /**
      * Perform the training of the neural network.
      * <p>
-     * Before training is launched, if the network mod-el exists on disk it is reloaded, otherwise a
+     * Before training is launched, if the network model exists on disk it is reloaded, otherwise a
      * brand new one is created.
      *
      * @param bins selected bin numbers
@@ -116,38 +115,34 @@ public class Training
         watch.start("Set iterators");
 
         // Model
-        final ComputationGraph model;
+        ///final ComputationGraph model;
+        ///final MultiLayerNetwork model;
+        final NeuralNetwork model;
 
         if (Files.exists(MODEL_PATH)) {
-            logger.info("Restoring model from {}", MODEL_PATH);
             watch.start("Restoring model");
-
-            ///String simpleMlp = new ClassPathResource("simple_mlp.h5").getFile().getPath();
-            ///model = KerasModelImport.importKerasModelAndWeights(MODEL_PATH.toString());
             model = ModelSerializer.restoreComputationGraph(MODEL_PATH.toFile(), true);
+            ///model = ModelSerializer.restoreMultiLayerNetwork(MODEL_PATH.toFile(), true);
             logger.info("Model restored from {}", MODEL_PATH.toAbsolutePath());
-            logger.info("Summary: {}", model.summary());
 
             // Backup model with time stamp before training
             final LocalDateTime now = LocalDateTime.now();
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
-            Path backup = MODEL_PATH.resolveSibling(now.format(formatter) + "-model.h5");
+            Path backup = MODEL_PATH.resolveSibling(now.format(formatter) + "-model.zip");
             watch.start("Model backup");
             Files.copy(MODEL_PATH, backup);
             logger.info("Model backup as {}", backup.toAbsolutePath());
         } else {
             watch.start("Building model");
             logger.info("Building model from scratch");
-//            model = new ResNet18V2(1,
-//                                   Main.context.getContextWidth(), // 54
-//                                   Main.context.getContextHeight(), // 54, was 42
-//                                   Main.context.getNumClasses()) // 12
-//                    .create();
-            model = new HeadClassifierNet(Main.context.getContextHeight(), // 54, was 42
-                                          Main.context.getContextWidth(), // 54
-                                          1,
-                                          Main.context.getNumClasses()) // 12
-                    .create();
+            model = new ResNet18V2(1,
+                                   Main.context.getContextWidth(), // 27
+                                   Main.context.getContextHeight(), // 21
+                                   Main.context.getNumClasses()).create();
+//            model = new HeadModel(1,
+//                                  Main.context.getContextWidth(),
+//                                  Main.context.getContextHeight(),
+//                                  Main.context.getNumClasses()).create();
         }
 
         try {
@@ -158,10 +153,19 @@ public class Training
                 StatsStorage statsStorage = new InMemoryStatsStorage(); //Alternative: new FileStatsStorage(File), for saving and loading later
                 uiServer.attach(statsStorage);
 
-                model.setListeners(new StatsListener(statsStorage),
-                                   new ScoreIterationListener(1));
+                if (model instanceof MultiLayerNetwork multiLayerNetwork) {
+                    multiLayerNetwork.setListeners(new StatsListener(statsStorage),
+                                                   new ScoreIterationListener(1));
+                } else if (model instanceof ComputationGraph computationGraph) {
+                    computationGraph.setListeners(new StatsListener(statsStorage),
+                                                  new ScoreIterationListener(1));
+                }
             } else {
-                model.setListeners(new ScoreIterationListener(1));
+                if (model instanceof MultiLayerNetwork multiLayerNetwork) {
+                    multiLayerNetwork.setListeners(new ScoreIterationListener(1));
+                } else if (model instanceof ComputationGraph computationGraph) {
+                    computationGraph.setListeners(new ScoreIterationListener(1));
+                }
             }
 
             logger.info("Training model...");
@@ -187,29 +191,6 @@ public class Training
                             -1);
                     trainIter.setCollectMetaData(true);
                     trainIter.setPreProcessor(preProcessor);
-//
-//                    while (trainIter.hasNext()) {
-//                        final DataSet ds = trainIter.next();
-//                        //ds.setFeatures(ds.getFeatures().reshape(BATCH_SIZE, 42, 54, 1));
-//                        INDArray f = ds.getFeatures();
-//                        logger.info("Features rank:{} shape:{}", f.rank(), f.shape());
-//                        logger.info("Features\n{}", f);
-//                        logger.info("DataSet \n{}", ds);
-//                        logger.info("\n-----------------------------------------------------------");
-//                        f = f.reshape(BATCH_SIZE, 54, 54, 1);
-//                        logger.info("Features rank:{} shape:{}", f.rank(), f.shape());
-//                        logger.info("Features\n{}", f);
-//
-//                        final INDArray l = ds.getLabels();
-//                        logger.info("Labels   rank:{} shape:{}", l.rank(), l.shape());
-//                        logger.info("Labels\n{}", l);
-//
-//                        ds.setFeatures(f);
-//                        ds.setLabels(l);
-//                        logger.info("DataSet \n{}", ds);
-//                        model.fit(ds);
-//                        break; ///////////////////////////////////////////
-//                    }
                     logger.info("{}", LocalDateTime.now());
                     logger.info("Training from {} ...", trainPath);
 
@@ -295,7 +276,8 @@ public class Training
      * @param bin   bin to use for test (usually the last one: 10)
      * @throws Exception if anything goes wrong
      */
-    private void evaluate (ComputationGraph model,
+    ///private void evaluate (MultiLayerNetwork model,
+    private void evaluate (NeuralNetwork model,
                            int bin)
             throws Exception
     {
@@ -315,7 +297,12 @@ public class Training
         testIter.setPreProcessor(preProcessor);
         logger.info("Using test dataset {} ...", zinTest);
 
-        final Evaluation eval = model.evaluate(testIter);
+        Evaluation eval = null;
+        if (model instanceof MultiLayerNetwork multiLayerNetwork) {
+            eval = multiLayerNetwork.evaluate(testIter);
+        } else if (model instanceof ComputationGraph computationGraph) {
+            eval = computationGraph.evaluate(testIter);
+        }
         eval.setLabelsList(Main.context.getLabelList());
 
         testIs.close();
@@ -349,11 +336,3 @@ public class Training
         }
     }
 }
-/*
- * org.deeplearning4j.exception.DL4JInvalidInputException:
- * Got rank 2 array as input to ConvolutionLayer
- * (layer name = Conv1, layer index = 1) with shape [64, 2268].
- * Expected rank 4 array with shape [minibatchSize, layerInputDepth, inputHeight, inputWidth].
- * (Wrong input type (see InputType.convolutionalFlat()) or wrong data type?)
- * (layer name: Conv1, layer index: 1, layer type: ConvolutionLayer)
- */
