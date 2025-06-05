@@ -1,7 +1,7 @@
 ///apply plugin: 'java'
 apply plugin: 'application'
 
-sourceCompatibility = '1.17'
+sourceCompatibility = '21'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 group   = 'org.audiveris'
@@ -9,10 +9,10 @@ version = '1.1.0'
 
 ext.programName    = "${rootProject.name}"
 
-ext.dl4jVersion = '1.0.0-beta6'
-ext.nd4jVersion = '1.0.0-beta6'
+ext.dl4jVersion = '1.0.0-M2'
+ext.nd4jVersion = '1.0.0-M2'
 
-//ext.jcppVersion = '1.5.2'
+//ext.jcppVersion = '1.5.2' 
 
 // this code is required in order to adapt values of os.name and os.arch to the
 // conventions used by Javacpp's dependencies
@@ -27,7 +27,7 @@ println "targetOS=${project.ext.targetOS}"
 
 // Ability to set a different main class
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'org.audiveris.omrdataset.Main'
+    ext.mainClass = 'org.audiveris.omrdataset.DSMain'
 }
 mainClassName = ext.mainClass
 
@@ -41,8 +41,8 @@ allprojects {
 }
 
 run {
-    minHeapSize = '512m'
-    maxHeapSize = '4g'
+    minHeapSize = '1g'
+    maxHeapSize = '3g'
     
     // Retrieve CLI arguments from cmdLineArgs property if any
     if (project.hasProperty("cmdLineArgs")) {
@@ -76,7 +76,7 @@ apply plugin: "com.github.ManifestClasspath"
 repositories {
     mavenCentral()
     mavenLocal()
-    //flatDir(dirs: 'dev/externals') // for libraries not in any other repository
+    flatDir(dirs: 'dev/externals') // for libraries not in any other repository
 }
 
 // Declare Lombok appropriately to avoid deprecation warnings in Gradle >= 4.6
@@ -88,6 +88,10 @@ dependencies {
 
 dependencies {
     implementation(
+        [name: 'Filters'],
+        [group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.2'],
+        [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2'],
+        [group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.13.2'],
         [group: 'org.jfree', name: 'jfreechart', version: '1.0.19'],
         [group: 'org.kohsuke', name: 'github-api', version: '1.99'],
         [group: 'args4j', name: 'args4j', version: '2.33'],
@@ -131,17 +135,17 @@ javadoc {
     title = "${project.ext.programName}-${version} API"
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
-    from sourceSets.main.allSource
-}
+//task sourcesJar(type: Jar, dependsOn: classes) {
+//    classifier = "sources"
+//    from sourceSets.main.allSource
+//}
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = "javadoc"
-    from javadoc.destinationDir
-}
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = "javadoc"
+//    from javadoc.destinationDir
+//}
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
+//artifacts {
+//    archives sourcesJar
+//    archives javadocJar
+//}

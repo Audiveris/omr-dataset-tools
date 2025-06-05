@@ -113,7 +113,7 @@ This detection is performed on MuseScore set only.
 This step is run on `xml_annotations` folder of `<sheet>.xml` files and results in `filtered` folder of `<sheet>.filtered.xml`.
 - Renaming of small version of shapes.
 - Fix inner dots of a repeat symbol as `repeatDot` instead of wrong `augmentationDot`.
-- Exclusion of symbols with zero widthh or zero height.
+- Exclusion of symbols with zero width or zero height.
 - Exclusion of tablatures areas (if any detected).
 - Exclusion of specific areas.
 - Exclusion of symbols not fully contained in sheet bounds
