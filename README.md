@@ -1,20 +1,23 @@
 # WARNING
 
 ```diff
-!The "patch-classifier" branch was created to implement and test the patch classifier concept.
 !
-!Such classifier was intended to work on any location in a score,
-!considering a rectangular patch centered on that location,
-!and reporting the musical symbol detected, if any, at that location.
+! The "patch-classifier" branch was created to implement and test the patch classifier concept.
 !
-!It worked in most cases, except for frequent confusion between small heads and normal heads.
+! Such classifier was intended to work on any location in a score,
+! considering a rectangular patch centered on that location,
+! and reporting the musical symbol detected, if any, at that location.
 !
-!However, it was far too slow, and applying the patch classifier via a sliding window across a full page
-!would have required several days of CPU resources on a PC.
+! It worked in most cases.
 !
-!Therefore, the approach was abandoned.
+! However, it was far too slow, and applying the patch classifier via a sliding window
+! across a full page would have required several days of CPU resources on a PC.
 !
-!This "patch-classifier" branch has been saved on GitHub for public access, but it is no longer maintained.
+! Therefore, the approach was abandoned.
+!
+! This "patch-classifier" branch has been saved on GitHub for public access,
+! but it is no longer maintained.
+!
 ```
 
 # omr-dataset
