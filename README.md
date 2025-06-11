@@ -1,8 +1,10 @@
 # WARNING
 
-This "patch-classifier" branch was created to implement and test the patch classifier concept.
+<div style="background-color:rgba(255, 200, 50, 0.27); padding: 20px;">
 
-This classifier was intended to work on any location in a score,
+The "patch-classifier" branch was created to implement and test the patch classifier concept.
+
+Such classifier was intended to work on any location in a score,
 considering a rectangular patch centered on that location,
 and reporting the musical symbol detected, if any, at that location.
 
@@ -11,9 +13,11 @@ It worked in most cases, except for frequent confusion between small heads and n
 However, it was far too slow, and applying the patch classifier via a sliding window across a full page
 would have required several days of CPU resources on a PC.
 
-Therefore, this approach was abandoned.
+Therefore, the approach was abandoned.
 
 This "patch-classifier" branch has been saved on GitHub for public access, but it is no longer maintained.
+
+</div>
 
 # omr-dataset
 
