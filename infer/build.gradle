@@ -1,0 +1,155 @@
+apply plugin: 'application'
+
+group   = 'org.audiveris'
+version = '1.1.0'
+
+ext.dl4jVersion = '1.0.0-M2.1'
+ext.nd4jVersion = '1.0.0-M2.1'
+
+ext.jcppVersion = '1.5.7' 
+
+ext.programName    = "${rootProject.name}"
+
+// this code is required in order to adapt values of os.name and os.arch to the
+// conventions used by Javacpp's dependencies
+ext.targetOSName   = System.getProperty('os.name').toLowerCase()\
+                     .startsWith('mac os x') ? 'macosx' :\
+                     System.getProperty('os.name').split(' ')[0].toLowerCase()
+ext.targetOSArch   = ["i386":"x86", "i486":"x86", "i586":"x86", "i686":"x86", "x86":"x86",
+                      "amd64":"x86_64", "x86-64":"x86_64", "x86_64":"x86_64", "arm":"armhf"]\
+                     [System.getProperty('os.arch').toLowerCase()]
+ext.targetOS       = "${project.ext.targetOSName}-${project.ext.targetOSArch}"
+println "targetOS=${project.ext.targetOS}"
+
+application {
+    mainClass = 'org.audiveris.omrdataset.infer.Inference'
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+// Useful for turning on deprecation warnings
+// Just uncomment the appropriate option
+allprojects {
+    tasks.withType(JavaCompile) {
+        //options.compilerArgs << "-Xlint:deprecation"
+        //options.compilerArgs << "-Xlint:unchecked"
+    }
+}
+
+run {
+    // minHeapSize = '1g'
+    maxHeapSize = '1g'
+    
+    // Retrieve CLI arguments from cmdLineArgs property if any
+    if (project.hasProperty("cmdLineArgs")) {
+        if (cmdLineArgs) {
+            args(cmdLineArgs.split(','))
+        }
+    }
+
+    // Retrieve JVM arguments from jvmLineArgs property if any
+    if (project.hasProperty("jvmLineArgs")) {
+        if (jvmLineArgs) {
+            jvmArgs(jvmLineArgs.split(','))
+        }
+    }
+}
+
+// // Workaround for "CreateProcess error=206, The filename or extension is too long" under Windows
+// // See https://github.com/viswaramamoorthy/gradle-util-plugins/
+// buildscript {
+  // repositories {
+    // maven {
+      // url "https://plugins.gradle.org/m2/"
+    // }
+  // }
+  // dependencies {
+    // classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE"
+  // }
+// }
+// apply plugin: "com.github.ManifestClasspath"
+
+repositories {
+    mavenCentral()
+    // mavenLocal()
+    flatDir(dirs: 'dev/externals') // for libraries not in any other repository
+}
+
+// Declare Lombok appropriately to avoid deprecation warnings in Gradle >= 4.6
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
+}
+
+dependencies {
+    implementation "org.deeplearning4j:deeplearning4j-core:${project.ext.dl4jVersion}"
+    implementation "org.deeplearning4j:deeplearning4j-modelimport:${project.ext.dl4jVersion}"
+    
+    implementation "org.nd4j:nd4j-native:${project.ext.nd4jVersion}"
+    implementation "org.nd4j:nd4j-onnxruntime:${project.ext.nd4jVersion}"
+
+    implementation "args4j:args4j:2.37"
+
+    implementation "org.slf4j:slf4j-api:2.0.17"
+    implementation "ch.qos.logback:logback-classic:1.5.18"    
+
+    // Runtime only are gathered here below
+    runtimeOnly "org.nd4j:nd4j-backend-impls:${project.ext.nd4jVersion}"
+    runtimeOnly "org.nd4j:nd4j-native:${project.ext.nd4jVersion}:${project.ext.targetOS}"
+    runtimeOnly "org.bytedeco:javacpp:${project.ext.jcppVersion}:${project.ext.targetOS}"
+}
+
+// // Avoid JDK8 too strict javadoc
+// if (JavaVersion.current().isJava8Compatible()) {
+    // allprojects {
+        // tasks.withType(Javadoc) {
+            // options.addStringOption('Xdoclint:none', '-quiet')
+        // }
+    // }
+// }
+
+// javadoc {
+    // doFirst {
+        // copy {
+            // from "src/main/java/org/audiveris/omrdataset"
+            // into "$buildDir/docs/javadoc/org/audiveris/omrdataset"
+            // include ("*/doc-files/**")
+        // }
+    // }
+    // title = "${project.ext.programName}-${version} API"
+// }
+
+//task sourcesJar(type: Jar, dependsOn: classes) {
+//    classifier = "sources"
+//    from sourceSets.main.allSource
+//}
+
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = "javadoc"
+//    from javadoc.destinationDir
+//}
+
+//artifacts {
+//    archives sourcesJar
+//    archives javadocJar
+//}
+
+// Workaround for "CreateProcess error=206, The filename or extension is too long" under Windows
+// See https://github.com/viswaramamoorthy/gradle-util-plugins/
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE"
+  }
+}
+apply plugin: "com.github.ManifestClasspath"

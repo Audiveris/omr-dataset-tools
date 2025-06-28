@@ -1,10 +1,9 @@
 /.nb-gradle/
 /.gradle/
 /build/
-/data/
-/tools/addNoise/.idea/*
-/tools/addNoise/*.pyc
-/tools/addNoise/output/
-/tools/addNoise/testResource/mops-1 (copy).xml
-/data/output/
-/data/old_output/
+/data/*
+prepare/build/
+prepare/build/*
+prepare/data/
+infer/build/
+infer/build/*

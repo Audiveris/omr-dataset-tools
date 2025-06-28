@@ -1,0 +1,49 @@
+/*
+ * Adapting the DeepScoresV2 dataset for its use by YOLO.
+ */
+
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies { 
+    ///testImplementation libs.junit.jupiter
+
+    ///testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // This dependency is used by the application. ????
+    ///implementation libs.guava
+
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0'
+
+    implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    implementation 'args4j:args4j:2.37'
+
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.18'
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'org.audiveris.omrdataset.prepare.DataSetFactory'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}

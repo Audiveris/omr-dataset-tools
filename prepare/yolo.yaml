@@ -1,0 +1,9 @@
+#--------------------------------
+# Configuration for Yolo dataset
+#--------------------------------
+
+# Folder where datasets for Yolo should be written
+target: D:\\soft\\datasets\\yolo
+
+# Should we print ID and name of YoloLabels?
+print_labels: true

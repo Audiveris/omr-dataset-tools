@@ -1,86 +1,33 @@
-# omr-dataset
+# omr-dataset-tools
 
-## Vision
+This repository was created in 2017 as an attempt to manage a dataset specifically meant for
+the training and evaluation of optical music recognition (OMR) tools.  
+The original content is still available in the "**original**" branch.
 
-Inspired by the famous example of [MNIST][1] public database (60000 labelled images of hand-written digits), we acknowledge the need for a well-known and representative data set to help the development of applications in the specific domain of Optical Music Recognition.
+In 2022, it was used to train and test a specific classifier called a "patch-classifier",
+aiming at recognizing any musical symbol centered on a given image location.
+The patch classifier was too slow to be effective on a full-page and was finally abandoned.  
+The related content is still available in the "**patch-classifier**" branch.
 
-## Purpose
+In 2025, it was refocused on the training of a full-page detector/classifier based on 
+latest architectures like YOLO.
+This is the content of this "**master**" branch (and of the temporary "yolo" development branch)
 
-+ OMR samples for the training and testing of symbol classifiers
-+ Ground-truth material for the evaluation or comparison of OMR engines
 
-## Organization
 
-Ultimately, once data structuring and content are sufficiently validated, we think this reference should preferably be hosted by the International Music Score Library Project ([IMSLP][2]). 
+## Work in progress
 
-Meanwhile, the purpose of this `omr-dataset` Github repository is to gather the material used to build preliminary versions of the target reference.
+This repository is now focused on the training of a deep learning model suitable for Audiveris OMR.
 
-## Usage
+It is based on:
+- The YOLO architecture and tools provided by Ultralytics
+- The datasets provided by DeepScores V2 and DoReMi
+- Perhaps other datasets (such as those provided by Audiveris sampling)
+- The use of ONNX format between YOLO (Python) and DeepLearning4j (Java)
 
-This project is handled by gradle tool, and can be driven from an IDE or the command line.
+## Structure
 
-\[NOTA: Noise addition tools are not yet included in this gradle build\]
-
-From command line, for a full rebuild, use:
-
-```
-    gradle clean build
-```
-
-To just display usage rules, use:
-
-```
-    gradle run
-```   
-
-this will display:  
-
-```
-   Syntax:
-      [OPTIONS] -- [INPUT_FILES]
-   
-   @file:
-    Content to be extended in line
-   
-   Options:
-    -clean             : Cleans up output
-    -controls          : Generates control images
-    -features          : Generates .csv and .dat files
-    -help              : Displays general help then stops
-    -mistakes          : Saves mistake images
-    -model <.zip file> : Defines path to model
-    -names             : Prints all possible symbol names
-    -nones             : Generates none symbols
-    -output <folder>   : Defines output directory
-    -subimages         : Generates subimages
-    -training          : Trains classifier on features
-   
-   Input file extensions:
-    .xml: annotations file
-```
-
-To clean up output, use:
-```
-    gradle run -PcmdLineArgs="-output,data/output,-clean"
-```
-
-To generate features, with all options, using input from `data/input-images`, use:
-```
-    gradle run -PcmdLineArgs="-output,data/output,-features,-nones,-controls,-subimages,--,data/input-images"
-```
-
-To launch training on generated features, while saving mistaken images, and targeting a specific model file, use:
-```
-    gradle run -PcmdLineArgs="-output,data/output,-training,-mistakes,-model,data/patch-classifier.zip"
-```
-
-Remark: the training task lasts about 15 minutes when run on the toy example `data/input-images` folder.
-To monitor the neural network being trained, simply open a browser on http://localhost:9000 url.
-
-## Development
-
-See the related [wiki][3] for more details.
-
-[1]: http://yann.lecun.com/exdb/mnist/
-[2]: http://imslp.org/
-[3]: https://github.com/Audiveris/omr-dataset/wiki
+The repository is a Gradle project composed of 3 sub-projects, namely:
+- [**prepare**](./prepare/README.md): to prepare the images and labels according to the YOLO expected input format.
+- [**train**](./train/README.md): to train and validate the model on the prepared data-set.
+- [**infer**](./infer/README.md): to use the model in detection mode on representative music scores.
