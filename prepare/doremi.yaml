@@ -14,10 +14,10 @@ annotations: Parsed_by_page_omr_xml
 
 # List of tasks to be actually performed
 tasks:
-#  - histogram
-  - checking
-#  - train
-#  - val
+  - histogram
+#  - checking
+  - train
+  - val
 
 # Specifications for some visual checking
 checking:

@@ -16,10 +16,10 @@ print_predefined_labels: true
 
 # List of tasks to be actually performed
 tasks:
-#  - histogram
+  - histogram
 #  - checking
-#  - train
-#  - val
+  - train
+  - val
 
 # Specifications for some visual checking
 checking:

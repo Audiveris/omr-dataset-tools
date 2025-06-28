@@ -315,7 +315,7 @@ public abstract class DataSetFactory
     public static void main (String... args)
         throws Exception
     {
-        ///new DeepScores("yolo.yaml", "deepscores.yaml").process();
+        new DeepScores("yolo.yaml", "deepscores.yaml").process();
         new DoReMi("yolo.yaml", "doremi.yaml").process();
     }
 
