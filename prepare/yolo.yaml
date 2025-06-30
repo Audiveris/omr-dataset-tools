@@ -6,4 +6,4 @@
 target: D:\\soft\\datasets\\yolo
 
 # Should we print ID and name of YoloLabels?
-print_labels: true
+print_labels: false

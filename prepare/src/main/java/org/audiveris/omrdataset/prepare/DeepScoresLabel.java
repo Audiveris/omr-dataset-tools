@@ -165,14 +165,6 @@ public enum DeepScoresLabel
     staff, //  134
     ottavaBracket; //  135
 
-    //~ Static fields/initializers -----------------------------------------------------------------
-
-    //~ Instance fields ----------------------------------------------------------------------------
-
-    //~ Constructors -------------------------------------------------------------------------------
-
-    //~ Methods ------------------------------------------------------------------------------------
-
     //~ Static Methods -----------------------------------------------------------------------------
 
     /**
@@ -184,6 +176,17 @@ public enum DeepScoresLabel
     public static YoloLabel of (DeepScoresLabel label)
     {
         return switch (label) {
+
+            case clefG -> YoloLabel.gClef;
+            case clefCAlto, clefCTenor -> YoloLabel.cClef;
+            case clefF -> YoloLabel.fClef;
+            case clefUnpitchedPercussion -> YoloLabel.unpitchedPercussionClef1;
+
+            // No inSpace vs onLine
+            case noteheadBlackInSpace, noteheadBlackOnLine -> YoloLabel.noteheadBlack;
+            case noteheadHalfInSpace, noteheadHalfOnLine -> YoloLabel.noteheadHalf;
+            case noteheadWholeInSpace, noteheadWholeOnLine -> YoloLabel.noteheadWhole;
+            case noteheadDoubleWholeInSpace, noteheadDoubleWholeOnLine -> YoloLabel.noteheadDoubleWhole;
 
             // Removed small shapes
             case noteheadBlackOnLineSmall -> null;
@@ -202,8 +205,24 @@ public enum DeepScoresLabel
             case accidentalNaturalSmall -> null;
             case accidentalSharpSmall -> null;
 
+            //    keyFlat ?
+            //    keyNatural ?
+            //    keySharp ?
+
+            // Irrelevant above / below
+            case articAccentAbove, articAccentBelow -> YoloLabel.articAccent;
+            case articStaccatoAbove, articStaccatoBelow -> YoloLabel.articStaccato;
+            case articTenutoAbove, articTenutoBelow -> YoloLabel.articTenuto;
+
             // Don't know what this is
             case restHNr -> null;
+
+            //    dynamicP, //  ?
+            //    dynamicM, //
+            //    dynamicF, //
+            //    dynamicS, //
+            //    dynamicZ, //
+            //    dynamicR, //
 
             // Unreliable, and useless in fact
             case staff -> null;
@@ -211,6 +230,4 @@ public enum DeepScoresLabel
             default -> YoloLabel.valueOf(label.name());
         };
     }
-
-    //~ Inner Classes ------------------------------------------------------------------------------
 }

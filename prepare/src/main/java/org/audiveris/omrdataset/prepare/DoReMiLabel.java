@@ -28,9 +28,15 @@ package org.audiveris.omrdataset.prepare;
  */
 public enum DoReMiLabel
 {
+    kStaffLine,
+
+    barline,
+    systemicBarline, // System starting barline
+
     gClef,
     cClef,
     fClef,
+
     timeSig2,
     timeSig3,
     timeSig4,
@@ -41,25 +47,33 @@ public enum DoReMiLabel
     timeSig9,
     timeSigCommon,
     timeSigCutCommon,
+    timeSignatureComponent, // Time signature number composed of several digits
+
     noteheadBlack,
     noteheadHalf,
     noteheadWhole,
+
     augmentationDot,
+
     stem,
+
     flag8thUp,
     flag16thUp,
     flag32ndUp,
     flag8thDown,
     flag16thDown,
     flag32ndDown,
+
     accidentalFlat,
     accidentalNatural,
     accidentalSharp,
     accidentalDoubleSharp,
     accidentalDoubleFlat,
+
     accidentalQuarterToneFlatStein,
     accidentalQuarterToneSharpStein,
     accidentalThreeQuarterTonesSharpStein,
+
     articAccentAbove,
     articAccentBelow,
     articStaccatoAbove,
@@ -70,12 +84,14 @@ public enum DoReMiLabel
     articStaccatissimoBelow,
     articMarcatoAbove,
     articMarcatoBelow,
+
     restWhole,
     restHalf,
     restQuarter,
     rest8th,
     rest16th,
     rest32nd,
+
     dynamicPiano,
     dynamicPP,
     dynamicPPP,
@@ -89,16 +105,15 @@ public enum DoReMiLabel
     dynamicSforzato,
     dynamicText,
     gradualDynamic,
+
     ornamentTrill,
-    barline,
-    slur,
-    beam,
-    tie,
-    kStaffLine,
-    systemicBarline,
-    timeSignatureComponent,
+
     tupletBracket,
-    tupletText;
+    tupletText,
+
+    beam,
+    slur,
+    tie;
 
     //~ Static Methods -----------------------------------------------------------------------------
 
@@ -112,17 +127,20 @@ public enum DoReMiLabel
     {
         return switch (label) {
 
-            case gClef -> YoloLabel.clefG;
-            case cClef -> null; // YoloLabel.clefCAlto or YoloLabel.clefCTenor;
-            case fClef -> YoloLabel.clefF;
+            case kStaffLine -> null;
 
-            case noteheadBlack -> null; // YoloLabel.noteheadBlackOnLine or YoloLabel.noteheadBlackInSpace
-            case noteheadHalf -> null; // YoloLabel.noteheadHalfOnLine or YoloLabel.noteheadHalfInSpace
-            case noteheadWhole -> null; // YoloLabel.noteheadWholeOnLine or YoloLabel.noteheadWholeInSpace
+            case barline -> YoloLabel.barlineSingle; // ?
+            case systemicBarline -> null; // Interesting?
 
+            // QuarterTones
             case accidentalQuarterToneFlatStein -> null;
             case accidentalQuarterToneSharpStein -> null;
             case accidentalThreeQuarterTonesSharpStein -> null;
+
+            // Irrelevant above / below
+            case articAccentAbove, articAccentBelow -> YoloLabel.articAccent;
+            case articStaccatoAbove, articStaccatoBelow -> YoloLabel.articStaccato;
+            case articTenutoAbove, articTenutoBelow -> YoloLabel.articTenuto;
 
             case dynamicPiano -> YoloLabel.dynamicP;
             case dynamicPP -> null;
@@ -138,90 +156,84 @@ public enum DoReMiLabel
             case dynamicText -> null;
             case gradualDynamic -> null;
 
-            case barline -> null; // Interesting?
-            case systemicBarline -> null; // Interesting?
             case tupletText -> null;
             case timeSignatureComponent -> null;
-            case kStaffLine -> null;
 
             default -> YoloLabel.valueOf(label.name());
         };
     }
-
-    //~ Inner Classes ------------------------------------------------------------------------------
-
-    //Classes found in DoReMi train/val:
-
-    //accidentalDoubleFlat
-    //accidentalDoubleSharp
-    //accidentalFlat
-    //accidentalNatural
-    //accidentalQuarterToneFlatStein
-    //accidentalQuarterToneSharpStein
-    //accidentalSharp
-    //accidentalThreeQuarterTonesSharpStein
-    //articAccentAbove
-    //articAccentBelow
-    //articMarcatoAbove
-    //articMarcatoBelow
-    //articStaccatissimoAbove
-    //articStaccatissimoBelow
-    //articStaccatoAbove
-    //articStaccatoBelow
-    //articTenutoAbove
-    //articTenutoBelow
-    //augmentationDot
-    //barline
-    //beam
-    //cClef
-    //dynamicFF
-    //dynamicFFF
-    //dynamicForte
-    //dynamicFortePiano
-    //dynamicForzando
-    //dynamicMF
-    //dynamicMP
-    //dynamicPP
-    //dynamicPPP
-    //dynamicPiano
-    //dynamicSforzato
-    //dynamicText
-    //fClef
-    //flag16thDown
-    //flag16thUp
-    //flag32ndDown
-    //flag32ndUp
-    //flag8thDown
-    //flag8thUp
-    //gClef
-    //gradualDynamic
-    //kStaffLine
-    //noteheadBlack
-    //noteheadHalf
-    //noteheadWhole
-    //ornamentTrill
-    //rest16th
-    //rest32nd
-    //rest8th
-    //restHalf
-    //restQuarter
-    //restWhole
-    //slur
-    //stem
-    //systemicBarline
-    //tie
-    //timeSig2
-    //timeSig3
-    //timeSig4
-    //timeSig5
-    //timeSig6
-    //timeSig7
-    //timeSig8
-    //timeSig9
-    //timeSigCommon
-    //timeSigCutCommon
-    //timeSignatureComponent
-    //tupletBracket
-    //tupletText
-
 }
+
+// Classes based on instances found in DoReMi corpus:
+
+// accidentalDoubleFlat
+// accidentalDoubleSharp
+// accidentalFlat
+// accidentalNatural
+// accidentalQuarterToneFlatStein
+// accidentalQuarterToneSharpStein
+// accidentalSharp
+// accidentalThreeQuarterTonesSharpStein
+// articAccentAbove
+// articAccentBelow
+// articMarcatoAbove
+// articMarcatoBelow
+// articStaccatissimoAbove
+// articStaccatissimoBelow
+// articStaccatoAbove
+// articStaccatoBelow
+// articTenutoAbove
+// articTenutoBelow
+// augmentationDot
+// barline
+// beam
+// cClef
+// dynamicFF
+// dynamicFFF
+// dynamicForte
+// dynamicFortePiano
+// dynamicForzando
+// dynamicMF
+// dynamicMP
+// dynamicPP
+// dynamicPPP
+// dynamicPiano
+// dynamicSforzato
+// dynamicText
+// fClef
+// flag16thDown
+// flag16thUp
+// flag32ndDown
+// flag32ndUp
+// flag8thDown
+// flag8thUp
+// gClef
+// gradualDynamic
+// kStaffLine
+// noteheadBlack
+// noteheadHalf
+// noteheadWhole
+// ornamentTrill
+// rest16th
+// rest32nd
+// rest8th
+// restHalf
+// restQuarter
+// restWhole
+// slur
+// stem
+// systemicBarline
+// tie
+// timeSig2
+// timeSig3
+// timeSig4
+// timeSig5
+// timeSig6
+// timeSig7
+// timeSig8
+// timeSig9
+// timeSigCommon
+// timeSigCutCommon
+// timeSignatureComponent
+// tupletBracket
+// tupletText

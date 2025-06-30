@@ -15,9 +15,9 @@ annotations: Parsed_by_page_omr_xml
 # List of tasks to be actually performed
 tasks:
   - histogram
-#  - checking
-  - train
-  - val
+  - checking
+#  - train
+#  - val
 
 # Specifications for some visual checking
 checking:
@@ -25,66 +25,11 @@ checking:
   draw_name: true                   # draw class name rather than class rank?
   hidden_labels:                    # labels not to be drawn
     - kStaffLine
-  use_train: false                  # select full train?
-  use_val: false                    # select full val?
+  required_labels:                  # limit to images containing any of these items
+    - timeSignatureComponent 
+  use_train: true                  # select full train?
+  use_val: true                    # select full val?
   selection:                        # list of selected images
-    - 'Reger - Introduction-023.png'
-    - 'Reger - Introduction-022.png'
-    - 'Bartok - Nights Music-023.png'
-    - 'Delius - String Quartet mvt III-030.png'
-    - 'Bartok - String Quartet 5 mvt 3-083.png'
-    - 'beams 2-note intervals-010.png'
-    - 'Bartok - String Quartet 5 mvt 3-069.png'
-    - 'Haydn - Piano Trio 27 mvt I-033.png'
-    - 'Haydn - Piano Trio 27 mvt I-054.png'
-    - 'Chopin - Etude Op 10 no 11-009.png'
-    - 'Bartok - String Quartet 5 mvt 3-075.png'
-    - 'Haydn - Piano Trio 27 mvt I-040.png'
-    - 'Bartok - Nights Music-025.png'
-    - 'Bartok - String Quartet 5 mvt 3-066.png'
-    - 'Haydn - Piano Trio 27 mvt I-011.png'
-    - 'Haydn - Piano Trio 27 mvt I-035.png'
-    - 'Delius - String Quartet mvt III-005.png'
-    - 'Bartok - String Quartet 5 mvt 3-058.png'
-    - 'Chopin - Etude Op 10 no 11-005.png'
-    - 'Haydn - Piano Trio 27 mvt I-041.png'
-    - 'Bartok - Nights Music-029.png'
-    - 'Delius - String Quartet mvt III-004.png'
-    - 'Delius - String Quartet mvt III-031.png'
-    - 'Haydn - Piano Trio 27 mvt I-044.png'
-    - 'Chopin - Etude Op 10 no 11-012.png'
-    - 'Chopin - Etude Op 10 no 11-002.png'
-    - 'beams 2-note intervals-019.png'
-    - 'Reger - Improvisationen 8-046.png'
-    - 'Schumann - String Quartet 1 mvt 3-015.png'
-    - 'Delius - String Quartet mvt III-008.png'
-    - 'Haydn - Piano Trio 27 mvt I-045.png'
-    - 'Haydn - Piano Trio 27 mvt I-030.png'
-    - 'Bartok - String Quartet 5 mvt 3-072.png'
-    - 'Haydn - Piano Trio 27 mvt I-051.png'
-    - 'beams 2-note intervals-020.png'
-    - 'Bartok - String Quartet 5 mvt 3-016.png'
-    - 'Haydn - Piano Trio 27 mvt I-028.png'
-    - 'Chopin - Etude Op 10 no 11-020.png'
-    - 'Haydn - Piano Trio 27 mvt I-029.png'
-    - 'Haydn - Piano Trio 27 mvt I-010.png'
-    - 'Delius - String Quartet mvt III-009.png'
-    - 'Bartok - String Quartet 5 mvt 3-071.png'
-    - 'Bartok - String Quartet 5 mvt 3-022.png'
-    - 'Reger - Improvisationen 8-030.png'
-    - 'Schumann - String Quartet 1 mvt 3-029.png'
-    - 'Schumann - String Quartet 1 mvt 3-014.png'
-    - 'Bartok - String Quartet 5 mvt 3-005.png'
-    - 'Schumann - String Quartet 1 mvt 3-009.png'
-    - 'Bartok - String Quartet 5 mvt 3-015.png'
-    - 'beams 2-note intervals-005.png'
-    - 'Bartok - String Quartet 5 mvt 3-003.png'
-    - 'Reger - Improvisationen 4-008.png'
-    - 'Schumann - String Quartet 1 mvt 3-025.png'
-    - 'Bartok - String Quartet 5 mvt 3-055.png'
-    - 'Delius - String Quartet mvt III-028.png'
-    - 'Chopin - Etude Op 10 no 11-010.png'
-    - 'Haydn - Piano Trio 27 mvt I-038.png'
 
 # train pages (4175)
 train:

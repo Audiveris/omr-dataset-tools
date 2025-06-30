@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------//
 //                                                                                                //
-//                                           D o R e M i                                          //
+//                                        B e e t h o v e n                                       //
 //                                                                                                //
 //------------------------------------------------------------------------------------------------//
 // <editor-fold defaultstate="collapsed" desc="hdr">
@@ -20,6 +20,8 @@
 //------------------------------------------------------------------------------------------------//
 // </editor-fold>
 package org.audiveris.omrdataset.prepare;
+
+import static org.audiveris.omrdataset.prepare.DataSetFactory.radixOf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,42 +44,58 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Class <code>DoReMi</code> includes the DoReMi dataset into the YOLO training dataset.
+ * Class <code>Beethoven</code> includes the Beethoven dataset into the YOLO training dataset.
  * <p>
  * We are interested in these elements:
  * <ul>
- * <li>"Images" folder gathering 5218 images
- * <li>"Parsed_by_page_omr_xml" folder gathering 5218 XML annotations
+ * <li>./ folder gathering 190 images
+ * <li>./ folder gathering 190 XML annotations
  * </ul>
- * An XML annotation is organized as follows:
+ * An XML annotation file is organized as follows:
  *
  * <pre>
- * &lt;Page pageIndex="0">
- *	&lt;Nodes>
- *		&lt;Node>
- *			&lt;Id>103&lt;/Id>
- *			&lt;ClassName>timeSig4&lt;/ClassName>
- *			&lt;Top>709&lt;/Top>
- * 			&lt;Left>386&lt;/Left>
- *			&lt;Width>36&lt;/Width>
- *			&lt;Height>42&lt;/Height>
- *			&lt;Mask>0:11 1:16 ... &lt;/Mask>
- *		&lt;/Node>
+ * &lt;annotation>
+ *     &lt;folder>_local/beethoven&lt;/folder>
+ *     &lt;filename>String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_2.png&lt;/filename>
+ *     &lt;font>Overpass&lt;/font>
+ *     &lt;size>
+ *         &lt;width>2480&lt;/width>
+ *         &lt;height>3508&lt;/height>
+ *         &lt;depth>1&lt;/depth>
+ *     &lt;/size>
+ *     &lt;segmented> &lt;/segmented>
+ *     &lt;object>
+ *         &lt;name>systemBoundingBox&lt;/name>
+ *         &lt;superclass>SystemBoundingBox&lt;/superclass>
+ *         &lt;uuid>se33py9&lt;/uuid>
+ *         &lt;color>165,14,36&lt;/color>
+ *         &lt;hexcolor>#A50E24&lt;/hexcolor>
+ *         &lt;unique_color>122,195,19&lt;/unique_color>
+ *         &lt;unique_hexcolor>#7AC313&lt;/unique_hexcolor>
+ *         &lt;bndbox>
+ *             &lt;xmin>0.01637&lt;/xmin>
+ *             &lt;xmax>0.9757&lt;/xmax>
+ *             &lt;ymin>0.01725&lt;/ymin>
+ *             &lt;ymax>0.22434&lt;/ymax>
+ *         &lt;/bndbox>
+ *     &lt;/object>
+ *     &lt;object>
+ *          ...
+ *     &lt;/object>
  * ...
  * </pre>
  *
  * @author Hervé Bitteur
  */
-public class DoReMi
+public class Beethoven
         extends DataSetFactory
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    private static final Logger logger = LoggerFactory.getLogger(DoReMi.class);
+    private static final Logger logger = LoggerFactory.getLogger(Beethoven.class);
 
     /** Un/marshalling context for use with JAXB. */
     private static volatile JAXBContext jaxbContext;
@@ -91,21 +109,21 @@ public class DoReMi
     //~ Constructors -------------------------------------------------------------------------------
 
     /**
-     * Create a new <code>DoReMi</code> instance.
+     * Create a new <code>Beethoven</code> instance.
      *
      * @param targetConfig path to Yolo .yaml config
-     * @param sourceConfig path to DoReMi .yaml config
+     * @param sourceConfig path to Beethoven .yaml config
      * @throws java.lang.Exception
      */
-    public DoReMi (String targetConfig,
-                   String sourceConfig)
+    public Beethoven (String targetConfig,
+                      String sourceConfig)
             throws Exception
     {
         super(targetConfig);
 
-        logger.info("DoReMi dataset");
+        logger.info("Beethoven dataset");
 
-        config = yamlMapper.readValue(Paths.get(sourceConfig).toFile(), DoReMiConfig.class);
+        config = yamlMapper.readValue(Paths.get(sourceConfig).toFile(), BeethovenConfig.class);
         logger.info("{}", config);
 
         sourceDir = Paths.get(config.source);
@@ -139,10 +157,10 @@ public class DoReMi
         System.out.println("| Width | Height | Instances | Image |");
         System.out.println("|  ---: |   ---: |      ---: | :---  |");
 
-        // For the count of DoReMi ignored labels
-        final TreeMap<DoReMiLabel, Integer> ignoredCounts = new TreeMap<>();
-        for (DoReMiLabel l : DoReMiLabel.values()) {
-            if (DoReMiLabel.of(l) == null)
+        // For the count of Beethoven ignored labels
+        final TreeMap<BeethovenLabel, Integer> ignoredCounts = new TreeMap<>();
+        for (BeethovenLabel l : BeethovenLabel.values()) {
+            if (BeethovenLabel.of(l) == null)
                 ignoredCounts.put(l, 0);
         }
 
@@ -166,7 +184,7 @@ public class DoReMi
             // Get the related annotations
             final String xmlName = xmlNameOf(imgName);
             final Path annPath = annotationsPath.resolve(xmlName);
-            final Page page = (Page) um.unmarshal(annPath.toFile());
+            final Annotation page = (Annotation) um.unmarshal(annPath.toFile());
 
             // Line in images listing
             System.out.format(
@@ -181,29 +199,24 @@ public class DoReMi
 
             try (PrintWriter writer = new PrintWriter(labelFile)) {
                 for (Node node : page.Nodes) {
-                    final String className = node.ClassName;
+                    final String className = legalNameOf(node.name); // Spe
 
                     // Find the corresponding YoloLabel, if any
-                    final DoReMiLabel drmLabel = DoReMiLabel.valueOf(className);
-                    final YoloLabel yoloLabel = DoReMiLabel.of(drmLabel);
+                    final BeethovenLabel beeLabel = BeethovenLabel.valueOf(className);
+                    final YoloLabel yoloLabel = BeethovenLabel.of(beeLabel);
 
                     if (yoloLabel != null) {
                         labelCounts.put(yoloLabel, labelCounts.get(yoloLabel) + 1);
 
-                        final int x = node.Left;
-                        final int y = node.Top;
-                        final int w = node.Width;
-                        final int h = node.Height;
-
                         writer.printf(
                                 "%3d %f %f %f %f%n",
                                 yoloLabel.ordinal(),
-                                (x + w / 2.0) / imgWidth,
-                                (y + h / 2.0) / imgHeight,
-                                w / (double) imgWidth,
-                                h / (double) imgHeight);
+                                (node.bndbox.xmin + node.bndbox.xmax) / 2, // xc
+                                (node.bndbox.ymin + node.bndbox.ymax) / 2, // yc
+                                (node.bndbox.xmax - node.bndbox.xmin), // w
+                                (node.bndbox.ymax - node.bndbox.ymin)); // h
                     } else {
-                        ignoredCounts.put(drmLabel, ignoredCounts.get(drmLabel) + 1);
+                        ignoredCounts.put(beeLabel, ignoredCounts.get(beeLabel) + 1);
                     }
                 }
             }
@@ -215,7 +228,7 @@ public class DoReMi
                 entry -> System.out.format("%6d : %s%n", entry.getValue(), entry.getKey()));
 
         // Print out the histogram count for the ignored DRM labels
-        System.out.format("\nPart %s. Counts of DoReMi labels ignored:\n", part);
+        System.out.format("\nPart %s. Counts of Beethoven labels ignored:\n", part);
         ignoredCounts.entrySet().forEach(entry -> {
             if (entry.getValue() != null)
                 System.out.format("%6d : %s%n", entry.getValue(), entry.getKey());
@@ -233,15 +246,19 @@ public class DoReMi
 
         final String xmlName = xmlNameOf(imgName);
         final Path annPath = annotationsPath.resolve(xmlName);
-        final Page page = (Page) um.unmarshal(annPath.toFile()); // Spe
+        final Annotation page = (Annotation) um.unmarshal(annPath.toFile()); // Spe
+
+        // Normalizing dimensions (Spe)
+        final int imgWidth = page.size.width;
+        final int imgHeight = page.size.height;
 
         for (Node node : page.Nodes) {
-            final String className = node.ClassName; // Spe
+            final String className = legalNameOf(node.name); // Spe
             if (config.checking.required_labels.contains(className)) {
-                final int x = node.Left;
-                final int y = node.Top;
-                final int w = node.Width;
-                final int h = node.Height;
+                final int x = (int) Math.rint(node.bndbox.xmin * imgWidth);
+                final int y = (int) Math.rint(node.bndbox.ymin * imgHeight);
+                final int w = (int) Math.rint((node.bndbox.xmax - node.bndbox.xmin) * imgWidth);
+                final int h = (int) Math.rint((node.bndbox.ymax - node.bndbox.ymin) * imgHeight);
                 System.out.format("%s at [x:%d, y:%d, w:%d, h:%d]%n", className, x, y, w, h);
                 return true;
             }
@@ -257,25 +274,29 @@ public class DoReMi
     {
         final String xmlName = xmlNameOf(imgName);
         final Path annPath = annotationsPath.resolve(xmlName);
-        final Page page = (Page) um.unmarshal(annPath.toFile());
+        final Annotation page = (Annotation) um.unmarshal(annPath.toFile()); // Spe
         System.out.println(imgName + " " + page);
 
+        // Normalizing dimensions (Spe)
+        final int imgWidth = page.size.width;
+        final int imgHeight = page.size.height;
+
         for (Node node : page.Nodes) {
-            final String className = node.ClassName;
+            final String className = legalNameOf(node.name); // Spe
             if (isHidden(className)) {
                 continue;
             }
-
-            final int x = node.Left;
-            final int y = node.Top;
-            final int w = node.Width;
-            final int h = node.Height;
+            // Spe
+            final int x = (int) Math.rint(node.bndbox.xmin * imgWidth);
+            final int y = (int) Math.rint(node.bndbox.ymin * imgHeight);
+            final int w = (int) Math.rint((node.bndbox.xmax - node.bndbox.xmin) * imgWidth);
+            final int h = (int) Math.rint((node.bndbox.ymax - node.bndbox.ymin) * imgHeight);
 
             // Draw obj rectangle
             g2d.drawRect(x, y, w, h);
 
             // Draw class ID
-            g2d.drawString(className, x, y);
+            g2d.drawString(className, x, y - 1);
         }
     }
 
@@ -293,10 +314,10 @@ public class DoReMi
         for (String imgName : imgNames) {
             final String xmlName = xmlNameOf(imgName);
             final Path annPath = annotationsPath.resolve(xmlName);
-            final Page page = (Page) um.unmarshal(annPath.toFile());
+            final Annotation annotation = (Annotation) um.unmarshal(annPath.toFile());
 
-            for (Node node : page.Nodes) {
-                final String className = node.ClassName;
+            for (Node node : annotation.Nodes) {
+                final String className = node.name;
 
                 Tuple tuple = map.get(className);
 
@@ -313,6 +334,18 @@ public class DoReMi
         }
     }
 
+    private String legalNameOf (String name)
+    {
+        if (name.equals("dynam-f")) {
+            return "dynamicF";
+        }
+        if (name.equals("dynam-p")) {
+            return "dynamicP";
+        }
+
+        return name;
+    }
+
     //~ Static Methods -----------------------------------------------------------------------------
 
     //----------------//
@@ -323,26 +356,10 @@ public class DoReMi
     {
         // Lazy creation
         if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(Page.class);
+            jaxbContext = JAXBContext.newInstance(Annotation.class);
         }
 
         return jaxbContext;
-    }
-
-    //-------------------//
-    // trimLeadingZeroes //
-    //-------------------//
-    private static String trimLeadingZeroes (String str)
-    {
-        for (int i = 0; i < str.length(); i++) {
-            final char c = str.charAt(i);
-
-            if (c != '0') {
-                return str.substring(i);
-            }
-        }
-
-        return "0";
     }
 
     //-----------//
@@ -351,9 +368,13 @@ public class DoReMi
     /**
      * Generate the name of the .xml file that corresponds to the provided .png file.
      * <p>
-     * Example:
-     * input : accidental tucking-001.png
-     * output : Parsed_accidental tucking-layout-0-muscima_Page_1.xml
+     * Example 1:
+     * -input : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_13.png
+     * output : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~annotations_13.png
+     * <p>
+     * Example 2:
+     * -input : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_13.png
+     * output : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~annotations_13.png
      *
      * @param imgName name of the .png file
      * @return the corresponding xmlName
@@ -361,45 +382,47 @@ public class DoReMi
     private static String xmlNameOf (String imgName)
     {
         final String radix = radixOf(imgName);
-        final int dash = radix.lastIndexOf('-');
-        final String name = radix.substring(0, dash);
 
-        final String numStr = radix.substring(dash + 1);
-        final String num = trimLeadingZeroes(numStr);
+        final int tilde = radix.lastIndexOf('~');
+        final String name = radix.substring(0, tilde);
 
-        return new StringBuilder("Parsed_") //
+        final int underscore = radix.lastIndexOf('_');
+        final String numStr = radix.substring(underscore + 1);
+
+        return new StringBuilder() //
                 .append(name) //
-                .append("-layout-0-muscima_Page_") //
-                .append(num) //
+                .append("~annotations_") //
+                .append(numStr) //
                 .append(".xml") //
                 .toString();
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
 
-    //------//
-    // Page //
-    //------//
-    /**
-     * Class <code>Page</code> is used to unmarshal the page XML description
-     */
-    @XmlAccessorType(XmlAccessType.NONE)
-    @XmlRootElement(name = "Page")
-    private static class Page
+    //------------//
+    // Annotation //
+    //------------//
+    @XmlRootElement(name = "annotation")
+    private static class Annotation
     {
-        /** List of Nodes. */
-        @XmlElementWrapper(name = "Nodes")
-        @XmlElement(name = "Node")
+        /** Page dimensions. */
+        public Size size;
+
+        /** List of objects. */
+        @XmlElement(name = "object")
         public List<Node> Nodes = new ArrayList<>();
 
-        private Page () // No-argument constructor meant for JAXB
+        private Annotation () // No-argument constructor meant for JAXB
         {
         }
 
         @Override
         public String toString ()
         {
-            return new StringBuilder().append("Nodes.size:").append(Nodes.size()).toString();
+            return new StringBuilder() //
+                    .append(" size:").append(size) //
+                    .append(" Nodes.size:").append(Nodes.size()) //
+                    .toString();
         }
     }
 
@@ -407,25 +430,85 @@ public class DoReMi
     // Node //
     //------//
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlRootElement(name = "Node")
     private static class Node
     {
-        //public Integer Id; // Ignored
+        public String name;
 
-        public String ClassName;
+        //  superclass      ignored
+        //  uuid            ignored
+        //  color           ignored
+        //  hexcolor        ignored
+        //  unique_color    ignored
+        //  unique_hexcolor ignored
 
-        public Integer Top;
-
-        public Integer Left;
-
-        public Integer Width;
-
-        public Integer Height;
-
-        //public String Mask; // Ignored
+        public BBox bndbox;
 
         private Node () // No-argument constructor meant for JAXB
         {
+        }
+
+        @Override
+        public String toString ()
+        {
+            return new StringBuilder() //
+                    .append("{name:").append(name) //
+                    .append(" bndbox:").append(bndbox) //
+                    .append('}').toString();
+        }
+    }
+
+    //------//
+    // BBox //
+    //------//
+    /**
+     * Abscissa and ordinate values are normalized by the image width and height.
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    private static class BBox
+    {
+        public double xmin;
+
+        public double xmax;
+
+        public double ymin;
+
+        public double ymax;
+
+        private BBox () // No-argument constructor meant for JAXB
+        {
+        }
+
+        @Override
+        public String toString ()
+        {
+            return new StringBuilder() //
+                    .append("{xmin:").append(xmin) //
+                    .append(" xmax:").append(xmax) //
+                    .append(" ymin:").append(ymin) //
+                    .append(" ymax:").append(ymax) //
+                    .append('}').toString();
+        }
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    private static class Size
+    {
+        public int width;
+
+        public int height;
+
+        // depth ignored
+        private Size () // No-argument constructor meant for JAXB
+        {
+        }
+
+        @Override
+        public String toString ()
+        {
+            return new StringBuilder() //
+                    .append("{width:").append(width) //
+                    .append(" height:").append(height) //
+                    .append('}').toString();
         }
     }
 }

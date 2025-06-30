@@ -17,7 +17,7 @@ print_predefined_labels: true
 # List of tasks to be actually performed
 tasks:
   - histogram
-#  - checking
+  - checking
   - train
   - val
 

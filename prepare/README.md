@@ -1,7 +1,7 @@
 # Dataset preparation
 
 >[!WARNING] 
->**This is a work in progress, based on a preliminary use of DeepScores V2 and DoReMi V1.**
+>**This is a work in progress, based on a preliminary use of DeepScores V2, DoReMi V1 and a Beethoven opus.**
 
 ## Goal
  
@@ -139,9 +139,12 @@ Explanations:
 - The `target` path value should be adjusted to your local environment.
 - The `print_labels` boolean governs the print out of the YoloLabel values (id and name).
 
-### The `deepscores.yaml` and `doremi.yaml` files
+### The `deepscores.yaml`, `doremi.yaml` and `beethoven.yaml` files
 
-As of this writing, we have two configuration files: [deepscores.yaml](deepscores.yaml) and [doremi.yaml](doremi.yaml).
+As of this writing, we have three configuration files:
+- [deepscores.yaml](./deepscores.yaml)
+- [doremi.yaml](./doremi.yaml)
+- [beethoven.yaml](./beethoven.yaml)
 
 They present a very similar structure.
 Here below is an example (excerpt):
@@ -169,6 +172,9 @@ checking:
   draw_name: true                       # draw class name rather than class number?
   hidden_labels:                        # labels not to be drawn
     - kStaffLine
+  required_labels:                  # limit to images containing any of these items
+    - systemicBarline
+    - timeSignatureComponent 
   use_train: false                      # select full train?
   use_val: false                        # select full val?
   selection:                            # list of selected images
@@ -591,6 +597,118 @@ First, this label is applied with no difference to both crescendo and diminuendo
 Second, and more annoying, is the bounding box. The abscissa is OK, but the ordinate is very often wrong, as in the example below found in image "Reger - Introduction-023.png":
 
 ![](./assets/GradualDynamics%20in%20Reger%20-%20Introduction-023.png)
+
+## Beethoven
+
+124 images based on Beethoven string quartet N° 4, using Bravura and Leipzig musical fonts.
+
+They all share the same dimensions: 2480 x 3508 pixels.
+
+No train / val split has been decided yet.
+
+### Classes
+
+Here is the histogram of the class instances found in this corpus:
+
+| Class                                  |  Train |    Val |
+| :---                                   |   ---: |   ---: |
+| accidentalFlat                         |   1064 |      0 |
+| accidentalNatural                      |   2246 |      0 |
+| accidentalSharp                        |    962 |      0 |
+| articStaccato                          |   9624 |      0 |
+| barlineDouble                          |      4 |      0 |
+| barlineHeavy                           |     12 |      0 |
+| barlineRepeatBoth                      |     18 |      0 |
+| barlineRepeatEnd                       |     24 |      0 |
+| barlineRepeatStart                     |      4 |      0 |
+| barlineSingle                          |   2292 |      0 |
+| beam                                   |   7116 |      0 |
+| cClef                                  |    404 |      0 |
+| charFullStop                           |    712 |      0 |
+| digit0                                 |     64 |      0 |
+| digit1                                 |    262 |      0 |
+| digit2                                 |     94 |      0 |
+| digit3                                 |    454 |      0 |
+| digit4                                 |     72 |      0 |
+| digit5                                 |     58 |      0 |
+| digit6                                 |     90 |      0 |
+| digit7                                 |    106 |      0 |
+| digit8                                 |     82 |      0 |
+| digit9                                 |     84 |      0 |
+| dirDash                                |    846 |      0 |
+| dot                                    |    990 |      0 |
+| dynam-f                                |    412 |      0 |
+| dynam-p                                |    660 |      0 |
+| dynamicFF                              |     78 |      0 |
+| dynamicFortePiano                      |     68 |      0 |
+| dynamicPP                              |    262 |      0 |
+| dynamicSforzando1                      |   1176 |      0 |
+| dynamicSforzandoPiano                  |    116 |      0 |
+| fClef                                  |    404 |      0 |
+| fermataAbove                           |    112 |      0 |
+| flag16thUp                             |     16 |      0 |
+| flag8thDown                            |    684 |      0 |
+| flag8thUp                              |    626 |      0 |
+| gClef                                  |    808 |      0 |
+| grpSymBracket                          |    404 |      0 |
+| hairpinCrescendo                       |     10 |      0 |
+| hairpinDiminuendo                      |     14 |      0 |
+| keyFlat                                |   3776 |      0 |
+| ledgerLine                             |   8530 |      0 |
+| letter_a                               |      4 |      0 |
+| letter_c                               |   1248 |      0 |
+| letter_cA                              |      6 |      0 |
+| letter_cP                              |      2 |      0 |
+| letter_d                               |     66 |      0 |
+| letter_e                               |    630 |      0 |
+| letter_g                               |      6 |      0 |
+| letter_i                               |     74 |      0 |
+| letter_l                               |     12 |      0 |
+| letter_m                               |     68 |      0 |
+| letter_o                               |     12 |      0 |
+| letter_p                               |      4 |      0 |
+| letter_r                               |    634 |      0 |
+| letter_s                               |    628 |      0 |
+| letter_t                               |      2 |      0 |
+| letter_z                               |      8 |      0 |
+| noteheadBlack                          |  29366 |      0 |
+| noteheadHalf                           |   1374 |      0 |
+| noteheadWhole                          |    182 |      0 |
+| octaveUp                               |      2 |      0 |
+| ornamentTrill                          |      2 |      0 |
+| ornamentTurn                           |     20 |      0 |
+| rest16th                               |     80 |      0 |
+| rest8th                                |   1372 |      0 |
+| restHalf                               |    420 |      0 |
+| restQuarter                            |   2942 |      0 |
+| restWhole                              |    836 |      0 |
+| slur                                   |   3226 |      0 |
+| staffLine                              |   8080 |      0 |
+| stem                                   |  29928 |      0 |
+| system                                 |    404 |      0 |
+| systemBoundingBox                      |    404 |      0 |
+| tie                                    |    940 |      0 |
+| timeSigCut                             |     32 |      0 |
+| trillSig                               |     84 |      0 |
+| voltaBracket                           |     20 |      0 |
+| word                                   |   1124 |      0 |
+
+### Remarks on this dataset
+
+This is based on the preparation work only.
+
+This small dataset is limited to a single opus, hence it may lack the diversity
+we would need for an efficient training.
+
+A manual review led to no detected anomaly, especially none of the problems encountered with DoReMi.
+Hairpins boxes are OK, accidentals are not mixed with keys, beams are labelled individually, ...
+
+The difference with DeepScores is the handling of dynamics:
+- DeepScores handles the letters in say "sfp" as 3 dynamic symbols: "s", "f" and "p"
+- Beethoven handles the symbol "sfp" as a whole: a `dynamicSforzandoPiano` symbol.
+
+We will have to make a decision between these two approaches before training a model on these datasets.
+
 
 ## Upload to drive
 

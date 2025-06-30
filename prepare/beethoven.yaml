@@ -1,0 +1,164 @@
+#---------------------------------------------
+# Configuration for A.Pacha Beethoven dataset
+#---------------------------------------------
+# Potentially 124 pages
+
+# source folder
+source: D:\\soft\\beethoven
+
+# images sub-folder
+images: .
+
+# annotations sub-folder
+annotations: .
+
+# List of tasks to be actually performed
+tasks:
+  - histogram
+  - checking
+  - train
+  - val
+
+# Specifications for some visual checking
+checking:
+  output: data/bee-annotated-images # where to store the annotated images
+  draw_name: true                   # draw class name rather than class rank?
+  hidden_labels:                    # labels not to be drawn
+    - staffLine
+  required_labels:                  # limit to images containing any of these items
+#    - octaveUp                            # line following the 8 (ottava) symbol
+#    - ornamentTrill                       # like a long mordent
+  use_train: true                  # select full train?
+  use_val: false                    # select full val?
+  selection:                        # list of selected images
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_11.png
+
+# train pages
+train:
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_13.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_14.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_16.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_17.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_19.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_2.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_20.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_21.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_22.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_23.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_24.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_25.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_26.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_27.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_3.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_32.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_34.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_37.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_4.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_40.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_41.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_42.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_43.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_44.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_53.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_7.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_8.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_13.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_14.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_16.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_17.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_19.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_2.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_20.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_21.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_22.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_23.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_24.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_25.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_26.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_27.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_3.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_32.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_34.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_37.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_4.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_40.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_41.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_42.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_43.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_44.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_53.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_7.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_8.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_11.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_12.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_13.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_14.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_15.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_17.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_18.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_19.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_2.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_20.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_22.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_23.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_25.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_27.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_28.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_3.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_30.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_31.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_32.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_33.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_34.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_35.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_37.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_40.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_41.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_43.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_45.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_46.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_48.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_54.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_55.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_56.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_57.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_6.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_album_9.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_11.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_12.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_13.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_14.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_15.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_17.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_18.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_19.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_2.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_20.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_22.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_23.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_25.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_27.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_28.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_3.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_30.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_31.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_32.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_33.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_34.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_35.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_37.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_40.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_41.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_43.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_45.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_46.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_48.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_54.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_55.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_56.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_57.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_6.png
+  - String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Leipzig~score_page_9.png
+  
+# val pages
+val:

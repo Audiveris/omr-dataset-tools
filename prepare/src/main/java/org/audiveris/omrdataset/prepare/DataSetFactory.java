@@ -106,9 +106,19 @@ public abstract class DataSetFactory
      * @param outLabels path for target labels
      * @throws java.lang.Exception
      */
-    public abstract void addPart (YoloPart part,
-                                  Path outImages,
-                                  Path outLabels)
+    protected abstract void addPart (YoloPart part,
+                                     Path outImages,
+                                     Path outLabels)
+        throws Exception;
+
+    /**
+     * Check if the condition is met to annotate the image.
+     *
+     * @param imgName the image name
+     * @return true if OK
+     * @throws Exception
+     */
+    protected abstract boolean conditionMet (String imgName)
         throws Exception;
 
     /**
@@ -116,7 +126,7 @@ public abstract class DataSetFactory
      *
      * @param imgName the selected image name
      * @param g2d     graphic context of the annotated image
-     * @throws java.lang.Exception
+     * @throws Exception
      */
     protected abstract void drawAnnotations (String imgName,
                                              Graphics2D g2d)
@@ -162,6 +172,10 @@ public abstract class DataSetFactory
 
         for (String imgName : imgNames) {
             final Path imgPath = imagesPath.resolve(imgName);
+
+            if (!conditionMet(imgName)) {
+                continue;
+            }
 
             final BufferedImage bufImg = ImageIO.read(imgPath.toFile());
             final BufferedImage off_Image = new BufferedImage(
@@ -317,8 +331,12 @@ public abstract class DataSetFactory
     {
         new DeepScores("yolo.yaml", "deepscores.yaml").process();
         new DoReMi("yolo.yaml", "doremi.yaml").process();
+        new Beethoven("yolo.yaml", "beethoven.yaml").process();
     }
 
+    //---------//
+    // radixOf //
+    //---------//
     public static String radixOf (String fileName)
     {
         final int dot = fileName.lastIndexOf('.');

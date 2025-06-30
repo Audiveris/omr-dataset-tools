@@ -97,6 +97,7 @@ public class DeepScores
         final ObjectMapper jsonMapper = new ObjectMapper();
         boolean labelsPrinted = false;
 
+        // Preload both .json files, to map annotations and images nodes
         for (String jsonName : new String[] { "deepscores_train.json", "deepscores_test.json" }) {
             final File jsonFile = sourceDir.resolve(jsonName).toFile();
 
@@ -235,6 +236,41 @@ public class DeepScores
     }
 
     @Override
+    protected boolean conditionMet (String imgName)
+        throws Exception
+    {
+        // Check at least one required label is present in this page
+        if (config.checking.required_labels == null) {
+            return true;
+        }
+
+        final JsonNode img = imgMap.get(imgName);
+        final JsonNode ann_ids = img.get("ann_ids");
+
+        for (Iterator<JsonNode> annIt = ann_ids.elements(); annIt.hasNext();) {
+            final String id = annIt.next().asText();
+
+            final JsonNode annotation = retrieveAnnotation(id);
+            final int cat_id = annotation.get("cat_id").get(0).asInt();
+            final String className = DeepScoresLabel.values()[cat_id - 1].name();
+
+            if (config.checking.required_labels.contains(className)) {
+                final JsonNode a_bbox = annotation.get("a_bbox");
+                final int x = a_bbox.get(0).asInt();
+                final int y = a_bbox.get(1).asInt();
+                final int x2 = a_bbox.get(2).asInt();
+                final int y2 = a_bbox.get(3).asInt();
+                final int w = x2 - x + 1;
+                final int h = y2 - y + 1;
+                System.out.format("%s at [x:%d, y:%d, w:%d, h:%d]%n", className, x, y, w, h);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     protected void drawAnnotations (String imgName,
                                     Graphics2D g2d)
         throws Exception
@@ -249,6 +285,7 @@ public class DeepScores
             final JsonNode annotation = retrieveAnnotation(id);
             final int cat_id = annotation.get("cat_id").get(0).asInt();
             final String className = DeepScoresLabel.values()[cat_id - 1].name();
+
             if (isHidden(className)) {
                 continue;
             }
@@ -256,10 +293,8 @@ public class DeepScores
             final JsonNode a_bbox = annotation.get("a_bbox");
             final int x = a_bbox.get(0).asInt();
             final int y = a_bbox.get(1).asInt();
-
             final int x2 = a_bbox.get(2).asInt();
             final int y2 = a_bbox.get(3).asInt();
-
             final int w = x2 - x + 1;
             final int h = y2 - y + 1;
 

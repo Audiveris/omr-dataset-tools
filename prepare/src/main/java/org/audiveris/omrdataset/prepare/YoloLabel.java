@@ -24,151 +24,188 @@ package org.audiveris.omrdataset.prepare;
 /**
  * Class <code>YoloLabel</code> represents the labels handled by a YOLO model.
  * <p>
- * From the DeepScores labels, we have removed:
- * <ul>
- * <li>All the "Small" label variants
- * <li>The "restHNr" label
- * <li>The "staff" label
- * </ul>
+ * We try to stick as much as possible with the SMuFL naming.
+ * See https://github.com/w3c/smufl/blob/gh-pages/metadata/glyphnames.json
  *
  * @author Hervé Bitteur
  */
 public enum YoloLabel
 {
-    brace, //
-    ledgerLine, //
-    repeatDot, //
-    segno, //
-    coda, //
-    clefG, //
-    clefCAlto, //
-    clefCTenor, //
-    clefF, //
-    clefUnpitchedPercussion, //
-    clef8, //
-    clef15, //
-    timeSig0, //
-    timeSig1, //
-    timeSig2, //
-    timeSig3, //
-    timeSig4, //
-    timeSig5, //
-    timeSig6, //
-    timeSig7, //
-    timeSig8, //
-    timeSig9, //
-    timeSigCommon, //
-    timeSigCutCommon, //
-    noteheadBlackOnLine, //
-    //    noteheadBlackOnLineSmall, //
-    noteheadBlackInSpace, //
-    //    noteheadBlackInSpaceSmall, //
-    noteheadHalfOnLine, //
-    //    noteheadHalfOnLineSmall, //
-    noteheadHalfInSpace, //
-    //    noteheadHalfInSpaceSmall, //
-    noteheadWholeOnLine, //
-    //    noteheadWholeOnLineSmall, //
-    noteheadWholeInSpace, //
-    //    noteheadWholeInSpaceSmall, //
-    noteheadDoubleWholeOnLine, //
-    //    noteheadDoubleWholeOnLineSmall, //
-    noteheadDoubleWholeInSpace, //
-    //    noteheadDoubleWholeInSpaceSmall, //
-    augmentationDot, //
-    stem, //
-    tremolo1, //
-    tremolo2, //
-    tremolo3, //
-    tremolo4, //
-    tremolo5, //
-    flag8thUp, //
-    //    flag8thUpSmall, //
-    flag16thUp, //
-    flag32ndUp, //
-    flag64thUp, //
-    flag128thUp, //
-    flag8thDown, //
-    //    flag8thDownSmall, //
-    flag16thDown, //
-    flag32ndDown, //
-    flag64thDown, //
-    flag128thDown, //
-    accidentalFlat, //
-    //    accidentalFlatSmall, //
-    accidentalNatural, //
-    //    accidentalNaturalSmall, //
-    accidentalSharp, //
-    //    accidentalSharpSmall, //
-    accidentalDoubleSharp, //
-    accidentalDoubleFlat, //
-    keyFlat, //
-    keyNatural, //
-    keySharp, //
-    articAccentAbove, //
-    articAccentBelow, //
-    articStaccatoAbove, //
-    articStaccatoBelow, //
-    articTenutoAbove, //
-    articTenutoBelow, //
-    articStaccatissimoAbove, //
-    articStaccatissimoBelow, //
-    articMarcatoAbove, //
-    articMarcatoBelow, //
-    fermataAbove, //
-    fermataBelow, //
-    caesura, //
-    restDoubleWhole, //
-    restWhole, //
-    restHalf, //
-    restQuarter, //
-    rest8th, //
-    rest16th, //
-    rest32nd, //
-    rest64th, //
-    rest128th, //
-    //    restHNr, //
+    // 4.1 Staff brackets and dividers
+    brace,
+    bracket,
+
+    // 4.2 Staves
+    ledgerLine,
+
+    // 4.3 Barlines
+    barlineSingle,
+    barlineDouble,
+    barlineHeavy,
+
+    // 4.4 Repeats
+    repeatLeft,
+    repeatRight,
+    repeatRightLeft,
+    repeatDot, // Should we keep it?
+    segno,
+    coda,
+
+    // 4.5 Clefs
+    gClef,
+    cClef,
+    fClef,
+    unpitchedPercussionClef1,
+    clef8,
+    clef15,
+
+    // 4.6 Time signatures
+    timeSig0,
+    timeSig1,
+    timeSig2,
+    timeSig3,
+    timeSig4,
+    timeSig5,
+    timeSig6,
+    timeSig7,
+    timeSig8,
+    timeSig9,
+    timeSigCommon,
+    timeSigCutCommon,
+
+    // 4.7 Noteheads
+    noteheadBlack,
+    noteheadHalf,
+    noteheadWhole,
+    noteheadDoubleWhole,
+
+    // 4.14 Beamed groups of notes (?)
+    augmentationDot,
+
+    // 4.15 Stems
+    stem,
+
+    // 4.16 Tremolos
+    tremolo1,
+    tremolo2,
+    tremolo3,
+    tremolo4,
+    tremolo5,
+
+    // 4.17 Flags
+    flag8thUp,
+    flag8thDown,
+    flag16thUp,
+    flag16thDown,
+    flag32ndUp,
+    flag32ndDown,
+    flag64thUp,
+    flag64thDown,
+    flag128thUp,
+    flag128thDown,
+
+    //4.18 Standard accidentals
+    accidentalFlat,
+    accidentalNatural,
+    accidentalSharp,
+    accidentalDoubleSharp,
+    accidentalDoubleFlat,
+    // keyFlat, //
+    // keyNatural, //
+    // keySharp, //
+
+    // 4.39 Articulation
+    articAccent, // above = below
+    articStaccato, // above = below
+    articTenuto, // above = below
+    articStaccatissimoAbove,
+    articStaccatissimoBelow,
+    articMarcatoAbove,
+    articMarcatoBelow,
+
+    // 4.40 Holds and pauses
+    fermataAbove,
+    fermataBelow,
+    caesura,
+
+    // 4.41 Rests
+    restDoubleWhole,
+    restWhole,
+    restHalf,
+    restQuarter,
+    rest8th,
+    rest16th,
+    rest32nd,
+    rest64th,
+    rest128th,
+    restHBar,
+
+    // 4.42 Bar repeats
+    repeat1Bar,
+    repeat2Bars,
+    repeat4Bars,
+
+    // 4.43 Octaves
+    ottava, // '8'
+    quindicesima, // '15'
+    ottavaBracket, // the following dashes - - -
+
+    // 4.44 Dynamics
+    // DeepScores handles single letters only
     dynamicP, //
     dynamicM, //
     dynamicF, //
     dynamicS, //
     dynamicZ, //
     dynamicR, //
-    graceNoteAcciaccaturaStemUp, //
-    graceNoteAppoggiaturaStemUp, //
-    graceNoteAcciaccaturaStemDown, //
-    graceNoteAppoggiaturaStemDown, //
-    ornamentTrill, //
-    ornamentTurn, //
-    ornamentTurnInverted, //
-    ornamentMordent, //
-    stringsDownBow, //
-    stringsUpBow, //
-    arpeggiato, //
-    keyboardPedalPed, //
-    keyboardPedalUp, //
+    dynamicCrescendoHairpin,
+    dynamicDiminuendoHairpin,
+
+    // 4.46 Common ornaments
+    graceNoteAcciaccaturaStemUp,
+    graceNoteAcciaccaturaStemDown,
+    graceNoteAppoggiaturaStemUp,
+    graceNoteAppoggiaturaStemDown,
+    ornamentTrill,
+    ornamentTurn,
+    ornamentTurnInverted,
+    ornamentTurnSlash,
+    ornamentTurnUp,
+    ornamentMordent,
+
+    // 4.52 String techniques
+    stringsDownBow,
+    stringsUpBow,
+
+    // 4.53 Plucked techniques
+    arpeggiato,
+
+    // 4.55 Keyboard techniques
+    keyboardPedalPed,
+    keyboardPedalUp,
+
+    // 4.75 Tuplets
+    tuplet1,
+    tuplet2,
     tuplet3, //
+    tuplet4,
+    tuplet5,
     tuplet6, //
+    tuplet7,
+    tuplet8,
+    tuplet9,
+    tupletBracket, //
+
+    // 4.115 Fingering
     fingering0, //
     fingering1, //
     fingering2, //
     fingering3, //
     fingering4, //
     fingering5, //
-    slur, //
-    beam, //
-    tie, //
-    restHBar, //
-    dynamicCrescendoHairpin, //
-    dynamicDiminuendoHairpin, //
-    tuplet1, //
-    tuplet2, //
-    tuplet4, //
-    tuplet5, //
-    tuplet7, //
-    tuplet8, //
-    tuplet9, //
-    tupletBracket, //
-    //    staff, //
-    ottavaBracket;
+
+    // 4.78 Beams and slurs
+    beam,
+    slur,
+    tie;
 }

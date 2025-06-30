@@ -111,6 +111,9 @@ public abstract class DataSetConfig
         /** Labels not to be drawn. */
         public List<String> hidden_labels;
 
+        /** Labels required. */
+        public List<String> required_labels;
+
         /** Should we check the whole train set. */
         public boolean use_train;
 
@@ -126,9 +129,11 @@ public abstract class DataSetConfig
             return new StringBuilder("{")//
                     .append("output:").append(output) //
                     .append(" draw_name:").append(draw_name) //
+                    .append(" required_labels:").append(required_labels) //
+                    .append(" hidden_labels:").append(hidden_labels) //
                     .append(" use_train:").append(use_train) //
                     .append(" use_val:").append(use_val) //
-                    .append(" selection.size:").append(selection.size()) //
+                    .append(" selection.size:").append(selection != null ? selection.size() : 0) //
                     .append('}').toString();
         }
     }
