@@ -11,7 +11,7 @@ The related content is still available in the "**patch-classifier**" branch.
 
 In 2025, it was refocused on the training of a full-page detector/classifier based on 
 latest architectures like YOLO.
-This is the content of this "**master**" branch (and of the temporary "yolo" development branch)
+This is the content of this "**development**" branch
 
 
 
