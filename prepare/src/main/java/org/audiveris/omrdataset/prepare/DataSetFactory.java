@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,6 +41,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -61,40 +63,25 @@ public abstract class DataSetFactory
 
     private static final Logger logger = LoggerFactory.getLogger(DataSetFactory.class);
 
+    protected static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+
+    private static Path trainImages;
+
+    private static Path valImages;
+
+    private static Path trainLabels;
+
+    private static Path valLabels;
+
     //~ Instance fields ----------------------------------------------------------------------------
 
-    protected final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-
-    private Path trainImages;
-
-    private Path valImages;
-
-    private Path trainLabels;
-
-    private Path valLabels;
+    protected DataSetConfig config;
 
     protected Path sourceDir; //  Path to dataset source directory
 
     protected Path imagesPath;
 
-    protected DataSetConfig config;
-
     //~ Constructors -------------------------------------------------------------------------------
-
-    /**
-     * Create a new <code>DataSetFactory</code> instance.
-     *
-     * @param yoloConfigPath path to the Yolo configuration file
-     * @throws java.lang.Exception
-     */
-    public DataSetFactory (String yoloConfigPath)
-            throws Exception
-    {
-        final Path path = Paths.get(yoloConfigPath);
-        final YoloConfig yoloConfig = yamlMapper.readValue(path.toFile(), YoloConfig.class);
-        logger.info("{}", yoloConfig);
-        prepareYoloFolders(yoloConfig);
-    }
 
     //~ Methods ------------------------------------------------------------------------------------
 
@@ -244,48 +231,6 @@ public abstract class DataSetFactory
         return ((hiddens != null) && hiddens.contains(className));
     }
 
-    //--------------------//
-    // prepareYoloFolders //
-    //--------------------//
-    /**
-     * Prepare the target YOLO folders structure.
-     *
-     * @param the YOLO configuration
-     * @throws Exception
-     */
-    private void prepareYoloFolders (YoloConfig config)
-        throws Exception
-    {
-        final Path yoloDir = Paths.get(config.target);
-        Files.createDirectories(yoloDir);
-
-        final Path imagesDir = yoloDir.resolve("images");
-        Files.createDirectories(imagesDir);
-
-        trainImages = imagesDir.resolve("train");
-        Files.createDirectories(trainImages);
-
-        valImages = imagesDir.resolve("val");
-        Files.createDirectories(valImages);
-
-        final Path labelsDir = yoloDir.resolve("labels");
-        Files.createDirectories(labelsDir);
-
-        trainLabels = labelsDir.resolve("train");
-        Files.createDirectories(trainLabels);
-
-        valLabels = labelsDir.resolve("val");
-        Files.createDirectories(valLabels);
-
-        // Print out the YOLO labels id and name?
-        if (config.print_labels) {
-            System.out.println("\nYOLO labels ID and name:");
-            for (YoloLabel yl : YoloLabel.values()) {
-                System.out.println(String.format("  %d: %s", yl.ordinal(), yl));
-            }
-        }
-    }
-
     //---------//
     // process //
     //---------//
@@ -329,9 +274,67 @@ public abstract class DataSetFactory
     public static void main (String... args)
         throws Exception
     {
-        new DeepScores("yolo.yaml", "deepscores.yaml").process();
-        new DoReMi("yolo.yaml", "doremi.yaml").process();
-        new Beethoven("yolo.yaml", "beethoven.yaml").process();
+        final Path path = Paths.get("yolo.yaml");
+        final YoloConfig yoloConfig = yamlMapper.readValue(path.toFile(), YoloConfig.class);
+        logger.info("{}", yoloConfig);
+        prepareYoloFolders(yoloConfig);
+
+        //        new DeepScores("deepscores.yaml").process();
+        //        new DoReMi("doremi.yaml").process();
+        //        new Beethoven("beethoven.yaml").process();
+        new AudiverisDataset("audiveris.yaml").process();
+    }
+
+    //--------------------//
+    // prepareYoloFolders //
+    //--------------------//
+    /**
+     * Prepare the target YOLO folders structure.
+     *
+     * @param the YOLO configuration
+     * @throws Exception
+     */
+    private static void prepareYoloFolders (YoloConfig config)
+        throws Exception
+    {
+        final Path yoloDir = Paths.get(config.target);
+        Files.createDirectories(yoloDir);
+
+        final Path imagesDir = yoloDir.resolve("images");
+        Files.createDirectories(imagesDir);
+
+        trainImages = imagesDir.resolve("train");
+        Files.createDirectories(trainImages);
+
+        valImages = imagesDir.resolve("val");
+        Files.createDirectories(valImages);
+
+        final Path labelsDir = yoloDir.resolve("labels");
+        Files.createDirectories(labelsDir);
+
+        trainLabels = labelsDir.resolve("train");
+        Files.createDirectories(trainLabels);
+
+        valLabels = labelsDir.resolve("val");
+        Files.createDirectories(valLabels);
+
+        // Generate the dataset.yaml file?
+        if (config.dataset_file != null) {
+            final String dataFile = yoloDir.resolve(config.dataset_file).toString();
+            logger.info("Generating {}", dataFile);
+
+            try (PrintWriter writer = new PrintWriter(dataFile)) {
+                // Absolute paths to train and val
+                writer.printf("train: %s%n", config.drive_target + "/images/train");
+                writer.printf("val: %s%n", config.drive_target + "/images/val");
+                writer.println();
+
+                // Names
+                writer.println("names:");
+                Stream.of(YoloLabel.values()).forEach(
+                        l -> writer.printf("  %d: %s%n", l.ordinal(), l));
+            }
+        }
     }
 
     //---------//
@@ -360,19 +363,23 @@ public abstract class DataSetFactory
     //------------//
     private static class YoloConfig
     {
+        // Local folder where datasets for Yolo should be written
         public String target;
 
-        public boolean print_labels;
+        // Remote folder for dataset
+        public String drive_target;
+
+        // Dataset file to be generated
+        public String dataset_file;
 
         @Override
         public String toString ()
         {
-            final StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-            sb.append(" {")//
+            return new StringBuilder(getClass().getSimpleName()).append(" {")//
                     .append("\n  target:").append(target)//
-                    .append("\n  print_labels:").append(print_labels);
-
-            return sb.append("\n}").toString();
+                    .append("\n  drive_target:").append(drive_target)//
+                    .append("\n  dataset_file:").append(dataset_file)//
+                    .append("\n}").toString();
         }
     }
 

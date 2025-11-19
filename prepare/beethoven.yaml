@@ -15,9 +15,9 @@ annotations: .
 # List of tasks to be actually performed
 tasks:
   - histogram
-  - checking
+#  - checking
   - train
-  - val
+#  - val
 
 # Specifications for some visual checking
 checking:

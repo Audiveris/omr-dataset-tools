@@ -17,7 +17,7 @@ print_predefined_labels: true
 # List of tasks to be actually performed
 tasks:
   - histogram
-  - checking
+#  - checking
   - train
   - val
 
@@ -25,12 +25,12 @@ tasks:
 checking:
   output: data/ds2-annotated-images # where to store the annotated images
   draw_name: true                   # draw class name rather than class rank?
-  use_train: false                  # select full train?
-  use_val: false                    # select full val?
+  required_labels:                  # limit to images containing any of these items
+    - dynamicM
+  use_train: true                  # select full train?
+  use_val: true                    # select full val?
   selection:                        # list of selected images
-    - 'lg-2267728-aug-beethoven--page-2.png'
-    - 'lg-3948783-aug-emmentaler--page-1.png'
-    - 'lg-5230237-aug-gutenberg1939--page-2.png'
+    - lg-106810361-aug-emmentaler--page-2.png
   
 # train pages (1362 - 57 = 1305)
 train:

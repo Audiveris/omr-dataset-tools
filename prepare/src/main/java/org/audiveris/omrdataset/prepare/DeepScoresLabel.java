@@ -23,147 +23,235 @@ package org.audiveris.omrdataset.prepare;
 
 /**
  * Class <code>DeepScoresLabel</code> gathers the labels used in DeepScores V2.
+ * <p>
+ * This is a list <em>derived</em> from the original "categories" found in the DeepScores-XXXX.json
+ * files, with an important modification regarding the dynamics names:
+ * <ul>
+ * <li>The original list contained only the six 1-letter dynamic symbols:
+ * dynamicP,
+ * dynamicM,
+ * dynamicF,
+ * dynamicS,
+ * dynamicZ,
+ * dynamicR.
+ * <li>The modified list contains compound dynamic symbols:
+ * dynamicPPPP,
+ * dynamicPPP,
+ * dynamicPP,
+ * dynamicP,
+ * dynamicMP,
+ * dynamicMF,
+ * dynamicPF,
+ * dynamicF,
+ * dynamicFF,
+ * dynamicFFF,
+ * dynamicFFFF,
+ * dynamicFP,
+ * dynamicFZ,
+ * dynamicSF,
+ * dynamicSFP,
+ * dynamicSFPP,
+ * dynamicSFZ,
+ * dynamicSFZP,
+ * dynamicSFFZ,
+ * dynamicRF,
+ * dynamicRFZ.
+ * </ul>
  *
  * @author Hervé Bitteur
  */
 public enum DeepScoresLabel
 {
-    brace, //  0
-    ledgerLine, //  1
-    repeatDot, //  2
-    segno, //  3
-    coda, //  4
-    clefG, //  5
-    clefCAlto, //  6
-    clefCTenor, //  7
-    clefF, //  8
-    clefUnpitchedPercussion, //  9
-    clef8, //  10
-    clef15, //  11
-    timeSig0, //  12
-    timeSig1, //  13
-    timeSig2, //  14
-    timeSig3, //  15
-    timeSig4, //  16
-    timeSig5, //  17
-    timeSig6, //  18
-    timeSig7, //  19
-    timeSig8, //  20
-    timeSig9, //  21
-    timeSigCommon, //  22
-    timeSigCutCommon, //  23
-    noteheadBlackOnLine, //  24
-    noteheadBlackOnLineSmall, //  25
-    noteheadBlackInSpace, //  26
-    noteheadBlackInSpaceSmall, //  27
-    noteheadHalfOnLine, //  28
-    noteheadHalfOnLineSmall, //  29
-    noteheadHalfInSpace, //  30
-    noteheadHalfInSpaceSmall, //  31
-    noteheadWholeOnLine, //  32
-    noteheadWholeOnLineSmall, //  33
-    noteheadWholeInSpace, //  34
-    noteheadWholeInSpaceSmall, //  35
-    noteheadDoubleWholeOnLine, //  36
-    noteheadDoubleWholeOnLineSmall, //  37
-    noteheadDoubleWholeInSpace, //  38
-    noteheadDoubleWholeInSpaceSmall, //  39
-    augmentationDot, //  40
-    stem, //  41
-    tremolo1, //  42
-    tremolo2, //  43
-    tremolo3, //  44
-    tremolo4, //  45
-    tremolo5, //  46
-    flag8thUp, //  47
-    flag8thUpSmall, //  48
-    flag16thUp, //  49
-    flag32ndUp, //  50
-    flag64thUp, //  51
-    flag128thUp, //  52
-    flag8thDown, //  53
-    flag8thDownSmall, //  54
-    flag16thDown, //  55
-    flag32ndDown, //  56
-    flag64thDown, //  57
-    flag128thDown, //  58
-    accidentalFlat, //  59
-    accidentalFlatSmall, //  60
-    accidentalNatural, //  61
-    accidentalNaturalSmall, //  62
-    accidentalSharp, //  63
-    accidentalSharpSmall, //  64
-    accidentalDoubleSharp, //  65
-    accidentalDoubleFlat, //  66
-    keyFlat, //  67
-    keyNatural, //  68
-    keySharp, //  69
-    articAccentAbove, //  70
-    articAccentBelow, //  71
-    articStaccatoAbove, //  72
-    articStaccatoBelow, //  73
-    articTenutoAbove, //  74
-    articTenutoBelow, //  75
-    articStaccatissimoAbove, //  76
-    articStaccatissimoBelow, //  77
-    articMarcatoAbove, //  78
-    articMarcatoBelow, //  79
-    fermataAbove, //  80
-    fermataBelow, //  81
-    caesura, //  82
-    restDoubleWhole, //  83
-    restWhole, //  84
-    restHalf, //  85
-    restQuarter, //  86
-    rest8th, //  87
-    rest16th, //  88
-    rest32nd, //  89
-    rest64th, //  90
-    rest128th, //  91
-    restHNr, //  92
-    dynamicP, //  93
-    dynamicM, //  94
-    dynamicF, //  95
-    dynamicS, //  96
-    dynamicZ, //  97
-    dynamicR, //  98
-    graceNoteAcciaccaturaStemUp, //  99
-    graceNoteAppoggiaturaStemUp, //  100
-    graceNoteAcciaccaturaStemDown, //  101
-    graceNoteAppoggiaturaStemDown, //  102
-    ornamentTrill, //  103
-    ornamentTurn, //  104
-    ornamentTurnInverted, //  105
-    ornamentMordent, //  106
-    stringsDownBow, //  107
-    stringsUpBow, //  108
-    arpeggiato, //  109
-    keyboardPedalPed, //  110
-    keyboardPedalUp, //  111
-    tuplet3, //  112
-    tuplet6, //  113
-    fingering0, //  114
-    fingering1, //  115
-    fingering2, //  116
-    fingering3, //  117
-    fingering4, //  118
-    fingering5, //  119
-    slur, //  120
-    beam, //  121
-    tie, //  122
-    restHBar, //  123
-    dynamicCrescendoHairpin, //  124
-    dynamicDiminuendoHairpin, //  125
-    tuplet1, //  126
-    tuplet2, //  127
-    tuplet4, //  128
-    tuplet5, //  129
-    tuplet7, //  130
-    tuplet8, //  131
-    tuplet9, //  132
-    tupletBracket, //  133
-    staff, //  134
-    ottavaBracket; //  135
+    brace,
+
+    ledgerLine,
+
+    repeatDot,
+    segno,
+    coda,
+
+    clefG,
+    clefCAlto,
+    clefCTenor,
+    clefF,
+    clefUnpitchedPercussion,
+    clef8,
+    clef15,
+
+    timeSig0,
+    timeSig1,
+    timeSig2,
+    timeSig3,
+    timeSig4,
+    timeSig5,
+    timeSig6,
+    timeSig7,
+    timeSig8,
+    timeSig9,
+    timeSigCommon,
+    timeSigCutCommon,
+
+    noteheadBlackOnLine,
+    noteheadBlackOnLineSmall,
+    noteheadBlackInSpace,
+    noteheadBlackInSpaceSmall,
+    noteheadHalfOnLine,
+    noteheadHalfOnLineSmall,
+    noteheadHalfInSpace,
+    noteheadHalfInSpaceSmall,
+    noteheadWholeOnLine,
+    noteheadWholeOnLineSmall,
+    noteheadWholeInSpace,
+    noteheadWholeInSpaceSmall,
+    noteheadDoubleWholeOnLine,
+    noteheadDoubleWholeOnLineSmall,
+    noteheadDoubleWholeInSpace,
+    noteheadDoubleWholeInSpaceSmall,
+
+    augmentationDot,
+
+    stem,
+
+    tremolo1,
+    tremolo2,
+    tremolo3,
+    tremolo4,
+    tremolo5,
+
+    flag8thUp,
+    flag8thUpSmall,
+    flag16thUp,
+    flag32ndUp,
+    flag64thUp,
+    flag128thUp,
+    flag8thDown,
+    flag8thDownSmall,
+    flag16thDown,
+    flag32ndDown,
+    flag64thDown,
+    flag128thDown,
+
+    accidentalFlat,
+    accidentalFlatSmall,
+    accidentalNatural,
+    accidentalNaturalSmall,
+    accidentalSharp,
+    accidentalSharpSmall,
+    accidentalDoubleSharp,
+    accidentalDoubleFlat,
+
+    keyFlat,
+    keyNatural,
+    keySharp,
+
+    articAccentAbove,
+    articAccentBelow,
+    articStaccatoAbove,
+    articStaccatoBelow,
+    articTenutoAbove,
+    articTenutoBelow,
+    articStaccatissimoAbove,
+    articStaccatissimoBelow,
+    articMarcatoAbove,
+    articMarcatoBelow,
+
+    fermataAbove,
+    fermataBelow,
+    caesura,
+
+    restDoubleWhole,
+    restWhole,
+    restHalf,
+    restQuarter,
+    rest8th,
+    rest16th,
+    rest32nd,
+    rest64th,
+    rest128th,
+    restHNr,
+
+    //    dynamicP,
+    //    dynamicM,
+    //    dynamicF,
+    //    dynamicS,
+    //    dynamicZ,
+    //    dynamicR,
+    dynamicPPPPPP, // ?
+    dynamicPPPPP, // ?
+    dynamicPPPP, // ?
+    dynamicPPP, // pianississimo
+    dynamicPP, // pianissimo
+    dynamicP, // piano
+    dynamicM, // mezzo
+    dynamicMP, // mezzo piano
+    dynamicMF, // mezzo forte
+    dynamicPF, // piano forte
+    dynamicF, // forte
+    dynamicFF, // fortissimo
+    dynamicFFF, // fortississimo
+    dynamicFFFF, // ?
+    dynamicFFFFF, // ?
+    dynamicFFFFFF, // ?
+    dynamicFP, // forte piano
+    dynamicFZ, // forzando
+    dynamicSF, // sforzando
+    dynamicSFP, // sforzandoPiano
+    dynamicSFPP, // sforzandoPianissimo
+    dynamicSFZ, // sforzato
+    dynamicSFZP, // sforzatoPiano
+    dynamicSFF, // Abbreviation of SFFZ...
+    dynamicSFFZ, // sforzatoFF
+    dynamicRF, //  rinforzando1
+    dynamicRFZ, // rinforzando2
+
+    graceNoteAcciaccaturaStemUp,
+    graceNoteAppoggiaturaStemUp,
+    graceNoteAcciaccaturaStemDown,
+    graceNoteAppoggiaturaStemDown,
+    ornamentTrill,
+    ornamentTurn,
+    ornamentTurnInverted,
+    ornamentMordent,
+
+    stringsDownBow,
+    stringsUpBow,
+
+    arpeggiato,
+
+    keyboardPedalPed,
+    keyboardPedalUp,
+
+    tuplet3,
+    tuplet6,
+
+    fingering0,
+    fingering1,
+    fingering2,
+    fingering3,
+    fingering4,
+    fingering5,
+
+    slur,
+    beam,
+    tie,
+
+    restHBar,
+
+    dynamicCrescendoHairpin,
+    dynamicDiminuendoHairpin,
+
+    tuplet1,
+    tuplet2,
+    tuplet4,
+    tuplet5,
+    tuplet7,
+    tuplet8,
+    tuplet9,
+    tupletBracket,
+
+    staff,
+
+    ottavaBracket;
 
     //~ Static Methods -----------------------------------------------------------------------------
 
@@ -176,6 +264,8 @@ public enum DeepScoresLabel
     public static YoloLabel of (DeepScoresLabel label)
     {
         return switch (label) {
+
+            case repeatDot -> null;
 
             case clefG -> YoloLabel.gClef;
             case clefCAlto, clefCTenor -> YoloLabel.cClef;
@@ -205,10 +295,6 @@ public enum DeepScoresLabel
             case accidentalNaturalSmall -> null;
             case accidentalSharpSmall -> null;
 
-            //    keyFlat ?
-            //    keyNatural ?
-            //    keySharp ?
-
             // Irrelevant above / below
             case articAccentAbove, articAccentBelow -> YoloLabel.articAccent;
             case articStaccatoAbove, articStaccatoBelow -> YoloLabel.articStaccato;
@@ -217,12 +303,8 @@ public enum DeepScoresLabel
             // Don't know what this is
             case restHNr -> null;
 
-            //    dynamicP, //  ?
-            //    dynamicM, //
-            //    dynamicF, //
-            //    dynamicS, //
-            //    dynamicZ, //
-            //    dynamicR, //
+            // Abbreviated dynamic
+            case dynamicSFF -> null;
 
             // Unreliable, and useless in fact
             case staff -> null;

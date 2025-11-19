@@ -21,7 +21,7 @@
 // </editor-fold>
 package org.audiveris.omrdataset.infer;
 
-import static org.bytedeco.opencv.global.opencv_imgproc.COLOR_BGR2RGB;
+import org.audiveris.omrdataset.prepare.YoloLabel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +32,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.onnxruntime.runner.OnnxRuntimeRunner;
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2RGB;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -63,11 +64,6 @@ public class Inference
 {
     //~ Static fields/initializers -----------------------------------------------------------------
 
-    //    static {
-    //        System.setProperty("ORT_LOG_LEVEL", "error");
-    //        System.setProperty("ONNXRUNTIME_LOG_SEVERITY_LEVEL", "4");
-    //    }
-
     private static final Logger logger = LoggerFactory.getLogger(Inference.class);
 
     private static final int CLASSES_OFFSET = 4; // Offset of classes in output rows (4: x,y,w,h)
@@ -76,7 +72,7 @@ public class Inference
 
     private static final double detectionThreshold = 0.5; // Threshold for Detection
 
-    private static final double nmsThreshold = 0.4; // Threshold for Non Max Suppresion
+    private static final double nmsThreshold = 0.4; // Threshold for Non Max Suppression
 
     //~ Instance fields ----------------------------------------------------------------------------
 
@@ -102,6 +98,7 @@ public class Inference
      * Create an <code>Inference</code>.
      *
      * @param targetDir target directory
+     * @throws java.lang.Exception
      */
     public Inference (String targetDir)
             throws Exception
@@ -109,7 +106,7 @@ public class Inference
         logger.info("start");
 
         // Load the model
-        final File f = new File("best (4).onnx");
+        final File f = new File("../data/models/best-12s-5.onnx");
         onnxRuntimeRunner = OnnxRuntimeRunner.builder().modelUri(f.getAbsolutePath()).build();
         logger.info("ONNX runtime loaded on model: {}", f.toString());
 
@@ -120,6 +117,218 @@ public class Inference
     }
 
     //~ Methods ------------------------------------------------------------------------------------
+
+    //-------------//
+    // drawObjects //
+    //-------------//
+    /**
+     * Draw, over the original image, the name and bounding box for each predicted object.
+     *
+     * @param objs the predicted objects
+     * @throws Exception
+     */
+    private void drawObjects (List<DetectedObject> objs)
+        throws Exception
+    {
+        final YoloLabel[] classes = YoloLabel.values();
+        final BufferedImage off_Image = new BufferedImage(
+                orgImage.getWidth(),
+                orgImage.getHeight(),
+                BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g2d = off_Image.createGraphics();
+        final Font font = new Font("Arial", Font.PLAIN, 12);
+        g2d.setFont(font);
+        g2d.drawImage(orgImage, null, 0, 0);
+        g2d.setColor(Color.MAGENTA);
+
+        objs.forEach(obj -> {
+            // Resize according to original image size
+            final double[] topLeft = obj.getTopLeftXY();
+            int x = (int) Math.rint(wRatio * topLeft[0]);
+            int y = (int) Math.rint(hRatio * topLeft[1]);
+            int w = (int) Math.rint(wRatio * obj.getWidth());
+            int h = (int) Math.rint(hRatio * obj.getHeight());
+
+            // Draw obj rectangle
+            g2d.drawRect(x - 1, y - 1, w + 2, h + 2);
+
+            //            // Draw class name + conf
+            //            g2d.setColor(Color.MAGENTA);
+            //            final YoloLabel cls = classes[obj.getPredictedClass()];
+            //            final double conf = obj.getConfidence();
+            //            g2d.drawString(cls.name() + String.format(" %.2f", conf), x, y);
+            // Draw class ID
+            final YoloLabel cls = classes[obj.getPredictedClass()];
+            g2d.drawString(cls.name(), x, y - 3);
+        });
+
+        g2d.dispose();
+
+        // Save the annotated image
+        final String fileName = imgPath.getFileName().toString();
+        final int dot = fileName.lastIndexOf('.');
+        final String radix = fileName.substring(0, dot);
+        final String annotatedName = radix + "-ann.png";
+        final Path targetPath = targetDirPath.resolve(annotatedName);
+
+        ImageIO.write(off_Image, "png", targetPath.toFile());
+        logger.info("Objects printed in {}", targetPath);
+    }
+    //
+    //    //---------------------//
+    //    // getPredictedObjects //
+    //    //---------------------//
+    //    /**
+    //     * Report only the predicted objects among all the candidates.
+    //     *
+    //     * @param out the model raw output
+    //     * @return the list of candidates kept
+    //     */
+    //    private List<DetectedObject> getPredictedObjects (INDArray out)
+    //    {
+    //        final List<DetectedObject> objs = new ArrayList<>();
+    //
+    //        ///for (int c = 0, clsNb = YoloLabel.values().length; c < clsNb; c++) {
+    //        final Point p = new Point(618, 1123);
+    //        final int c = YoloLabel.beam.ordinal();
+    //        final int row = CLASSES_OFFSET + c;
+    //        final INDArray confs = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
+    //
+    //        for (int i = 0; i < boxNb; i++) {
+    //            final double conf = confs.getDouble(i);
+    //            if (conf < 0.01) {
+    //                continue;
+    //            }
+    //
+    //            final double xc = out.getDouble(0, i);
+    //            final double yc = out.getDouble(1, i);
+    //            final double w = out.getDouble(2, i);
+    //            final double h = out.getDouble(3, i);
+    //
+    //            double x = xc - w / 2;
+    //            double y = yc - h / 2;
+    //
+    //            // Resize according to original image size
+    //            int xx = (int) Math.rint(x * wRatio);
+    //            int yy = (int) Math.rint(y * hRatio);
+    //            int ww = (int) Math.rint(w * wRatio);
+    //            int hh = (int) Math.rint(h * hRatio);
+    //
+    //            final Rectangle r = new Rectangle(xx, yy, ww, hh);
+    //            if (r.contains(p)) {
+    //                System.out.println(
+    //                        String.format("x: %d y: %d w: %d h: %d conf: %.5f", xx, yy, ww, hh, conf));
+    //                final DetectedObject obj = new DetectedObject(0, xc, yc, w, h, c, conf);
+    //                objs.add(obj);
+    //            }
+    //        }
+    //        ///}
+    //
+    //        return objs;
+    //    }
+
+    //---------------------//
+    // getPredictedObjects //
+    //---------------------//
+    /**
+     * Report only the predicted objects among all the candidates.
+     *
+     * @param out the model raw output
+     * @return the list of candidates kept
+     */
+    private List<DetectedObject> getPredictedObjects (INDArray out)
+    {
+        final List<DetectedObject> objs = new ArrayList<>();
+
+        for (int c = 0, clsNb = YoloLabel.values().length; c < clsNb; c++) {
+            final int row = CLASSES_OFFSET + c;
+            final INDArray confs = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
+
+            for (int i = 0; i < boxNb; i++) {
+                final double conf = confs.getDouble(i);
+                if (conf < detectionThreshold) {
+                    continue;
+                }
+
+                final double xc = out.getDouble(0, i);
+                final double yc = out.getDouble(1, i);
+                final double w = out.getDouble(2, i);
+                final double h = out.getDouble(3, i);
+
+                final DetectedObject obj = new DetectedObject(0, xc, yc, w, h, c, conf);
+                objs.add(obj);
+            }
+        }
+
+        return objs;
+    }
+
+    //-----------------//
+    // printClassBoxes //
+    //-----------------//
+    /**
+     * Print the bounding box for each candidate of the desired class.
+     *
+     * @param cls the desired class
+     * @param out model raw output
+     */
+    private void printClassBoxes (YoloLabel cls,
+                                  INDArray out)
+    {
+        System.out.println("\nBoxes for class: " + cls);
+        final int row = cls.ordinal() + 4;
+        final INDArray confs = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
+
+        for (int i = 0; i < boxNb; i++) {
+            final double conf = confs.getDouble(i);
+            if (conf >= detectionThreshold) {
+                // Convert from xc,yc,w,h to x,y,w,h
+                double xc = out.getDouble(0, i);
+                double yc = out.getDouble(1, i);
+                double w = out.getDouble(2, i);
+                double h = out.getDouble(3, i);
+                double x = xc - w / 2;
+                double y = yc - h / 2;
+
+                // Resize according to original image size
+                int xx = (int) Math.rint(x * wRatio);
+                int yy = (int) Math.rint(y * hRatio);
+                int ww = (int) Math.rint(w * wRatio);
+                int hh = (int) Math.rint(h * hRatio);
+                System.out.println(
+                        String.format("x: %d y: %d w: %d h: %d conf: %.5f", xx, yy, ww, hh, conf));
+            }
+        }
+
+    }
+
+    //----------------//
+    // printHistogram //
+    //----------------//
+    /**
+     * Print the histogram of all candidates found.
+     *
+     * @param out model raw output
+     */
+    private void printHistogram (INDArray out)
+    {
+        for (YoloLabel c : YoloLabel.values()) {
+            final int row = c.ordinal() + 4;
+            final INDArray values = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
+            final StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < boxNb; i++) {
+                final double conf = values.getDouble(i);
+                if (conf >= detectionThreshold) {
+                    sb.append('X');
+                }
+            }
+
+            if (sb.length() > 0) {
+                System.out.println(String.format("%40s %s", c, sb));
+            }
+        }
+    }
 
     //---------//
     // process //
@@ -160,12 +369,16 @@ public class Inference
         final Map<String, INDArray> inputs = new LinkedHashMap<>();
         inputs.put("images", image);
 
+        final long start = System.currentTimeMillis();
         final Map<String, INDArray> results = onnxRuntimeRunner.exec(inputs);
+        final long stop = System.currentTimeMillis();
+        logger.info("Inference duration: {} seconds", (stop - start) / 1000.0);
+
         logger.debug("keySet: {}", results.keySet());
         final INDArray output = results.get("output0");
         logger.debug("output.shape: {}", output.shape());
         // 1:     image index (0 for a single image)
-        // 125:   xc, yc, w, h, and then: c0, c1, ..., c120
+        // 150:   xc, yc, w, h, and then: c0, c1, ..., c145
         // 80724: boxes values
         rowNb = (int) output.shape()[1];
         boxNb = (int) output.shape()[2];
@@ -178,198 +391,140 @@ public class Inference
         final List<DetectedObject> objs = getPredictedObjects(out);
         logger.info("Detected {} objects", objs.size());
 
-        ///YoloUtils.nms(objs, nmsThreshold);
-        nms(objs, nmsThreshold); ///////////////////////////////////////////////////////
+        nms(objs, nmsThreshold);
         logger.info("Kept {} objects", objs.size());
 
-        //        printHistogram(out);
+        //printHistogram(out);
         drawObjects(objs);
-        //        printClassBoxes(Classe.fermataAbove, out);
-        //        printClassBoxes(Classe.fermataBelow, out);
-        ///printClassBoxes(Classe.slur, out);
-    }
+        //        printClassBoxes(YoloLabel.fermataAbove, out);
+        //        printClassBoxes(YoloLabel.fermataBelow, out);
 
-    //---------------------//
-    // getPredictedObjects //
-    //---------------------//
-    /**
-     * Report only the predicted objects among all the candidates.
-     *
-     * @param out the model raw output
-     * @return the list of candidates kept
-     */
-    private List<DetectedObject> getPredictedObjects (INDArray out)
-    {
-        final List<DetectedObject> objs = new ArrayList<>();
+        ///printClassBoxes(YoloLabel.slur, out);
 
-        for (int c = 0, clsNb = Classe.values().length; c < clsNb; c++) {
-            final int row = CLASSES_OFFSET + c;
-            final INDArray confs = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
-
-            for (int i = 0; i < boxNb; i++) {
-                final double conf = confs.getDouble(i);
-                if (conf < detectionThreshold) {
-                    continue;
-                }
-
-                final double xc = out.getDouble(0, i);
-                final double yc = out.getDouble(1, i);
-                final double w = out.getDouble(2, i);
-                final double h = out.getDouble(3, i);
-
-                //                final INDArray preds = out.get(
-                //                        NDArrayIndex.all(),
-                //                        NDArrayIndex.point(i),
-                //                        NDArrayIndex.interval(row, row + 1));
-
-                DetectedObject obj = new DetectedObject(0, xc, yc, w, h, c, conf);
-                objs.add(obj);
-            }
-        }
-
-        return objs;
-    }
-
-    //----------------//
-    // printHistogram //
-    //----------------//
-    /**
-     * Print the histogram of all candidates found.
-     *
-     * @param out model raw output
-     */
-    private void printHistogram (INDArray out)
-    {
-        for (Classe c : Classe.values()) {
-            final int row = c.ordinal() + 4;
-            final INDArray values = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
-            final StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < boxNb; i++) {
-                final double conf = values.getDouble(i);
-                if (conf >= detectionThreshold) {
-                    sb.append('X');
-                }
-            }
-
-            if (sb.length() > 0) {
-                System.out.println(String.format("%40s %s", c, sb));
-            }
-        }
-    }
-
-    //-----------------//
-    // printClassBoxes //
-    //-----------------//
-    /**
-     * Print the bounding box for each candidate of the desired class.
-     *
-     * @param cls the desired class
-     * @param out model raw output
-     */
-    private void printClassBoxes (Classe cls,
-                                  INDArray out)
-    {
-        System.out.println("\nBoxes for class: " + cls);
-        final int row = cls.ordinal() + 4;
-        final INDArray confs = out.get(NDArrayIndex.point(row), NDArrayIndex.all());
-
-        for (int i = 0; i < boxNb; i++) {
-            final double conf = confs.getDouble(i);
-            if (conf >= detectionThreshold) {
-                // Convert from xc,yc,w,h to x,y,w,h
-                double xc = out.getDouble(0, i);
-                double yc = out.getDouble(1, i);
-                double w = out.getDouble(2, i);
-                double h = out.getDouble(3, i);
-                double x = xc - w / 2;
-                double y = yc - h / 2;
-
-                // Resize according to original image size
-                int xx = (int) Math.rint(x * wRatio);
-                int yy = (int) Math.rint(y * hRatio);
-                int ww = (int) Math.rint(w * wRatio);
-                int hh = (int) Math.rint(h * hRatio);
-                System.out.println(
-                        String.format("x: %d y: %d w: %d h: %d conf: %.5f", xx, yy, ww, hh, conf));
-            }
-        }
+        // Look at a specific location, a halfRest in (457, 730, 48,29)
+        //studyLocation(out, new Rectangle(457, 730, 48, 29)); // half rest
+        ///studyLocation(out, new Rectangle(2144, 2811, 66, 91)); // Flat
 
     }
 
-    //-------------//
-    // drawObjects //
-    //-------------//
-    /**
-     * Draw, over the original image, the name and bounding box for each predicted object.
-     *
-     * @param objs the predicted objects
-     * @throws Exception
-     */
-    private void drawObjects (List<DetectedObject> objs)
-        throws Exception
-    {
-        final Classe[] classes = Classe.values();
-        final BufferedImage off_Image = new BufferedImage(
-                orgImage.getWidth(),
-                orgImage.getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g2d = off_Image.createGraphics();
-        final Font font = new Font("Arial", Font.PLAIN, 12);
-        g2d.setFont(font);
-        g2d.drawImage(orgImage, null, 0, 0);
-
-        objs.forEach(obj -> {
-            // Resize according to original image size
-            final double[] topLeft = obj.getTopLeftXY();
-            int x = (int) Math.rint(wRatio * topLeft[0]);
-            int y = (int) Math.rint(hRatio * topLeft[1]);
-            int w = (int) Math.rint(wRatio * obj.getWidth());
-            int h = (int) Math.rint(hRatio * obj.getHeight());
-
-            // Draw obj rectangle
-            g2d.setColor(Color.RED);
-            g2d.drawRect(x, y, w, h);
-
-            //            // Draw class name + conf
-            //            g2d.setColor(Color.MAGENTA);
-            //            final Classe cls = classes[obj.getPredictedClass()];
-            //            final double conf = obj.getConfidence();
-            //            g2d.drawString(cls.name() + String.format(" %.2f", conf), x, y);
-            // Draw class ID
-            g2d.setColor(Color.MAGENTA);
-            g2d.drawString("" + obj.getPredictedClass(), x, y);
-        });
-
-        g2d.dispose();
-
-        // Save the image with the rectangle drawn on it
-        final String fileName = imgPath.getFileName().toString();
-        final int dot = fileName.lastIndexOf('.');
-        final String radix = fileName.substring(0, dot);
-        final String annotatedName = radix + "-ann.png";
-        final Path targetPath = targetDirPath.resolve(annotatedName);
-
-        ImageIO.write(off_Image, "png", targetPath.toFile());
-        logger.info("Objects printed in {}", targetPath);
-    }
+    //    private void studyLocation (INDArray out,
+    //                                Rectangle rect)
+    //    {
+    //        final YoloLabel[] classes = YoloLabel.values();
+    //
+    //        for (int i = 0; i < boxNb; i++) {
+    //            // Normalized coordinates
+    //            final double xc = out.getDouble(0, i);
+    //            final double yc = out.getDouble(1, i);
+    //            final double wn = out.getDouble(2, i);
+    //            final double hn = out.getDouble(3, i);
+    //
+    //            final double xn = xc - wn / 2.0;
+    //            final double yn = yc - hn / 2.0;
+    //
+    //            int x = (int) Math.rint(wRatio * xn);
+    //            int y = (int) Math.rint(hRatio * yn);
+    //            int w = (int) Math.rint(wRatio * wn);
+    //            int h = (int) Math.rint(hRatio * hn);
+    //
+    //            final Rectangle r = new Rectangle(x, y, w, h);
+    //
+    //            if (rect.contains(r)) {
+    //                System.out.printf("%5d %s %n", i, r.toString());
+    //                System.out.println("BOX");
+    //                final List<DetectedObject> objs = new ArrayList<>();
+    //                for (int c = 0, clsNb = YoloLabel.values().length; c < clsNb; c++) {
+    //                    final double conf = out.getDouble(CLASSES_OFFSET + c, i);
+    //                    objs.add(new DetectedObject(0, xc, yc, wn, hn, c, conf));
+    //                }
+    //                Collections.sort(
+    //                        objs,
+    //                        (o1,
+    //                                o2) -> Double.compare(o2.confidence, o1.confidence));
+    //                for (int j = 0; j < 4; j++) {
+    //                    final DetectedObject obj = objs.get(j);
+    //                    System.out.printf(
+    //                            "%6.3f %s%n",
+    //                            obj.confidence,
+    //                            classes[obj.getPredictedClass()]);
+    //                }
+    //            }
+    //        }
+    //    }
 
     //~ Static Methods -----------------------------------------------------------------------------
 
+    //-----//
+    // iou //
+    //-----//
+    /**
+     * Returns intersection over union (IOU) between o1 and o2.
+     *
+     * @param o1 a detected object
+     * @param o2 another detected object
+     * @return the IOU of these two objects
+     */
+    public static double iou (DetectedObject o1,
+                              DetectedObject o2)
+    {
+        double x1min = o1.getCenterX() - o1.getWidth() / 2;
+        double x1max = o1.getCenterX() + o1.getWidth() / 2;
+        double y1min = o1.getCenterY() - o1.getHeight() / 2;
+        double y1max = o1.getCenterY() + o1.getHeight() / 2;
+
+        double x2min = o2.getCenterX() - o2.getWidth() / 2;
+        double x2max = o2.getCenterX() + o2.getWidth() / 2;
+        double y2min = o2.getCenterY() - o2.getHeight() / 2;
+        double y2max = o2.getCenterY() + o2.getHeight() / 2;
+
+        double ow = overlap(x1min, x1max, x2min, x2max);
+        double oh = overlap(y1min, y1max, y2min, y2max);
+
+        double intersection = ow * oh;
+        double union = o1.getWidth() * o1.getHeight() + o2.getWidth() * o2.getHeight()
+                - intersection;
+        return intersection / union;
+    }
+
+    //------//
+    // main //
+    //------//
     public static void main (String[] args)
         throws Exception
     {
         ///new TestND().test();
         ///
         final Inference inference = new Inference("../data/target");
-        Visitor visitor = new Visitor(inference);
+        //        inference.process(
+        //                Paths.get("D:\\soft\\cases\\Issue-841\\2025_09_14.15_11.Office.Lens-0.png"));
+        //        inference.process(
+        //                Paths.get("D:\\soft\\cases\\Issue-841\\2025_09_14.15_11.Office.Lens-cropped.png"));
+        //        inference.process(
+        //                Paths.get(
+        //                        "D:\\soft\\cases\\Issue-857\\506529310-cc152f5f-b95f-46bc-93ee-e9908daf8a13.jpg"));
+        inference.process(
+                Paths.get(
+                        "D:\\soft\\cases\\Issue-857\\506529310-cc152f5f-b95f-46bc-93ee-e9908daf8a13\\sheet#1\\BINARY-test.png"));
+        //        inference.process(
+        //                Paths.get(
+        //                        "D:\\soft\\cases\\Issue-845\\Allegro_appassionato_Foley-piano_hmol/sheet#1/BINARY#1.png"));
 
-        //final Path source = Paths.get("../data/source");
-        //        final Path source = Paths.get("D:\\soft\\cases");
-        //
-        //Files.walkFileTree(source, visitor);
+        //        final Visitor visitor = new Visitor(inference);
+        //        Files.walkFileTree(
+        //                Paths.get("D:\\soft\\cases\\Issue-846\\Training EXAMPLES Audiveris"),
+        //                visitor);
 
-        inference.process(Paths.get("../data/source/allegretto.png"));
+        //Files.walkFileTree(Paths.get("D:\\soft\\DeepScores\\ds2_dense\\images"), visitor);
+        //Files.walkFileTree(Paths.get("D:\\soft\\cases\\SonateClairDeLune"), visitor);
+
+        //        Files.walkFileTree(
+        //                Paths.get("C:\\Users\\herve\\Downloads\\HarpMusic\\23_Harfe_reduced"),
+        //                visitor);
+        //        Files.walkFileTree(Paths.get("D:\\soft\\cases"), visitor);
+        //        inference.process(
+        //                Paths.get(
+        //                        "D:\\soft\\DeepScores\\ds2_dense\\images\\lg-9919568-aug-beethoven--page-4.png"));
+        //        inference.process(Paths.get("../data/source/allegretto.png"));
         //        inference.process("carmen.png");
         // inference.process(Paths.get("../data/source/lg-617866567367835980-aug-beethoven-.png"));
         //        inference.process("cucaracha.png");
@@ -381,12 +536,82 @@ public class Inference
         //        inference.process("lg-198200840-aug-beethoven--page-1.png");
     }
 
+    //-----//
+    // nms //
+    //-----//
+    /**
+     * Performs non-maximum suppression (NMS) on objects, using their IOU with threshold
+     * to match pairs.
+     *
+     * @param objects      the raw list of detected objects
+     * @param iouThreshold minimum IOU value to consider boxes pairs are the same
+     */
+    public static void nms (List<DetectedObject> objects,
+                            double iouThreshold)
+    {
+        for (int i = 0; i < objects.size(); i++) {
+            for (int j = 0; j < objects.size(); j++) {
+                final DetectedObject o1 = objects.get(i);
+                final DetectedObject o2 = objects.get(j);
+
+                if (o1 != null && o2 != null //
+                        && o1.getPredictedClass() == o2.getPredictedClass() //
+                        && o1.getConfidence() < o2.getConfidence() //
+                        && iou(o1, o2) > iouThreshold) {
+                    objects.set(i, null);
+                }
+            }
+        }
+
+        final Iterator<DetectedObject> it = objects.iterator();
+        while (it.hasNext()) {
+            if (it.next() == null) {
+                it.remove();
+            }
+        }
+    }
+
+    //---------//
+    // overlap //
+    //---------//
+    /**
+     * Report overlap between lines [x1, x2] and [x3, x4].
+     *
+     * @param x1 start of first line
+     * @param x2 stop of first line
+     * @param x3 start of second line
+     * @param x4 stop of second line
+     * @return the overlap value (>=0)
+     */
+    public static double overlap (double x1,
+                                  double x2,
+                                  double x3,
+                                  double x4)
+    {
+        if (x3 < x1) {
+            if (x4 < x1) {
+                return 0;
+            } else {
+                return Math.min(x2, x4) - x1;
+            }
+        } else {
+            if (x2 < x3) {
+                return 0;
+            } else {
+                return Math.min(x2, x4) - x3;
+            }
+        }
+    }
+
+    //~ Inner Classes ------------------------------------------------------------------------------
+
     //---------//
     // Visitor //
     //---------//
     private static class Visitor
             extends SimpleFileVisitor<Path>
     {
+
         private static final List<String> supported = Arrays.asList(".png", ".jpg");
 
         private final Inference inference;
@@ -416,31 +641,9 @@ public class Inference
         }
     }
 
-    /**
-     * Performs non-maximum suppression (NMS) on objects, using their IOU with threshold to match
-     * pairs.
-     */
-    public static void nms (List<DetectedObject> objects,
-                            double iouThreshold)
-    {
-        for (int i = 0; i < objects.size(); i++) {
-            for (int j = 0; j < objects.size(); j++) {
-                DetectedObject o1 = objects.get(i);
-                DetectedObject o2 = objects.get(j);
-                if (o1 != null && o2 != null && o1.getPredictedClass() == o2.getPredictedClass()
-                        && o1.getConfidence() < o2.getConfidence() && iou(o1, o2) > iouThreshold) {
-                    objects.set(i, null);
-                }
-            }
-        }
-        Iterator<DetectedObject> it = objects.iterator();
-        while (it.hasNext()) {
-            if (it.next() == null) {
-                it.remove();
-            }
-        }
-    }
-
+    //----------------//
+    // DetectedObject //
+    //----------------//
     public static class DetectedObject
     {
 
@@ -459,13 +662,14 @@ public class Inference
         private final double confidence;
 
         /**
-         * @param exampleNumber  Index of the example in the current minibatch. For single images,
-         *                       this is always 0
+         * @param exampleNumber  Index of the example in the current minibatch.
+         *                       For single images, this is always 0
          * @param centerX        Center X position of the detected object
          * @param centerY        Center Y position of the detected object
          * @param width          Width of the detected object
          * @param height         Height of the detected object
          * @param predictedClass the predicted class
+         * @param confidence     the assigned confidence
          */
         public DetectedObject (int exampleNumber,
                                double centerX,
@@ -549,49 +753,4 @@ public class Inference
                     + ")";
         }
     }
-
-    /** Returns intersection over union (IOU) between o1 and o2. */
-    public static double iou (DetectedObject o1,
-                              DetectedObject o2)
-    {
-        double x1min = o1.getCenterX() - o1.getWidth() / 2;
-        double x1max = o1.getCenterX() + o1.getWidth() / 2;
-        double y1min = o1.getCenterY() - o1.getHeight() / 2;
-        double y1max = o1.getCenterY() + o1.getHeight() / 2;
-
-        double x2min = o2.getCenterX() - o2.getWidth() / 2;
-        double x2max = o2.getCenterX() + o2.getWidth() / 2;
-        double y2min = o2.getCenterY() - o2.getHeight() / 2;
-        double y2max = o2.getCenterY() + o2.getHeight() / 2;
-
-        double ow = overlap(x1min, x1max, x2min, x2max);
-        double oh = overlap(y1min, y1max, y2min, y2max);
-
-        double intersection = ow * oh;
-        double union = o1.getWidth() * o1.getHeight() + o2.getWidth() * o2.getHeight()
-                - intersection;
-        return intersection / union;
-    }
-
-    /** Returns overlap between lines [x1, x2] and [x3. x4]. */
-    public static double overlap (double x1,
-                                  double x2,
-                                  double x3,
-                                  double x4)
-    {
-        if (x3 < x1) {
-            if (x4 < x1) {
-                return 0;
-            } else {
-                return Math.min(x2, x4) - x1;
-            }
-        } else {
-            if (x2 < x3) {
-                return 0;
-            } else {
-                return Math.min(x2, x4) - x3;
-            }
-        }
-    }
-
 }

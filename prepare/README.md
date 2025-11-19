@@ -104,20 +104,21 @@ where the various labels are listed with their ordinal value.
 
 ## Operations
 
-The main() method of the `org.audiveris.omrdataset.prepare.DataSetFactory` Java class launches the processing of DeepScores and DoReMi datasets in sequence:
+The main() method of the `org.audiveris.omrdataset.prepare.DataSetFactory` Java class launches the processing of DeepScores, DoReMi and Beethoven datasets in sequence:
 ```java
     public static void main (String... args)
         throws Exception
     {
         new DeepScores("yolo.yaml", "deepscores.yaml").process();
         new DoReMi("yolo.yaml", "doremi.yaml").process();
+        new Beethoven("yolo.yaml", "beethoven.yaml").process();
     }
 ```
-`DeepScores` and `DoReMi` classes inherit from the `DataSetFactory` abstract class.
+`DeepScores`, `DoReMi` and `Beethoven` classes inherit from the `DataSetFactory` abstract class.
 
 These classes expect two parameters:
 - The path to a file configuration for the Yolo target, here: [yolo.yaml](./yolo.yaml)
-- The path to a file configuration for the source dataset, here [deepscores.yaml](deepscores.yaml) and [doremi.yaml](doremi.yaml) respectively.
+- The path to a file configuration for the source dataset, here [deepscores.yaml](./deepscores.yaml), [doremi.yaml](./doremi.yaml) and [beethoven.yaml](./beethoven.yaml) respectively.
 
 All these files are located in the "prepare" sub-project.
 
@@ -400,12 +401,13 @@ even though their size is smaller. Therefore, we can safely remove these label n
 #### `restHNr` label
 There is no instance of this `restHNr` label in the dataset.
 I don't know what it is and looks like.
+Perhaps the number (Nr) of measures concerned by a restHBar just below?  
 We'll remove this label.
 
 #### `staff` label
 The `staff` label has 14496 instances in the training part, and 3864 instances in the validation part.  
 First inference results have shown that this class is very poorly recognized.  
-We think we should simply ignore this label.
+I think we should simply ignore this label.
 
 #### Noteheads
 
@@ -436,6 +438,46 @@ What is more annoying, is the case shown below, found in "lg-648395017847626711-
 In this example (I stumbled upon it while reviewing some checking results), two cross-heads are labelled as `noteHeadBlack`.  
 What should we do?
 
+#### Dynamics
+
+DeepScores defines only six "1-letter symbols" (f, m, p, r, s, z) as `dynamicF`, `dynamicM`, etc.
+It has no notion of compound symbols like ppp, pp, mp, mf, ff, fff, fp, df, sfz, sfp...
+
+Since other datasets do handle such compound symbols, we need a way to populate the Yolo dataset
+with the dynamic compound symbols located in the DeepScores images.
+For example, by detecting and building them on-the-fly during the preparation phase.
+
+UPDATE: After having implemented this "merging" of compound dynamics, the histogram for dynamics names is now the following:
+
+| Class                                  |  Train |    Val |
+| :---                                   |   ---: |   ---: |
+| dynamicF                               |   1415 |    343 |
+| dynamicFF                              |    452 |    110 |
+| dynamicFFF                             |    251 |     62 |
+| dynamicFFFF                            |    203 |     54 |
+| dynamicFFFFF                           |     63 |     12 |
+| dynamicFFFFFF                          |      5 |      0 |
+| dynamicFP                              |    212 |     30 |
+| dynamicFZ                              |      1 |      0 |
+| dynamicM                               |    349 |    101 |
+| dynamicMF                              |   1056 |    235 |
+| dynamicMP                              |    909 |    196 |
+| dynamicP                               |   1443 |    354 |
+| dynamicPF                              |      0 |      0 |
+| dynamicPP                              |    290 |     67 |
+| dynamicPPP                             |    202 |     87 |
+| dynamicPPPP                            |     38 |     22 |
+| dynamicPPPPP                           |      4 |      6 |
+| dynamicPPPPPP                          |      5 |      0 |
+| dynamicRF                              |      0 |      0 |
+| dynamicRFZ                             |     29 |      4 |
+| dynamicSF                              |    199 |     58 |
+| dynamicSFF                             |      4 |      1 |
+| dynamicSFFZ                            |     18 |     15 |
+| dynamicSFP                             |     12 |      2 |
+| dynamicSFPP                            |      0 |      0 |
+| dynamicSFZ                             |    232 |     51 |
+| dynamicSFZP                            |      0 |      0 |
 
 #### Scores scales
 
@@ -457,8 +499,8 @@ Especially when, in the same score image, we are faced with staves with differen
 
 #### Abnormal scores
 
-We noticed a few scores in which the symbols overlap so much that they cannot be considered
-as "real" scores.
+We noticed a few scores in which the symbols overlap so much that these artificial images
+cannot be considered as "real" scores.
 
 For example, in file "lg-505588761689839126-aug-beethoven--page-1.png":
 
@@ -709,10 +751,15 @@ The difference with DeepScores is the handling of dynamics:
 
 We will have to make a decision between these two approaches before training a model on these datasets.
 
+## Conclusions
+
+- The DoReMi dataset is discarded because we consider its defects as prohibitive for our training task.
+- The DeepScores dataset has been modified to deliver compound dynamics instead of its original 1-letter dynamics and can then be used.
+- The Beethoven dataset can be used to complement the DeepScores dataset.
 
 ## Upload to drive
 
 When we are through with the preparation of these datasets, it's time to switch to the Yolo training.
 
 To make this material available for a notebook on Google Colab, it is manually copied
-from my PC to a target location on my Google drive.
+from my PC to a target location on a Google drive.

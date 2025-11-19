@@ -111,16 +111,12 @@ public class Beethoven
     /**
      * Create a new <code>Beethoven</code> instance.
      *
-     * @param targetConfig path to Yolo .yaml config
      * @param sourceConfig path to Beethoven .yaml config
      * @throws java.lang.Exception
      */
-    public Beethoven (String targetConfig,
-                      String sourceConfig)
+    public Beethoven (String sourceConfig)
             throws Exception
     {
-        super(targetConfig);
-
         logger.info("Beethoven dataset");
 
         config = yamlMapper.readValue(Paths.get(sourceConfig).toFile(), BeethovenConfig.class);
@@ -154,8 +150,8 @@ public class Beethoven
 
         // For images listing
         System.out.format("%nPart %s. Listing of images:%n", part);
-        System.out.println("| Width | Height | Instances | Image |");
-        System.out.println("|  ---: |   ---: |      ---: | :---  |");
+        System.out.println("| Rank  | Width | Height | Instances | Image |");
+        System.out.println("|  ---: |  ---: |   ---: |      ---: | :---  |");
 
         // For the count of Beethoven ignored labels
         final TreeMap<BeethovenLabel, Integer> ignoredCounts = new TreeMap<>();
@@ -169,6 +165,9 @@ public class Beethoven
             logger.info("No file names for part {}", part);
             return;
         }
+
+        final int total = imgNames.size();
+        int rank = 0;
 
         for (String imgName : imgNames) {
             final Path imgPath = imagesPath.resolve(imgName);
@@ -188,7 +187,9 @@ public class Beethoven
 
             // Line in images listing
             System.out.format(
-                    "| %4d | %4d | %4d | %s |%n",
+                    "| %4d/%4d | %4d | %4d | %4d | %s |%n",
+                    ++rank,
+                    total,
                     imgWidth,
                     imgHeight,
                     page.Nodes.size(),
@@ -370,11 +371,11 @@ public class Beethoven
      * <p>
      * Example 1:
      * -input : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_album_13.png
-     * output : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~annotations_13.png
+     * output : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~annotations_13.xml
      * <p>
      * Example 2:
      * -input : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~score_page_13.png
-     * output : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~annotations_13.png
+     * output : String_Quartet_No.4_Op.18_No.4__Ludwig_van_Beethoven.mei~Bravura~annotations_13.xml
      *
      * @param imgName name of the .png file
      * @return the corresponding xmlName
@@ -423,6 +424,17 @@ public class Beethoven
                     .append(" size:").append(size) //
                     .append(" Nodes.size:").append(Nodes.size()) //
                     .toString();
+        }
+    }
+
+    //-----------------//
+    // BeethovenConfig //
+    //-----------------//
+    private static class BeethovenConfig
+            extends DataSetConfig
+    {
+        public BeethovenConfig ()
+        {
         }
     }
 

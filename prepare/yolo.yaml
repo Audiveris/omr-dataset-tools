@@ -2,8 +2,11 @@
 # Configuration for Yolo dataset
 #--------------------------------
 
-# Folder where datasets for Yolo should be written
+# Local folder where datasets for Yolo should be written
 target: D:\\soft\\datasets\\yolo
 
-# Should we print ID and name of YoloLabels?
-print_labels: false
+# Remote folder for dataset
+drive_target: /content/drive/MyDrive/YOLO/datasets/medium
+
+# Dataset file to be generated
+dataset_file: dataset.yaml

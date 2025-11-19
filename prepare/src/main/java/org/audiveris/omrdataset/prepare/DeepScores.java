@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -35,6 +36,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +56,11 @@ import java.util.TreeMap;
  * But we discard the separation between "train" and "test" JSON files, so that we can instead drive
  * the processing based on the provided configuration file which explicitly lists which
  * pages should be considered for train, and which pages for val.
+ * <p>
+ * DeepScores handles dynamic symbols only at the letter level.
+ * For instance, an "sfp" (sforzandoPiano) dynamic symbol is not described as such,
+ * but as 3 separate symbols: "dynamicS", "dynamicF" and "dynamicP".
+ * In this preparation work, we rebuild upfront these compound symbols.
  *
  * @author Hervé Bitteur
  */
@@ -63,7 +71,17 @@ public class DeepScores
 
     private static final Logger logger = LoggerFactory.getLogger(DeepScores.class);
 
+    /** Dynamics that cannot be extended. */
+    private static final List<String> finalDynamics = Arrays.asList("mf", "mp");
+
     //~ Instance fields ----------------------------------------------------------------------------
+
+    /**
+     * Original map: cat_id -> class name.
+     * This map represents the <b>original</b> names as found in the .json files,
+     * that is, for dynamics, just the 1-letter dynamic symbols.
+     */
+    private Map<Integer, String> orgClassMap;
 
     /** List of the 2 annotations JSON nodes. */
     private final List<JsonNode> annotationsList = new ArrayList<>();
@@ -71,21 +89,20 @@ public class DeepScores
     /** Map: image name -> image JSON node. */
     private final Map<String, JsonNode> imgMap = new HashMap<>();
 
+    /** Cached symbols of the image being processed. */
+    private List<Symbol> cachedSymbols;
+
     //~ Constructors -------------------------------------------------------------------------------
 
     /**
      * Create a new <code>DeepScores</code> instance.
      *
-     * @param targetConfig path to Yolo .yaml descriptor
      * @param sourceConfig path to DeepScores .yaml descriptor
      * @throws java.lang.Exception
      */
-    public DeepScores (String targetConfig,
-                       String sourceConfig)
+    public DeepScores (String sourceConfig)
             throws Exception
     {
-        super(targetConfig);
-
         logger.info("DeepScores dataset");
 
         config = yamlMapper.readValue(Paths.get(sourceConfig).toFile(), DeepScoresConfig.class);
@@ -95,7 +112,6 @@ public class DeepScores
         imagesPath = sourceDir.resolve(config.images);
 
         final ObjectMapper jsonMapper = new ObjectMapper();
-        boolean labelsPrinted = false;
 
         // Preload both .json files, to map annotations and images nodes
         for (String jsonName : new String[] { "deepscores_train.json", "deepscores_test.json" }) {
@@ -107,6 +123,25 @@ public class DeepScores
             final JsonNode wholeTree = jsonMapper.readTree(jsonFile);
             final long stop = System.currentTimeMillis();
             logger.debug("File {} loaded in {} ms ", jsonName, stop - start);
+
+            // Map the original class names
+            if (orgClassMap == null) {
+                orgClassMap = new TreeMap<>();
+                final JsonNode categories = wholeTree.get("categories");
+                for (Map.Entry<String, JsonNode> entry : categories.properties()) {
+                    final JsonNode value = entry.getValue();
+                    if (value.get("annotation_set").asText().equals("deepscores")) {
+                        orgClassMap.put(Integer.decode(entry.getKey()), value.get("name").asText());
+                    }
+                }
+
+                if (((DeepScoresConfig) config).print_predefined_labels) {
+                    System.out.println("\nDeepScores ORIGINAL labels ID and name:");
+                    orgClassMap.entrySet().forEach(
+                            e -> System.out.println(
+                                    String.format("  %d: %s", e.getKey(), e.getValue())));
+                }
+            }
 
             // Remember annotations
             final JsonNode annotations = wholeTree.get("annotations");
@@ -120,10 +155,6 @@ public class DeepScores
                 imgMap.put(filename, img);
             }
 
-            if (((DeepScoresConfig) config).print_predefined_labels && !labelsPrinted) {
-                printDSLabels(wholeTree);
-                labelsPrinted = true;
-            }
         }
     }
 
@@ -148,8 +179,8 @@ public class DeepScores
 
         // For images listing
         System.out.format("%nPart %s. Listing of images:%n", part);
-        System.out.println("| Width | Height | Instances | Image |");
-        System.out.println("|  ---: |   ---: |      ---: | :---  |");
+        System.out.println("| Rank  | Width | Height | Instances | Image |");
+        System.out.println("|  ---: |  ---: |   ---: |      ---: | :---  |");
 
         // For the count of DeepScores ignored labels
         final TreeMap<DeepScoresLabel, Integer> ignoredCounts = new TreeMap<>();
@@ -163,6 +194,9 @@ public class DeepScores
             logger.info("No file names for part {}", part);
             return;
         }
+
+        final int total = imgNames.size();
+        int rank = 0;
 
         for (String imgName : imgNames) {
             final Path imgPath = imagesPath.resolve(imgName);
@@ -180,43 +214,40 @@ public class DeepScores
 
             // Line in images listing
             System.out.format(
-                    "| %4d | %4d | %4d | %s |%n",
+                    "| %4d/%4d | %4d | %4d | %4d | %s |%n",
+                    ++rank,
+                    total,
                     imgWidth,
                     imgHeight,
                     ann_ids.size(),
                     imgName);
 
+            // Retrieve all symbols
+            final List<Symbol> symbols = getImageSymbols(imgName);
+
             // Generate the related label file
             final String labelFile = outLabels.resolve(radixOf(imgName) + ".txt").toString();
 
             try (PrintWriter writer = new PrintWriter(labelFile)) {
-                for (Iterator<JsonNode> annIt = ann_ids.elements(); annIt.hasNext();) {
-                    final String id = annIt.next().asText();
-                    final JsonNode annotation = retrieveAnnotation(id);
-                    final int cat_id = annotation.get("cat_id").get(0).asInt();
-
+                for (Symbol symbol : symbols) {
                     // Find the corresponding YoloLabel, if any
-                    final DeepScoresLabel dsLabel = DeepScoresLabel.values()[cat_id - 1];
+                    DeepScoresLabel dsLabel = DeepScoresLabel.valueOf(symbol.name);
                     final YoloLabel yoloLabel = DeepScoresLabel.of(dsLabel);
 
                     if (yoloLabel != null) {
                         labelCounts.put(yoloLabel, labelCounts.get(yoloLabel) + 1);
-
-                        final JsonNode a_bbox = annotation.get("a_bbox");
-                        final int x1 = a_bbox.get(0).asInt();
-                        final int y1 = a_bbox.get(1).asInt();
-                        final int x2 = a_bbox.get(2).asInt();
-                        final int y2 = a_bbox.get(3).asInt();
-
+                        final Rectangle rect = symbol.rect;
+                        final double xc = rect.x + rect.width / 2.0;
+                        final double yc = rect.y + rect.height / 2.0;
                         writer.printf(
                                 "%3d %f %f %f %f%n",
                                 yoloLabel.ordinal(),
-                                (x1 + x2) / (2.0 * imgWidth),
-                                (y1 + y2) / (2.0 * imgHeight),
-                                (x2 - x1 + 1) / (double) imgWidth,
-                                (y2 - y1 + 1) / (double) imgHeight);
+                                xc / imgWidth,
+                                yc / imgHeight,
+                                rect.width / (double) imgWidth,
+                                rect.height / (double) imgHeight);
                     } else {
-                        ignoredCounts.put(dsLabel, ignoredCounts.get(dsLabel) + 1);
+                        ///ignoredCounts.put(dsLabel, ignoredCounts.get(dsLabel) + 1);
                     }
                 }
             }
@@ -239,30 +270,19 @@ public class DeepScores
     protected boolean conditionMet (String imgName)
         throws Exception
     {
+        cachedSymbols = null;
+
         // Check at least one required label is present in this page
         if (config.checking.required_labels == null) {
             return true;
         }
 
-        final JsonNode img = imgMap.get(imgName);
-        final JsonNode ann_ids = img.get("ann_ids");
+        final List<Symbol> symbols = getImageSymbols(imgName);
 
-        for (Iterator<JsonNode> annIt = ann_ids.elements(); annIt.hasNext();) {
-            final String id = annIt.next().asText();
-
-            final JsonNode annotation = retrieveAnnotation(id);
-            final int cat_id = annotation.get("cat_id").get(0).asInt();
-            final String className = DeepScoresLabel.values()[cat_id - 1].name();
-
-            if (config.checking.required_labels.contains(className)) {
-                final JsonNode a_bbox = annotation.get("a_bbox");
-                final int x = a_bbox.get(0).asInt();
-                final int y = a_bbox.get(1).asInt();
-                final int x2 = a_bbox.get(2).asInt();
-                final int y2 = a_bbox.get(3).asInt();
-                final int w = x2 - x + 1;
-                final int h = y2 - y + 1;
-                System.out.format("%s at [x:%d, y:%d, w:%d, h:%d]%n", className, x, y, w, h);
+        for (Symbol symbol : symbols) {
+            if (config.checking.required_labels.contains(symbol.name)) {
+                System.out.println(symbol.toString());
+                cachedSymbols = symbols;
                 return true;
             }
         }
@@ -275,34 +295,133 @@ public class DeepScores
                                     Graphics2D g2d)
         throws Exception
     {
+        final List<Symbol> symbols = cachedSymbols != null ? cachedSymbols
+                : getImageSymbols(imgName);
+        System.out.println(imgName + " symbols:" + symbols.size());
+
+        symbols.forEach(symbol -> {
+            if (!isHidden(symbol.name)) {
+                g2d.draw(symbol.rect);
+                g2d.drawString(symbol.name, symbol.rect.x, symbol.rect.y);
+            }
+        });
+    }
+
+    /**
+     * Retrieve (and merge) all image symbols of an image.
+     *
+     * @param imgName the image name
+     * @return the symbols ready to use
+     */
+    private List<Symbol> getImageSymbols (String imgName)
+    {
         final JsonNode img = imgMap.get(imgName);
         final JsonNode ann_ids = img.get("ann_ids");
-        System.out.println(imgName + " labels:" + ann_ids.size());
+
+        final List<Symbol> standardSymbols = new ArrayList<>();
+        final List<Symbol> dynamicSymbols = new ArrayList<>();
 
         for (Iterator<JsonNode> annIt = ann_ids.elements(); annIt.hasNext();) {
             final String id = annIt.next().asText();
-
             final JsonNode annotation = retrieveAnnotation(id);
             final int cat_id = annotation.get("cat_id").get(0).asInt();
-            final String className = DeepScoresLabel.values()[cat_id - 1].name();
-
-            if (isHidden(className)) {
-                continue;
-            }
-
+            final String className = orgClassMap.get(cat_id);
             final JsonNode a_bbox = annotation.get("a_bbox");
-            final int x = a_bbox.get(0).asInt();
-            final int y = a_bbox.get(1).asInt();
-            final int x2 = a_bbox.get(2).asInt();
-            final int y2 = a_bbox.get(3).asInt();
-            final int w = x2 - x + 1;
-            final int h = y2 - y + 1;
+            final String letter = getDynamicLetter(className);
 
-            // Draw obj rectangle
-            g2d.drawRect(x, y, w, h);
+            if (letter == null) {
+                standardSymbols.add(new Symbol(className, a_bbox));
+            } else {
+                dynamicSymbols.add(new Symbol(letter, a_bbox));
+            }
+        }
 
-            // Draw class ID
-            g2d.drawString(className, x, y);
+        if (!dynamicSymbols.isEmpty()) {
+            mergeDynamicSymbols(dynamicSymbols);
+        }
+
+        standardSymbols.addAll(dynamicSymbols);
+        return standardSymbols;
+    }
+
+    /**
+     * Merge the 1-letter dynamic symbols into compound dynamic symbols wherever possible.
+     *
+     * @param dynamicSymbols the collection of dynamic symbols
+     */
+    private void mergeDynamicSymbols (List<Symbol> dynamicSymbols)
+    {
+        Collections.sort(dynamicSymbols); // Sort the candidates by their starting abscissa
+
+        if (logger.isDebugEnabled()) {
+            System.out.println("Dynamic candidates:");
+            dynamicSymbols.forEach(s -> System.out.format("   %s%n", s));
+        }
+
+        // Retrieve the minimum symbol width
+        int minWidth = Integer.MAX_VALUE;
+        for (Symbol s : dynamicSymbols) {
+            minWidth = Math.min(minWidth, s.rect.width);
+        }
+
+        final int gap = 3; // Should be enough for intersecting a sibling symbol
+        final int dblMax = 3;
+        logger.debug("gap:{} dblMax:{}", gap, dblMax);
+
+        // Cache: The last (letter) symbol merged
+        Symbol last;
+
+        for (int i = 0; i < dynamicSymbols.size(); i++) {
+            final Symbol left = dynamicSymbols.get(i);
+            Rectangle fatLeft = new Rectangle(left.rect);
+            fatLeft.width += gap;
+            last = left;
+            logger.debug("i:{} left:{} fat:{}", i, left, fatLeft);
+
+            for (int j = i + 1; j < dynamicSymbols.size(); j++) {
+                final Symbol right = dynamicSymbols.get(j);
+                logger.debug("   j:{} right:{}", j, right);
+
+                if (right.rect.x > fatLeft.x + fatLeft.width) {
+                    logger.debug("   end");
+                    break; // since symbols are sorted by their starting abscissa
+                }
+
+                if (fatLeft.intersects(right.rect)) {
+                    // Verify the baselines are consistent between last and right symbols
+                    final int lastBl = getBaseline(last);
+                    final int rightBl = getBaseline(right);
+                    final int dbl = Math.abs(rightBl - lastBl);
+                    logger.debug("   Baseline delta:{}", dbl);
+
+                    if (dbl <= dblMax || mergeBoosted(left, right)) {
+                        // Extend left with right
+                        left.name = left.name + right.name;
+                        left.rect = left.rect.union(right.rect);
+                        fatLeft = new Rectangle(left.rect);
+                        fatLeft.width += gap;
+                        logger.debug("   Extended i:{} left:{} fat:{}", i, left, fatLeft);
+                        dynamicSymbols.remove(j--);
+                        last = right;
+
+                        if (finalDynamics.contains(left.name)) {
+                            logger.debug("   final symbol");
+                            break;
+                        }
+                    } else {
+                        logger.debug("   Incompatible baselines");
+                    }
+                }
+            }
+        }
+
+        // Update all dynamic names, i.e. "mf" -> "dynamicMF"
+        dynamicSymbols.forEach(s -> s.name = "dynamic" + s.name.toUpperCase());
+
+        if (logger.isDebugEnabled()) {
+            System.out.println();
+            System.out.println("Dynamic results:");
+            dynamicSymbols.forEach(s -> System.out.format("   %s%n", s));
         }
     }
 
@@ -325,21 +444,12 @@ public class DeepScores
             return;
         }
 
-        for (String imgName : imgNames) {
-            final JsonNode img = imgMap.get(imgName);
-            final JsonNode ann_ids = img.get("ann_ids");
-
-            for (Iterator<JsonNode> annIt = ann_ids.elements(); annIt.hasNext();) {
-                final String id = annIt.next().asText();
-
-                final JsonNode annotation = retrieveAnnotation(id);
-                final int cat_id = annotation.get("cat_id").get(0).asInt();
-                final String className = DeepScoresLabel.values()[cat_id - 1].name();
-
-                Tuple tuple = map.get(className);
+        imgNames.forEach(img -> {
+            getImageSymbols(img).forEach(symbol -> {
+                Tuple tuple = map.get(symbol.name);
 
                 if (tuple == null) {
-                    map.put(className, tuple = new Tuple());
+                    map.put(symbol.name, tuple = new Tuple());
                 }
 
                 if (part == YoloPart.train) {
@@ -347,8 +457,8 @@ public class DeepScores
                 } else {
                     tuple.val++;
                 }
-            }
-        }
+            });
+        });
     }
 
     private JsonNode retrieveAnnotation (String id)
@@ -366,33 +476,170 @@ public class DeepScores
         return null;
     }
 
-    //---------------//
-    // printDSLabels //
-    //---------------//
+    //~ Static Methods -----------------------------------------------------------------------------
+
     /**
-     * Print out the DeepScores labels id and name.
+     * Report the letter of a (1-letter) dynamic name, when applicable.
      *
-     * @param wholeTree JSON tree
+     * @param className any symbol name to test
+     * @return the letter for a 1-letter dynamic symbol name, null otherwise
      */
-    private void printDSLabels (JsonNode wholeTree)
+    private static String getDynamicLetter (String className)
     {
-        final Map<Integer, String> cats = new TreeMap<>();
-        final JsonNode categories = wholeTree.get("categories");
+        return switch (className) {
+            case "dynamicP" -> "p";
+            case "dynamicM" -> "m";
+            case "dynamicF" -> "f";
+            case "dynamicS" -> "s";
+            case "dynamicZ" -> "z";
+            case "dynamicR" -> "r";
+            default -> null;
+        };
+    }
 
-        categories.properties().forEach(entry -> {
-            final int key = Integer.decode(entry.getKey());
-            final JsonNode value = entry.getValue();
-            final String name = value.get("name").asText();
-            final String set = value.get("annotation_set").asText();
+    /**
+     * Report the normalized vertical offset of the baseline for the provided dynamic letter.
+     * <p>
+     * NOTA: These ratios are OK for a standard musical font, much less for a Jazz font.
+     *
+     * @param letter a dynamic letter in (p, m, f, s, z, r)
+     * @return vertical offset of letter baseline, normalized by letter height
+     */
+    private static Double getYOffsetRatio (String letter)
+    {
+        return switch (letter) {
+            case "p" -> 0.66;
+            case "m" -> 0.96;
+            case "f" -> 0.74;
+            case "s" -> 0.96;
+            case "z" -> 0.96;
+            case "r" -> 1.00;
+            default -> null;
+        };
+    }
 
-            if (set.equals("deepscores")) {
-                cats.put(key - 1, name);
-            }
-        });
+    /**
+     * Report the ordinate of the baseline for the provided (dynamic) symbol.
+     *
+     * @param symbol the 1-letter dynamic symbol
+     * @return the baseline ordinate
+     */
+    private static int getBaseline (Symbol symbol)
+    {
+        final Double ratio = getYOffsetRatio(symbol.name);
+        return symbol.rect.y + (int) Math.rint(ratio * symbol.rect.height);
+    }
 
-        System.out.println("\nDeepScores predefined labels ID and name:");
+    /**
+     * Some left/right combinations should survive a baseline offset.
+     *
+     * @param left  symbol on left
+     * @param right symbol on right
+     * @return true if they should be merged
+     */
+    private static boolean mergeBoosted (Symbol left,
+                                         Symbol right)
+    {
+        // m+p
+        if (left.name.equals("m") && right.name.equals("p")) {
+            return true;
+        }
 
-        cats.entrySet().forEach(
-                e -> System.out.println(String.format("  %d: %s", e.getKey(), e.getValue())));
+        // m+f
+        if (left.name.equals("m") && right.name.equals("f")) {
+            return true;
+        }
+
+        // r+f
+        if (left.name.equals("r") && right.name.equals("f")) {
+            return true;
+        }
+
+        // rf+z
+        if (left.name.equals("rf") && right.name.equals("z")) {
+            return true;
+        }
+
+        // s+f
+        if (left.name.equals("s") && right.name.equals("f")) {
+            return true;
+        }
+
+        // sf+z
+        if (left.name.equals("sf") && right.name.equals("z")) {
+            return true;
+        }
+
+        // sff+z
+        if (left.name.equals("sff") && right.name.equals("z")) {
+            return true;
+        }
+
+        // sfz+p
+        if (left.name.equals("sfz") && right.name.equals("p")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //~ Inner Classes ------------------------------------------------------------------------------
+
+    //------------------//
+    // DeepScoresConfig //
+    //------------------//
+    private static class DeepScoresConfig
+            extends DataSetConfig
+    {
+        public boolean print_predefined_labels;
+    }
+
+    //--------//
+    // Symbol //
+    //--------//
+    private static class Symbol
+            implements Comparable<Symbol>
+    {
+        public String name;
+
+        public Rectangle rect;
+
+        public Symbol (String name,
+                       JsonNode a_bbox)
+        {
+            this.name = name;
+            final int x1 = a_bbox.get(0).asInt();
+            final int y1 = a_bbox.get(1).asInt();
+            final int x2 = a_bbox.get(2).asInt();
+            final int y2 = a_bbox.get(3).asInt();
+            rect = new Rectangle(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+        }
+
+        @Override
+        public int compareTo (Symbol that)
+        {
+            // first abscissa, then ordinate
+            if (this.rect.x != that.rect.x)
+                return Integer.signum(this.rect.x - that.rect.x);
+            if (this.rect.y != that.rect.y)
+                return Integer.signum(this.rect.y - that.rect.y);
+            if (this.rect.width != that.rect.width)
+                return Integer.signum(this.rect.width - that.rect.width);
+            if (this.rect.height != that.rect.height)
+                return Integer.signum(this.rect.height - that.rect.height);
+            return 0;
+        }
+
+        @Override
+        public String toString ()
+        {
+            return new StringBuilder() //
+                    .append(name) //
+                    .append(" [").append(rect.x) //
+                    .append(", ").append(rect.y) //
+                    .append(", ").append(rect.width) //
+                    .append(", ").append(rect.height) //
+                    .append(']').toString();
+        }
     }
 }

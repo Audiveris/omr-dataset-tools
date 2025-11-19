@@ -1,5 +1,7 @@
 apply plugin: 'application'
 
+def prepare = project(':prepare')
+
 group   = 'org.audiveris'
 version = '1.1.0'
 
@@ -8,7 +10,7 @@ ext.nd4jVersion = '1.0.0-M2.1'
 
 ext.jcppVersion = '1.5.7' 
 
-ext.programName    = "${rootProject.name}"
+//ext.programName    = rootProject.name
 
 // this code is required in order to adapt values of os.name and os.arch to the
 // conventions used by Javacpp's dependencies
@@ -18,26 +20,19 @@ ext.targetOSName   = System.getProperty('os.name').toLowerCase()\
 ext.targetOSArch   = ["i386":"x86", "i486":"x86", "i586":"x86", "i686":"x86", "x86":"x86",
                       "amd64":"x86_64", "x86-64":"x86_64", "x86_64":"x86_64", "arm":"armhf"]\
                      [System.getProperty('os.arch').toLowerCase()]
-ext.targetOS       = "${project.ext.targetOSName}-${project.ext.targetOSArch}"
-println "targetOS=${project.ext.targetOS}"
+ext.targetOS       = "${ext.targetOSName}-${ext.targetOSArch}"
+println "targetOS=${ext.targetOS}"
 
 application {
     mainClass = 'org.audiveris.omrdataset.infer.Inference'
+
+    applicationDefaultJvmArgs = ["--enable-native-access=ALL-UNNAMED"]
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-// Useful for turning on deprecation warnings
-// Just uncomment the appropriate option
-allprojects {
-    tasks.withType(JavaCompile) {
-        //options.compilerArgs << "-Xlint:deprecation"
-        //options.compilerArgs << "-Xlint:unchecked"
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -45,19 +40,19 @@ run {
     // minHeapSize = '1g'
     maxHeapSize = '1g'
     
-    // Retrieve CLI arguments from cmdLineArgs property if any
-    if (project.hasProperty("cmdLineArgs")) {
-        if (cmdLineArgs) {
-            args(cmdLineArgs.split(','))
-        }
-    }
+    // // Retrieve CLI arguments from cmdLineArgs property if any
+    // if (project.hasProperty("cmdLineArgs")) {
+        // if (cmdLineArgs) {
+            // args(cmdLineArgs.split(','))
+        // }
+    // }
 
-    // Retrieve JVM arguments from jvmLineArgs property if any
-    if (project.hasProperty("jvmLineArgs")) {
-        if (jvmLineArgs) {
-            jvmArgs(jvmLineArgs.split(','))
-        }
-    }
+    // // Retrieve JVM arguments from jvmLineArgs property if any
+    // if (project.hasProperty("jvmLineArgs")) {
+        // if (jvmLineArgs) {
+            // jvmArgs(jvmLineArgs.split(','))
+        // }
+    // }
 }
 
 // // Workaround for "CreateProcess error=206, The filename or extension is too long" under Windows
@@ -76,8 +71,11 @@ run {
 
 repositories {
     mavenCentral()
-    // mavenLocal()
-    flatDir(dirs: 'dev/externals') // for libraries not in any other repository
+}
+
+// Dependency upon YoloLabel Java class
+dependencies {
+    implementation prepare
 }
 
 // Declare Lombok appropriately to avoid deprecation warnings in Gradle >= 4.6
@@ -88,11 +86,11 @@ dependencies {
 }
 
 dependencies {
-    implementation "org.deeplearning4j:deeplearning4j-core:${project.ext.dl4jVersion}"
-    implementation "org.deeplearning4j:deeplearning4j-modelimport:${project.ext.dl4jVersion}"
+    implementation "org.deeplearning4j:deeplearning4j-core:${dl4jVersion}"
+    implementation "org.deeplearning4j:deeplearning4j-modelimport:${dl4jVersion}"
     
-    implementation "org.nd4j:nd4j-native:${project.ext.nd4jVersion}"
-    implementation "org.nd4j:nd4j-onnxruntime:${project.ext.nd4jVersion}"
+    implementation "org.nd4j:nd4j-native:${nd4jVersion}"
+    implementation "org.nd4j:nd4j-onnxruntime:${nd4jVersion}"
 
     implementation "args4j:args4j:2.37"
 
@@ -100,9 +98,9 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:1.5.18"    
 
     // Runtime only are gathered here below
-    runtimeOnly "org.nd4j:nd4j-backend-impls:${project.ext.nd4jVersion}"
-    runtimeOnly "org.nd4j:nd4j-native:${project.ext.nd4jVersion}:${project.ext.targetOS}"
-    runtimeOnly "org.bytedeco:javacpp:${project.ext.jcppVersion}:${project.ext.targetOS}"
+    runtimeOnly "org.nd4j:nd4j-backend-impls:${nd4jVersion}"
+    runtimeOnly "org.nd4j:nd4j-native:${nd4jVersion}:${targetOS}"
+    runtimeOnly "org.bytedeco:javacpp:${jcppVersion}:${targetOS}"
 }
 
 // // Avoid JDK8 too strict javadoc
@@ -122,7 +120,7 @@ dependencies {
             // include ("*/doc-files/**")
         // }
     // }
-    // title = "${project.ext.programName}-${version} API"
+    // title = "${ext.programName}-${version} API"
 // }
 
 //task sourcesJar(type: Jar, dependsOn: classes) {
@@ -145,11 +143,10 @@ dependencies {
 buildscript {
   repositories {
     maven {
-      url "https://plugins.gradle.org/m2/"
+      url = "https://plugins.gradle.org/m2/"
     }
   }
   dependencies {
     classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE"
   }
 }
-apply plugin: "com.github.ManifestClasspath"

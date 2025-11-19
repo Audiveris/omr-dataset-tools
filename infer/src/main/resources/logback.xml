@@ -8,7 +8,7 @@
         </encoder>
     </appender>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE" />
     </root>
     
@@ -18,7 +18,5 @@
     <logger name="org.reflections.Reflections" level="WARN"/>
     
     <logger name="org.nd4j.onnxruntime.runner.OnnxRuntimeRunner" level="WARN"/>
-    
-<!--    <logger name="org.omrdataset.train.SheetProcessor" level="DEBUG"/>-->
 
 </configuration>

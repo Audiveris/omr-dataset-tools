@@ -165,11 +165,9 @@ public enum BeethovenLabel
 
             case octaveUp -> null; // Line following YoloLabel.ottava
 
-            case dynamicFF -> null;
-            case dynamicFortePiano -> null;
-            case dynamicPP -> null;
-            case dynamicSforzando1 -> null;
-            case dynamicSforzandoPiano -> null;
+            case dynamicFortePiano -> YoloLabel.dynamicFP;
+            case dynamicSforzando1 -> YoloLabel.dynamicSF;
+            case dynamicSforzandoPiano -> YoloLabel.dynamicSFP;
 
             case hairpinCrescendo -> YoloLabel.dynamicCrescendoHairpin;
             case hairpinDiminuendo -> YoloLabel.dynamicDiminuendoHairpin;

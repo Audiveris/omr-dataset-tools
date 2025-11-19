@@ -1,0 +1,55 @@
+#-------------------------------------
+# Configuration for Audiveris dataset
+#-------------------------------------
+# Potentially ??? pages
+
+# source folder
+source: D:\\soft\\audiveris-dataset\\sheets
+
+# images sub-folder
+images: .
+
+# annotations sub-folder
+annotations: .
+
+# List of tasks to be actually performed
+tasks:
+#  - histogram
+  - checking
+#  - train
+#  - val
+
+# Specifications for some visual checking
+checking:
+  output: data/avs-annotated-images # where to store the annotated images
+  draw_name: true                   # draw class name rather than class rank?
+  hidden_labels:                    # labels not to be drawn
+    #- kStaffLine
+  required_labels:                  # limit to images containing any of these items
+    #- timeSignatureComponent 
+  use_train: true                  # select full train?
+  use_val: true                    # select full val?
+  selection:                        # list of selected images
+
+# train pages (???)
+train:
+  - 'Autumn from The Four Seasons 1st Violin-#1.png'
+  - 'Autumn from The Four Seasons 1st Violin-#2.png'
+  - 'Rigaudon Vladigerov - Viola#1.png'
+  - 'Rigaudon Vladigerov - Viola#2.png'
+  - '[7 instruments] Somewhere in my Memory#1.png'
+  - '[7 instruments] Somewhere in my Memory#10.png'
+  - '[7 instruments] Somewhere in my Memory#2.png'
+  - '[7 instruments] Somewhere in my Memory#3.png'
+  - '[7 instruments] Somewhere in my Memory#4.png'
+  - '[7 instruments] Somewhere in my Memory#5.png'
+  - '[7 instruments] Somewhere in my Memory#6.png'
+  - '[7 instruments] Somewhere in my Memory#7.png'
+  - '[7 instruments] Somewhere in my Memory#8.png'
+  - '[7 instruments] Somewhere in my Memory#9.png'
+ 
+  
+# val pages (???)
+val:
+  - '[v1] Die Moldau - Bedrich Smetana#1.png'
+  - '[v1] Die Moldau - Bedrich Smetana#2.png'

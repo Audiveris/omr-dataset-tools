@@ -93,16 +93,12 @@ public class DoReMi
     /**
      * Create a new <code>DoReMi</code> instance.
      *
-     * @param targetConfig path to Yolo .yaml config
      * @param sourceConfig path to DoReMi .yaml config
      * @throws java.lang.Exception
      */
-    public DoReMi (String targetConfig,
-                   String sourceConfig)
+    public DoReMi (String sourceConfig)
             throws Exception
     {
-        super(targetConfig);
-
         logger.info("DoReMi dataset");
 
         config = yamlMapper.readValue(Paths.get(sourceConfig).toFile(), DoReMiConfig.class);
@@ -136,8 +132,8 @@ public class DoReMi
 
         // For images listing
         System.out.format("%nPart %s. Listing of images:%n", part);
-        System.out.println("| Width | Height | Instances | Image |");
-        System.out.println("|  ---: |   ---: |      ---: | :---  |");
+        System.out.println("| Rank  | Width | Height | Instances | Image |");
+        System.out.println("|  ---: |  ---: |   ---: |      ---: | :---  |");
 
         // For the count of DoReMi ignored labels
         final TreeMap<DoReMiLabel, Integer> ignoredCounts = new TreeMap<>();
@@ -151,6 +147,9 @@ public class DoReMi
             logger.info("No file names for part {}", part);
             return;
         }
+
+        final int total = imgNames.size();
+        int rank = 0;
 
         for (String imgName : imgNames) {
             final Path imgPath = imagesPath.resolve(imgName);
@@ -170,7 +169,9 @@ public class DoReMi
 
             // Line in images listing
             System.out.format(
-                    "| %4d | %4d | %4d | %s |%n",
+                    "| %4d/%4d | %4d | %4d | %4d | %s |%n",
+                    ++rank,
+                    total,
                     imgWidth,
                     imgHeight,
                     page.Nodes.size(),
@@ -376,6 +377,14 @@ public class DoReMi
     }
 
     //~ Inner Classes ------------------------------------------------------------------------------
+
+    //--------------//
+    // DoReMiConfig //
+    //--------------//
+    private static class DoReMiConfig
+            extends DataSetConfig
+    {
+    }
 
     //------//
     // Page //

@@ -25,8 +25,9 @@ package org.audiveris.omrdataset.prepare;
  * Class <code>YoloLabel</code> represents the labels handled by a YOLO model.
  * <p>
  * We try to stick as much as possible with the SMuFL naming.
- * See https://github.com/w3c/smufl/blob/gh-pages/metadata/glyphnames.json
  *
+ * @see https://w3c.github.io/smufl/latest/tables/index.html
+ * @see https://github.com/w3c/smufl/blob/gh-pages/metadata/glyphnames.json
  * @author Hervé Bitteur
  */
 public enum YoloLabel
@@ -47,13 +48,12 @@ public enum YoloLabel
     repeatLeft,
     repeatRight,
     repeatRightLeft,
-    repeatDot, // Should we keep it?
     segno,
     coda,
 
     // 4.5 Clefs
     gClef,
-    cClef,
+    cClef, // TODO: Should differentiate Alto or Tenor
     fClef,
     unpitchedPercussionClef1,
     clef8,
@@ -79,7 +79,7 @@ public enum YoloLabel
     noteheadWhole,
     noteheadDoubleWhole,
 
-    // 4.14 Beamed groups of notes (?)
+    // 4.14
     augmentationDot,
 
     // 4.15 Stems
@@ -104,20 +104,20 @@ public enum YoloLabel
     flag128thUp,
     flag128thDown,
 
-    //4.18 Standard accidentals
+    // 4.18 Standard accidentals
     accidentalFlat,
     accidentalNatural,
     accidentalSharp,
     accidentalDoubleSharp,
     accidentalDoubleFlat,
-    // keyFlat, //
-    // keyNatural, //
-    // keySharp, //
+    keyFlat,
+    keyNatural,
+    keySharp,
 
-    // 4.39 Articulation
-    articAccent, // above = below
-    articStaccato, // above = below
-    articTenuto, // above = below
+    // 4.39 Articulations
+    articAccent, // TODO: Could differentiate Above or Below
+    articStaccato, // TODO: Could differentiate Above or Below
+    articTenuto, // TODO: Could differentiate Above or Below
     articStaccatissimoAbove,
     articStaccatissimoBelow,
     articMarcatoAbove,
@@ -148,18 +148,37 @@ public enum YoloLabel
     // 4.43 Octaves
     ottava, // '8'
     quindicesima, // '15'
-    ottavaBracket, // the following dashes - - -
+    ottavaBracket, // the following dashes, including the final hook if any
 
     // 4.44 Dynamics
-    // DeepScores handles single letters only
-    dynamicP, //
-    dynamicM, //
-    dynamicF, //
-    dynamicS, //
-    dynamicZ, //
-    dynamicR, //
-    dynamicCrescendoHairpin,
-    dynamicDiminuendoHairpin,
+    dynamicPPPPPP, //
+    dynamicPPPPP, //
+    dynamicPPPP, //
+    dynamicPPP, // pianississimo
+    dynamicPP, // pianissimo
+    dynamicP, // piano
+    dynamicM, // mezzo
+    dynamicMP, // mezzo piano
+    dynamicMF, // mezzo forte
+    dynamicPF, // piano forte
+    dynamicF, // forte
+    dynamicFF, // fortissimo
+    dynamicFFF, // fortississimo
+    dynamicFFFF, //
+    dynamicFFFFF, //
+    dynamicFFFFFF, //
+    dynamicFP, // forte piano
+    dynamicFZ, // forzando
+    dynamicSF, // sforzando
+    dynamicSFP, // sforzandoPiano
+    dynamicSFPP, // sforzandoPianissimo
+    dynamicSFZ, // sforzato
+    dynamicSFZP, // sforzatoPiano
+    dynamicSFFZ, // sforzatoFF
+    dynamicRF, //  rinforzando1
+    dynamicRFZ, // rinforzando2
+    dynamicCrescendoHairpin, // <
+    dynamicDiminuendoHairpin, // >
 
     // 4.46 Common ornaments
     graceNoteAcciaccaturaStemUp,
@@ -187,25 +206,25 @@ public enum YoloLabel
     // 4.75 Tuplets
     tuplet1,
     tuplet2,
-    tuplet3, //
+    tuplet3,
     tuplet4,
     tuplet5,
-    tuplet6, //
+    tuplet6,
     tuplet7,
     tuplet8,
     tuplet9,
-    tupletBracket, //
-
-    // 4.115 Fingering
-    fingering0, //
-    fingering1, //
-    fingering2, //
-    fingering3, //
-    fingering4, //
-    fingering5, //
+    tupletBracket,
 
     // 4.78 Beams and slurs
     beam,
     slur,
-    tie;
+    tie,
+
+    // 4.115 Fingering
+    fingering0,
+    fingering1,
+    fingering2,
+    fingering3,
+    fingering4,
+    fingering5;
 }

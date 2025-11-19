@@ -143,16 +143,10 @@ public enum DoReMiLabel
             case articTenutoAbove, articTenutoBelow -> YoloLabel.articTenuto;
 
             case dynamicPiano -> YoloLabel.dynamicP;
-            case dynamicPP -> null;
-            case dynamicPPP -> null;
             case dynamicForte -> YoloLabel.dynamicF;
-            case dynamicFF -> null;
-            case dynamicFFF -> null;
-            case dynamicMP -> null;
-            case dynamicMF -> null;
-            case dynamicFortePiano -> null;
-            case dynamicForzando -> null;
-            case dynamicSforzato -> null;
+            case dynamicFortePiano -> YoloLabel.dynamicFP;
+            case dynamicForzando -> YoloLabel.dynamicFZ;
+            case dynamicSforzato -> YoloLabel.dynamicSFZ;
             case dynamicText -> null;
             case gradualDynamic -> null;
 
